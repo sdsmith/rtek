@@ -1,0 +1,28 @@
+# Example of PVS-Studio rules configuration file. 
+# See http://www.viva64.com/en/d/0021/ for full documentation.
+#
+# Filtering out messages by specifying a fragment from source code:
+# //-V:textFromSourceCode:3001,3002,3003
+#
+# Turning off specific analyzer rules:
+# //-V::3021,3022
+#
+# Changing in analyzer's output message:
+# //+V3022:RENAME:{oldText0:newText0},{oldText1:newText1}
+#
+# Appends message to analyzer's message:
+# //+V3023:ADD:{Message}
+#
+#
+#
+# Rule filters should be written without '#' character.
+# http://editorconfig.org
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
