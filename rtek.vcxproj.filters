@@ -15,28 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="rtek.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\core\platform.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\assert.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\core.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\logging.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rtek.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\status.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\types.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\core\version.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -48,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\test\main_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\assert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\platform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
