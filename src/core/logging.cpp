@@ -5,22 +5,43 @@
 
 using namespace Rtek;
 
-void Rtek::LogInfo(char const* file_name, long line_no, char const* func_name, char const* msg, ...)
+bool Logger::s_initialized = false;
+std::shared_ptr<spdlog::logger> Logger::s_logger{ nullptr };
+std::string Logger::s_log_dir = "log";
+std::string Logger::s_log_file = "rtek.log";
+
+Status Logger::initialize() noexcept
 {
-    RTK_ASSERT(!"unimplemented");
+    using namespace Platform;
+
+    // Create log directory
+    if (!directory_exists(s_log_dir.c_str())) {
+        RTK_CHECK(create_directory(s_log_dir.c_str()));
+    }
+
+    try {
+        auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+        stderr_sink->set_level(spdlog::level::err);
+
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(s_log_dir + "/" + s_log_file, true);
+        file_sink->set_level(spdlog::level::trace);
+
+        std::vector<spdlog::sink_ptr> sinks = { stderr_sink, file_sink };
+        s_logger = std::make_shared<spdlog::logger>("rtek", sinks.begin(), sinks.end());
+
+        s_initialized = true;
+
+    } catch (spdlog::spdlog_ex&) {
+        std::cerr << "Unable to initialize logger\n";
+        return Status::GENERIC_ERROR;
+    }
+
+    return Status::OK;
 }
 
-void Rtek::LogDebug(char const* file_name, long line_no, char const* func_name, char const* msg, ...)
+std::string Logger::sconcat(char const* a, char const* b)
 {
-    RTK_ASSERT(!"unimplemented");
-}
-
-void Rtek::LogWarn(char const* file_name, long line_no, char const* func_name, char const* msg, ...)
-{
-    RTK_ASSERT(!"unimplemented");
-}
-
-void Rtek::LogError(char const* file_name, long line_no, char const* func_name, char const* msg, ...)
-{
-    RTK_ASSERT(!"unimplemented");
+    RTK_ASSERT(a);
+    RTK_ASSERT(b);
+    return std::string(a) + std::string(b);
 }

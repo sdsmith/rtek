@@ -13,6 +13,7 @@ namespace Rtek
             OK = 0,
             GENERIC_ERROR = 1,
             API_ERROR = 2,
+            UNSUPPORTED_FUNCTION = 3
         };
 
         constexpr Status(Type status) : m_status(status) {}

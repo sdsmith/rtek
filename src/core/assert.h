@@ -1,5 +1,6 @@
 #pragma once
 
+#include "src/core/logging.h"
 #include "src/core/types.h"
 
 #include <atomic>

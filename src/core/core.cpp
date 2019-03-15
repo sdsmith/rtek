@@ -1,5 +1,6 @@
 #include "src/core/core.h"
 
+#include "src/core/assert.h"
 #include "src/core/logging.h"
 
 using namespace Rtek;
@@ -7,6 +8,8 @@ using namespace Rtek;
 Status RtekEngine::Initialize() 
 {
     m_initialized = true;
+
+    RTK_CHECK(Logger::initialize());
 
     LOG_INFO("Engine initialized\n");
     return Status::OK;
