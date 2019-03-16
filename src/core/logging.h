@@ -5,6 +5,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "src/core/status.h"
+#include <mutex>
 
 #ifdef RTK_LOGGING_OFF
 //  Remove all logging from the engine. Not recommended!
@@ -42,6 +43,8 @@ namespace Rtek
         template<typename... Args>
         static void log_info(char const* file_name, long line_no, char const* func_name, char const* msg, Args const&... args) noexcept
         {
+            std::scoped_lock<std::mutex> lock(m_log_mutex);
+
             if (s_initialized) {
                 s_logger->info(sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
             } else {
@@ -52,6 +55,8 @@ namespace Rtek
         template<typename... Args>
         static void log_debug(char const* file_name, long line_no, char const* func_name, char const* msg, Args const&... args) noexcept
         {
+            std::scoped_lock<std::mutex> lock(m_log_mutex);
+
             if (s_initialized) {
                 s_logger->debug(sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
             } else {
@@ -62,6 +67,8 @@ namespace Rtek
         template<typename... Args>
         static void log_warn(char const* file_name, long line_no, char const* func_name, char const* msg, Args const& ... args) noexcept
         {
+            std::scoped_lock<std::mutex> lock(m_log_mutex);
+
             if (s_initialized) {
                 s_logger->warn(sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
             } else {
@@ -72,6 +79,8 @@ namespace Rtek
         template<typename... Args>
         static void log_error(char const* file_name, long line_no, char const* func_name, char const* msg, Args const& ... args) noexcept
         {
+            std::scoped_lock<std::mutex> lock(m_log_mutex);
+
             if (s_initialized) {
                 s_logger->error(sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
             } else {
@@ -79,8 +88,11 @@ namespace Rtek
             }
         }
 
+        static void flush() noexcept;
+
     private:
         static bool s_initialized;
+        static std::mutex m_log_mutex;
 
         static std::shared_ptr<spdlog::logger> s_logger;
         static std::string s_log_dir;
@@ -99,5 +111,7 @@ namespace Rtek
         {
             fmt::fprintf(std::cerr, sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
         }
+
+        static void fallback_flush() noexcept;
     };
 }

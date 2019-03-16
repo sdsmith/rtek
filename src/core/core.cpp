@@ -25,6 +25,7 @@ Status RtekEngine::Destroy()
     m_initialized = false;
 
     LOG_INFO("Engine destroyed\n");
+    Logger::flush();
     return Status::OK;
 }
 

@@ -6,6 +6,7 @@
 using namespace Rtek;
 
 bool Logger::s_initialized = false;
+std::mutex Logger::m_log_mutex;
 std::shared_ptr<spdlog::logger> Logger::s_logger{ nullptr };
 std::string Logger::s_log_dir = "log";
 std::string Logger::s_log_file = "rtek.log";
@@ -39,9 +40,25 @@ Status Logger::initialize() noexcept
     return Status::OK;
 }
 
+void Logger::flush() noexcept
+{
+    if (s_initialized) {
+
+        s_logger->flush();
+    }
+
+    fallback_flush();
+}
+
 std::string Logger::sconcat(char const* a, char const* b)
 {
     RTK_ASSERT(a);
     RTK_ASSERT(b);
     return std::string(a) + std::string(b);
+}
+
+void Logger::fallback_flush() noexcept
+{
+    std::cout << std::flush;
+    std::cerr << std::flush;
 }
