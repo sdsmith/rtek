@@ -5,6 +5,8 @@ configuration:
 - Release
 platform:
 - x64
+install:
+- git submodule update --init --recursive
 build:
   project: rtek.sln
   verbosity: normal
