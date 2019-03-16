@@ -1,0 +1,10 @@
+version: 0.0.{build}
+image: Visual Studio 2017
+configuration:
+- Debug
+- Release
+platform:
+- x64
+build:
+  project: rtek.sln
+verbosity: normal
