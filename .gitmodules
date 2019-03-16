@@ -1,3 +1,6 @@
 [submodule "external/spdlog"]
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "external/type_safe"]
+	path = external/type_safe
+	url = https://github.com/foonathan/type_safe
