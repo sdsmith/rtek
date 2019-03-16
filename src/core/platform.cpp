@@ -26,7 +26,7 @@ void Platform::log_windows_error(LPCTSTR function_name)
         (std::strlen(static_cast<LPCTSTR>(msg_buf))
             + std::strlen(static_cast<LPCTSTR>(function_name)) + 40) * sizeof(TCHAR)));
 
-    StringCchPrintf(static_cast<LPTSTR>(display_buf),
+    StringCchPrintf(static_cast<LPTSTR>(display_buf), //-V111 -V576
         LocalSize(display_buf) / sizeof(TCHAR),
         TEXT("%s failed with error %d: %s"),
         function_name, dw, msg_buf);

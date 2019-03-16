@@ -103,13 +103,13 @@ namespace Rtek
         template<typename... Args>
         static void fallback_log(char const* file_name, long line_no, char const* func_name, char const* msg, Args const& ... args) noexcept
         {
-            fmt::fprintf(std::cout, sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
+            fmt::fprintf(std::cout, sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...); //-V111
         }
 
         template<typename... Args>
         static void fallback_log_error(char const* file_name, long line_no, char const* func_name, char const* msg, Args const& ... args) noexcept
         {
-            fmt::fprintf(std::cerr, sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...);
+            fmt::fprintf(std::cerr, sconcat("{}:{}:{}: ", msg).c_str(), file_name, line_no, func_name, args...); //-V111
         }
 
         static void fallback_flush() noexcept;
