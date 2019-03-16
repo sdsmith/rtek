@@ -7,4 +7,4 @@ platform:
 - x64
 build:
   project: rtek.sln
-verbosity: normal
+  verbosity: normal
