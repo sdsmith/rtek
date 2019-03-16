@@ -14,15 +14,15 @@ namespace Rtek
     using u32 = uint32_t;
     using u64 = uint64_t;
 
-    constexpr auto operator""_KB(size_t const s) {
+    constexpr auto operator""_KB(u64 s) {
         return s * 1024;
-    };
+    }
 
-    constexpr auto operator""_MB(size_t const s) {
+    constexpr auto operator""_MB(u64 s) {
         return s * 1024_KB;
     }
 
-    constexpr auto operator""_GB(size_t const s) {
+    constexpr auto operator""_GB(u64 s) {
         return s * 1024_MB;
     }
 }

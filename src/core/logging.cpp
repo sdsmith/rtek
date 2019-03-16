@@ -43,7 +43,6 @@ Status Logger::initialize() noexcept
 void Logger::flush() noexcept
 {
     if (s_initialized) {
-
         s_logger->flush();
     }
 
