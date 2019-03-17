@@ -8,6 +8,8 @@
 #   include <Windows.h>
 #   include <strsafe.h>
 
+#   define PATH_SEPARATOR '\\'
+
 namespace Rtek
 {
     namespace Platform
@@ -23,6 +25,7 @@ namespace Rtek
 #   warning Cygwin is not officially supported
 #else
 #   error Unsupported platform
+#   define PATH_SEPARATOR '/'
 #endif
 
 #if defined(_MSC_VER)
@@ -31,3 +34,5 @@ namespace Rtek
 #else
 #   define RTK_FUNC_NAME __FUNC__
 #endif
+
+#define _FILENAME_ (std::strrchr(__FILE__, PATH_SEPARATOR) ? std::strrchr(__FILE__, PATH_SEPARATOR) + 1 : __FILE__)

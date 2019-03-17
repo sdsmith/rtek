@@ -1,11 +1,13 @@
 #pragma once
 
+#include "core/platform/platform.h"
+#include "core/utility/status.h"
 #include "spdlog/fmt/fmt.h"
 #include "spdlog/fmt/bundled/printf.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
-#include "core/utility/status.h"
 #include <mutex>
+#include <string>
 
 #ifdef RTK_LOGGING_OFF
 //  Remove all logging from the engine. Not recommended!
@@ -19,11 +21,11 @@
 #       define LOG_INFO(...)
 #       define LOG_DEBUG(...)
 #   else
-#       define LOG_INFO(...)  Logger::log_info(__FILE__, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
-#       define LOG_DEBUG(...) Logger::log_debug(__FILE__, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
+#       define LOG_INFO(...)  Logger::log_info(_FILENAME_, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
+#       define LOG_DEBUG(...) Logger::log_debug(_FILENAME_, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
 #   endif
-#   define LOG_WARN(...) Logger::log_warn(__FILE__, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
-#   define LOG_ERROR(...) Logger::log_error(__FILE__, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
+#   define LOG_WARN(...) Logger::log_warn(_FILENAME_, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
+#   define LOG_ERROR(...) Logger::log_error(_FILENAME_, __LINE__, RTK_FUNC_NAME, __VA_ARGS__)
 #endif
 
 // Define the log macros before platform.h so they can be used
