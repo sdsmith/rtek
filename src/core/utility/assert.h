@@ -1,7 +1,7 @@
 #pragma once
 
-#include "src/core/logging.h"
-#include "src/core/types.h"
+#include "core/logging/logging.h"
+#include "core/types.h"
 
 #include <atomic>
 #include <cstdlib>

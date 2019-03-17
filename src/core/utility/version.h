@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/core/types.h"
+#include "core/types.h"
 
 namespace Rtek
 {

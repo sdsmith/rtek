@@ -1,6 +1,6 @@
-#include "src/core/logging.h"
+#include "core/logging/logging.h"
 
-#include "src/core/assert.h"
+#include "core/utility/assert.h"
 #include <string>
 
 using namespace Rtek;

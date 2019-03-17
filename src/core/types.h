@@ -14,6 +14,9 @@ namespace Rtek
     using u32 = uint32_t;
     using u64 = uint64_t;
 
+    using f32 = float;
+    using f64 = double;
+
     constexpr auto operator""_KB(u64 s) {
         return s * 1024;
     }

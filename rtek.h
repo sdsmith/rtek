@@ -1,7 +1,8 @@
 #pragma once
 
-#include "src/core/core.h"
-#include "src/core/version.h"
+#include "core/core.h"
+#include "core/utility/status.h"
+#include "core/utility/version.h"
 
 namespace Rtek
 {

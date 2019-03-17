@@ -4,7 +4,7 @@
 #include "spdlog/fmt/bundled/printf.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
-#include "src/core/status.h"
+#include "core/utility/status.h"
 #include <mutex>
 
 #ifdef RTK_LOGGING_OFF
@@ -27,7 +27,7 @@
 #endif
 
 // Define the log macros before platform.h so they can be used
-#include "src/core/platform.h"
+#include "core/platform/platform.h"
 
 #include <iostream>
 #include <memory>

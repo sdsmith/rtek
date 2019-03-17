@@ -1,6 +1,6 @@
-#include "src/core/platform.h"
+#include "core/platform/platform.h"
 
-#include "src/core/assert.h"
+#include "core/utility/assert.h"
 #include <type_traits>
 
 using namespace Rtek;

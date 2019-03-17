@@ -1,4 +1,4 @@
-#include "rtek.h"
+#include "../rtek.h"
 
 // Engine logging macros should not be defined beyond engine source files.
 #if defined(LOG_INFO) || defined(LOG_DEBUG) || defined(LOG_WARN) || defined(LOG_ERROR)

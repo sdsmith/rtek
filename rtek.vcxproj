@@ -20,22 +20,35 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rtek.h" />
-    <ClInclude Include="src\core\assert.h" />
     <ClInclude Include="src\core\core.h" />
-    <ClInclude Include="src\core\logging.h" />
-    <ClInclude Include="src\core\platform.h" />
-    <ClInclude Include="src\core\status.h" />
+    <ClInclude Include="src\core\ecs\components\component.h" />
+    <ClInclude Include="src\core\ecs\components\movement_component.h" />
+    <ClInclude Include="src\core\ecs\components\transform_component.h" />
+    <ClInclude Include="src\core\ecs\entity.h" />
+    <ClInclude Include="src\core\ecs\entity_manager.h" />
+    <ClInclude Include="src\core\ecs\systems\movement_system.h" />
+    <ClInclude Include="src\core\ecs\systems\system.h" />
+    <ClInclude Include="src\core\logging\logging.h" />
+    <ClInclude Include="src\core\math\vector.h" />
+    <ClInclude Include="src\core\platform\platform.h" />
     <ClInclude Include="src\core\types.h" />
-    <ClInclude Include="src\core\version.h" />
+    <ClInclude Include="src\core\utility\assert.h" />
+    <ClInclude Include="src\core\utility\status.h" />
+    <ClInclude Include="src\core\utility\time.h" />
+    <ClInclude Include="src\core\utility\version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\core\assert.cpp" />
     <ClCompile Include="src\core\core.cpp" />
-    <ClCompile Include="src\core\logging.cpp" />
-    <ClCompile Include="src\core\platform.cpp" />
+    <ClCompile Include="src\core\ecs\entity_manager.cpp" />
+    <ClCompile Include="src\core\logging\logging.cpp" />
+    <ClCompile Include="src\core\math\vector.cpp" />
+    <ClCompile Include="src\core\platform\platform.cpp" />
+    <ClCompile Include="src\core\utility\assert.cpp" />
     <ClCompile Include="src\test\main_test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".doxyfile" />
+    <None Include=".editorconfig" />
     <None Include="README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -106,7 +119,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\spdlog\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\type_safe\include;$(SolutionDir)external\spdlog\include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnableModules>false</EnableModules>
