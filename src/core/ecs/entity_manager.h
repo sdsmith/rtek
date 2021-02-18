@@ -21,7 +21,7 @@ namespace Rtek
             void update(Time_Step time_step) noexcept;
 
         private:
-            std::map<Entity_Id, Entity*> m_entity_map;
+            //std::map<Entity_Id, Entity*> m_entity_map;
             std::vector<System*> m_systems;
             //Object_Pool<Component>*
             //std::vector<Component*> components;

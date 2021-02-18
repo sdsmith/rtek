@@ -1,6 +1,5 @@
 #include "core/ecs/components/component.h"
 #include "core/types.h"
-#include "type_safe/strong_typedef.hpp"
 #include <map>
 #include <vector>
 
@@ -8,6 +7,7 @@ namespace Rtek
 {
     namespace Ecs
     {
+        /*
         using Entity_Id_Base_Type = s32;
         struct Entity_Id
             : type_safe::strong_typedef<Entity_Id, Entity_Id_Base_Type>,
@@ -24,6 +24,7 @@ namespace Rtek
             Entity_Id id;
             std::vector<Component*> components;
         };
+        */
 
         class Entity_Definition {}; // TODO(sdsmith):
     }
