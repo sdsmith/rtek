@@ -1,9 +1,10 @@
 #pragma once
 
+#include "core/types.h"
 #include "core/utility/status.h"
 #include <cstring>
 
-#if defined(_WIN32) || defined(_WIN64)
+#if RK_OS == RK_OS_WINDOWS
 #   define NOMINMAX      // Stop definition of max and min from windows.h
 #   include <Windows.h>
 #   include <strsafe.h>
@@ -21,7 +22,7 @@ namespace rk
     }
 }
 
-#elif defined(__CYGWIN__) && !defined(_WIN32)
+#elif defined(__CYGWIN__) && RK_OS != RK_OS_WINDOWS
 #   warning Cygwin is not officially supported
 #else
 #   error Unsupported platform
