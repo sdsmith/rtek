@@ -11,20 +11,20 @@ Status Rtek_Engine::initialize()
 
     RK_CHECK(Logger::initialize());
 
-    LOG_INFO("Engine initialized\n");
+    LOG_INFO("Engine initialized");
     return Status::OK;
 }
 
 Status Rtek_Engine::destroy()
 {
     if (!m_initialized) {
-        LOG_ERROR("Attempt to destroy uninitialized engine\n");
+        LOG_ERROR("Attempt to destroy uninitialized engine");
         return Status::API_ERROR;
     }
 
     m_initialized = false;
 
-    LOG_INFO("Engine destroyed\n");
+    LOG_INFO("Engine destroyed");
     Logger::flush();
     return Status::OK;
 }
