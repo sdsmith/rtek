@@ -28,11 +28,4 @@ namespace rk
 #   define PATH_SEPARATOR '/'
 #endif
 
-#if defined(_MSC_VER)
-//  Compiling with MSVC
-#   define RTK_FUNC_NAME __FUNCTION__
-#else
-#   define RTK_FUNC_NAME __FUNC__
-#endif
-
 #define _FILENAME_ (std::strrchr(__FILE__, PATH_SEPARATOR) ? std::strrchr(__FILE__, PATH_SEPARATOR) + 1 : __FILE__)

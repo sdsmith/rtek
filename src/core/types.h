@@ -94,4 +94,14 @@ namespace rk
 #   endif
 #endif
 
+/**
+ * \def RK_FUNCNAME
+ * \brief Portable function name.
+ */
+#if RK_COMPILER == RK_COMPILER_MSC
+#   define RK_FUNCNAME __FUNCTION__
+#else
+#   define RK_FUNCNAME __FUNC__
+#endif
+
 } // namespace rk
