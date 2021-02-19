@@ -171,7 +171,7 @@ Vector3 Rtek::cross(Vector3 const& v1, Vector3 const& v2)
 
 Vector3 Rtek::unit_vector(Vector3 const& v)
 {
-    RTK_ASSERT(v.length() > 0);
+    RK_ASSERT(v.length() > 0);
     return v / v.length();
 }
 

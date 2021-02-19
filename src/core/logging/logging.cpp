@@ -51,8 +51,8 @@ void Logger::flush() noexcept
 
 std::string Logger::sconcat(char const* a, char const* b)
 {
-    RTK_ASSERT(a);
-    RTK_ASSERT(b);
+    RK_ASSERT(a);
+    RK_ASSERT(b);
     return std::string(a) + std::string(b);
 }
 

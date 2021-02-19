@@ -1,26 +1,44 @@
 #pragma once
 
-#include "core/logging/logging.h"
 #include "core/types.h"
 
-#include <atomic>
-#include <cstdlib>
 
 namespace Rtek
 {
-    extern std::atomic<s32> g_assert_depth;
-    static constexpr s32 s_max_assert_depth = 3;
-}
+    /**
+     * \brief Break the program to the debugger, if available.
+     *
+     * Architecture specific. Controlled by the \a TARGET_ARCH_* macros.
+     */
+    [[noreturn]] void debug_break();
 
-#ifdef NDEBUG
-#   define RTK_ASSERT(Condition)
+    void report_assertion_failure(char const* expr, char const* file, s32 line);
+
+    /**
+     * \def RK_CRITICAL_ASSERT(expr)
+     * \brief An assert that is present in builds without \a ASSERTIONS_ENABLED set.
+     *
+     * Meant for assertions that should be run in production.
+     */
+#define RK_CRITICAL_ASSERT(expr)                                           \
+    if (expr) {                                                         \
+    } else {                                                            \
+        report_assertion_failure(#expr, __FILE__, __LINE__);            \
+        debug_break();                                                  \
+    }
+
+     /**
+      * \def RK_ASSERT(expr)
+      * \brief Assertion.
+      *
+      * Only compiled in when \a ASSERTIONS_ENABLED is set.
+      *
+      * \param expr Expression.
+      */
+#if ASSERTIONS_ENABLED
+#   define RK_ASSERT(expr) RK_CRITICAL_ASSERT(expr)
 #else
-#   define RTK_ASSERT(Condition)                                          \
-        if (!(Condition)) {                                               \
-            ++g_assert_depth;                                             \
-            if (g_assert_depth <= s_max_assert_depth) {                   \
-                LOG_ERROR("assert failed: %s\n", #Condition);             \
-            }                                                             \
-            abort();                                                      \
-        }
+#   define RK_ASSERT(expr)
 #endif
+
+} // namespace Rtek

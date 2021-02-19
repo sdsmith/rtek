@@ -1,11 +1,12 @@
 #include "core/platform/platform.h"
 
+#include "core/logging/logging.h"
 #include "core/utility/assert.h"
 #include <type_traits>
 
 using namespace Rtek;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if RK_OS == RK_OS_WINDOWS
 
 void Platform::log_windows_error(LPCTSTR function_name)
 {
@@ -42,8 +43,8 @@ void Platform::log_windows_error(LPCTSTR function_name)
 Status Platform::create_directory(char const* directory)
 {
     // TODO: support creating all parent directories
-    RTK_ASSERT(directory);
-    RTK_ASSERT(std::strlen(directory) < 248); // 248 character limit on ANSI ver
+    RK_ASSERT(directory);
+    RK_ASSERT(std::strlen(directory) < 248); // 248 character limit on ANSI ver
 
     if (!CreateDirectoryA(directory, nullptr)) {
         log_windows_error(TEXT("CreateDirectoryA"));
@@ -59,4 +60,4 @@ bool Platform::directory_exists(char const* path)
     return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-#endif // Windows
+#endif // RK_OS_WINDOWS

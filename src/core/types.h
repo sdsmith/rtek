@@ -30,4 +30,52 @@ namespace Rtek
     constexpr auto operator""_GB(u64 s) {
         return s * 1024_MB;
     }
-}
+
+/**
+ * \def RK_OS
+ * \brief Operating system being compiled on.
+ *
+ * Has a value from one of \a RK_OS_*. 
+ * Usage: `#if RK_OS == RK_OS_WINDOWS`
+ */
+#ifndef RK_OS
+#   define RK_OS_WINDOWS 1
+#   define RK_OS_LINUX 2
+#   define RK_OS_MAC 3
+
+#   if defined(_WIN32)
+#       define RK_OS RK_OS_WINDOWS
+#   elif defined(__linux__)
+#       define RK_OS RK_OS_LINUX
+#   elif defined(__APPLE__)
+#       define RK_OS RK_OS_MAC
+#   else
+#       error Unknown operating system
+#   endif
+#endif
+
+/**
+ * \def RK_COMPILER
+ * \brief Compiler compiling the project.
+ *
+ * Has a value from one of \a RK_COMPILER_*
+ * Usage: `#if RK_COMPILER == RK_COMPILER_MSC`
+ */
+#ifndef RK_COMPILER
+    /** Microsoft C/C++ compiler */
+#   define RK_COMPILER_MSC 1
+#   define RK_COMPILER_GCC 2
+#   define RK_COMPILER_CLANG 3
+
+#   if defined(_MSC_VER)
+#       define RK_COMPILER RK_COMPILER_MSC
+#   elif defined(__GNUC__)
+#       define RK_COMPILER RK_COMPILER_GCC
+#   elif defined(__clang__)
+#       define RK_COMPILER RK_COMPILER_CLANG
+#   else
+#       error Unknown compiler
+#   endif
+#endif
+
+} // namespace Rtek
