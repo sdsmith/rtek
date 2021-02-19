@@ -106,5 +106,7 @@
     <None Include="README.md">
       <Filter>Project Files</Filter>
     </None>
+    <None Include=".clang-format" />
+    <None Include=".clang-tidy" />
   </ItemGroup>
 </Project>
