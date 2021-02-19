@@ -35,7 +35,7 @@
 #include <memory>
 #include <string>
 
-namespace Rtek
+namespace rk
 {
     class Logger
     {

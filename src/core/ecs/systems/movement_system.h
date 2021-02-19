@@ -5,7 +5,7 @@
 #include "core/ecs/components/transform_component.h"
 #include <vector>
 
-namespace Rtek
+namespace rk
 {
     namespace Ecs
     {

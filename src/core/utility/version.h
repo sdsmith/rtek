@@ -2,7 +2,7 @@
 
 #include "core/types.h"
 
-namespace Rtek
+namespace rk
 {
     struct Version 
     {

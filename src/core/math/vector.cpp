@@ -5,7 +5,7 @@
 #include <cmath>
 #include <sstream>
 
-using namespace Rtek;
+using namespace rk;
 
 f32 Vector3::x() const { return vec[0]; }
 f32 Vector3::y() const { return vec[1]; }
@@ -90,86 +90,86 @@ std::string Vector3::to_string() const
     return ss.str();
 }
 
-std::istream& Rtek::operator>>(std::istream& is, Vector3& v)
+std::istream& rk::operator>>(std::istream& is, Vector3& v)
 {
     return is >> v[0] >> v[1] >> v[2];
 }
 
-std::ostream& Rtek::operator<<(std::ostream& os, Vector3 const& v)
+std::ostream& rk::operator<<(std::ostream& os, Vector3 const& v)
 {
     return os << v[0] << " " << v[1] << " " << v[2];
 }
 
-bool Rtek::operator==(Vector3 const& lhs, Vector3 const& rhs)
+bool rk::operator==(Vector3 const& lhs, Vector3 const& rhs)
 {
     return (lhs[0] == rhs[0]) && (lhs[1] == rhs[1]) &&
         (lhs[2] == rhs[2]);
 }
 
-bool Rtek::operator!=(Vector3 const& lhs, Vector3 const& rhs)
+bool rk::operator!=(Vector3 const& lhs, Vector3 const& rhs)
 {
     return !(lhs == rhs);
 }
 
-Vector3 Rtek::operator+(Vector3 const& v1, Vector3 const& v2)
+Vector3 rk::operator+(Vector3 const& v1, Vector3 const& v2)
 {
     Vector3 u(v1);
     u += v2;
     return u;
 }
-Vector3 Rtek::operator-(Vector3 const& v1, Vector3 const& v2)
+Vector3 rk::operator-(Vector3 const& v1, Vector3 const& v2)
 {
     Vector3 u(v1);
     u -= v2;
     return u;
 }
 
-Vector3 Rtek::operator*(Vector3 const& v1, Vector3 const& v2)
+Vector3 rk::operator*(Vector3 const& v1, Vector3 const& v2)
 {
     Vector3 u(v1);
     u *= v2;
     return u;
 }
 
-Vector3 Rtek::operator/(Vector3 const& v1, Vector3 const& v2)
+Vector3 rk::operator/(Vector3 const& v1, Vector3 const& v2)
 {
     Vector3 u(v1);
     u /= v2;
     return u;
 }
 
-Vector3 Rtek::operator*(Vector3 const& v, f32 const c)
+Vector3 rk::operator*(Vector3 const& v, f32 const c)
 {
     Vector3 u(v);
     u *= c;
     return u;
 }
 
-Vector3 Rtek::operator*(f32 const c, Vector3 const& v)
+Vector3 rk::operator*(f32 const c, Vector3 const& v)
 {
     return v * c;
 }
 
-Vector3 Rtek::operator/(Vector3 const& v, f32 const c)
+Vector3 rk::operator/(Vector3 const& v, f32 const c)
 {
     Vector3 u(v);
     u /= c;
     return u;
 }
 
-f32 Rtek::dot(Vector3 const& v1, Vector3 const& v2)
+f32 rk::dot(Vector3 const& v1, Vector3 const& v2)
 {
     Vector3 const u = v1 * v2;
     return u[0] + u[1] + u[2];
 }
-Vector3 Rtek::cross(Vector3 const& v1, Vector3 const& v2)
+Vector3 rk::cross(Vector3 const& v1, Vector3 const& v2)
 {
     return Vector3((v1[1] * v2[2] - v1[2] * v2[1]),
         (-(v1[0] * v2[2] - v1[2] * v2[0])),
         (v1[0] * v2[1] - v1[1] * v2[0]));
 }
 
-Vector3 Rtek::unit_vector(Vector3 const& v)
+Vector3 rk::unit_vector(Vector3 const& v)
 {
     RK_ASSERT(v.length() > 0);
     return v / v.length();

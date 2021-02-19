@@ -2,7 +2,7 @@
 
 #include "core/math/vector.h"
 
-namespace Rtek
+namespace rk
 {
     namespace Ecs
     {

@@ -4,7 +4,7 @@
 #include <array>
 #include <iostream>
 
-namespace Rtek
+namespace rk
 {
     class Vector3
     {

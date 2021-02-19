@@ -4,7 +4,7 @@
 #include "core/utility/status.h"
 #include "core/utility/version.h"
 
-namespace Rtek
+namespace rk
 {
     constexpr const char* name = "RTEK";
     constexpr Version version = { 0, 0 };

@@ -3,7 +3,7 @@
 #include "core/types.h"
 #include "core/utility/status.h"
 
-namespace Rtek
+namespace rk
 {
     class Status
     {
@@ -31,8 +31,8 @@ namespace Rtek
 
 #define RTK_CHECK(V)                        \
     do {                                    \
-        ::Rtek::Status status_ = V;         \
-        if (!::Rtek::StatusCheck(status_)) { \
+        ::rk::Status status_ = V;         \
+        if (!::rk::StatusCheck(status_)) { \
             return status_;                 \
         }                                   \
     } while (0)

@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-namespace Rtek
+namespace rk
 {
     namespace Ecs
     {

@@ -10,7 +10,7 @@
 
 #   define PATH_SEPARATOR '\\'
 
-namespace Rtek
+namespace rk
 {
     namespace Platform
     {

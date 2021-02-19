@@ -3,7 +3,7 @@
 #include "core/types.h"
 
 
-namespace Rtek
+namespace rk
 {
     /**
      * \brief Break the program to the debugger, if available.
@@ -78,4 +78,4 @@ namespace Rtek
 #undef ASSERT_GLUE
 #undef _ASSERT_GLUE
 
-} // namespace Rtek
+} // namespace rk

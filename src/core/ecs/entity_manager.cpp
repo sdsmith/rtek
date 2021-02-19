@@ -2,7 +2,7 @@
 
 #include "core/utility/assert.h"
 
-using namespace Rtek::Ecs;
+using namespace rk::Ecs;
 
 void Entity_Manager::add_entity(const Entity_Definition& def) noexcept
 {

@@ -4,7 +4,7 @@
 #include "core/utility/assert.h"
 #include <type_traits>
 
-using namespace Rtek;
+using namespace rk;
 
 #if RK_OS == RK_OS_WINDOWS
 

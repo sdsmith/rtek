@@ -1,6 +1,6 @@
 #include "core/types.h"
 
-namespace Rtek
+namespace rk
 {
     namespace Time
     {

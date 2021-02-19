@@ -5,7 +5,7 @@
 #include <cstring>
 #include <type_traits>
 
-namespace Rtek
+namespace rk
 {
 
 /**
@@ -26,4 +26,4 @@ ToT type_pun(FromT a) {
     return ret;
 }
 
-} // namespace Rtek
+} // namespace rk

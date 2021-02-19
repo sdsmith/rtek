@@ -3,7 +3,7 @@
 #include "core/utility/assert.h"
 #include <string>
 
-using namespace Rtek;
+using namespace rk;
 
 bool Logger::s_initialized = false;
 std::mutex Logger::m_log_mutex;

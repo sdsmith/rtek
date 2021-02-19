@@ -3,7 +3,7 @@
 #include "core/utility/assert.h"
 #include "core/logging/logging.h"
 
-using namespace Rtek;
+using namespace rk;
 
 Status RtekEngine::Initialize() 
 {

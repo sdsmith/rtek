@@ -3,9 +3,9 @@
 #include "core/logging/logging.h"
 #include "core/types.h"
 
-using namespace Rtek;
+using namespace rk;
 
-[[noreturn]] void Rtek::debug_break() {
+[[noreturn]] void rk::debug_break() {
     // Break into the debugger
 #if RK_COMPILER == RK_COMPILER_MSC
     __debugbreak();
@@ -24,6 +24,6 @@ using namespace Rtek;
 #endif
 }
 
-void Rtek::report_assertion_failure(char const* expr, char const* file, s32 line) {
+void rk::report_assertion_failure(char const* expr, char const* file, s32 line) {
     LOG_ERROR("%s:%d: Assertion \"%s\" failed\n", file, line, expr);
 }

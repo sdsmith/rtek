@@ -1,6 +1,6 @@
 #include "core/utility/time.h"
 
-namespace Rtek
+namespace rk
 {
     namespace Ecs
     {

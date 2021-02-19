@@ -3,7 +3,7 @@
 #include "core/types.h"
 #include "core/utility/status.h"
 
-namespace Rtek
+namespace rk
 {
     class RtekEngine
     {
