@@ -35,7 +35,7 @@ namespace Rtek
  * \def RK_OS
  * \brief Operating system being compiled on.
  *
- * Has a value from one of \a RK_OS_*. 
+ * Has a value from one of \a RK_OS_*.
  * Usage: `#if RK_OS == RK_OS_WINDOWS`
  */
 #ifndef RK_OS
@@ -54,13 +54,13 @@ namespace Rtek
 #   endif
 #endif
 
-/**
- * \def RK_COMPILER
- * \brief Compiler compiling the project.
- *
- * Has a value from one of \a RK_COMPILER_*
- * Usage: `#if RK_COMPILER == RK_COMPILER_MSC`
- */
+ /**
+  * \def RK_COMPILER
+  * \brief Compiler compiling the project.
+  *
+  * Has a value from one of \a RK_COMPILER_*
+  * Usage: `#if RK_COMPILER == RK_COMPILER_MSC`
+  */
 #ifndef RK_COMPILER
     /** Microsoft C/C++ compiler */
 #   define RK_COMPILER_MSC 1
@@ -75,6 +75,22 @@ namespace Rtek
 #       define RK_COMPILER RK_COMPILER_CLANG
 #   else
 #       error Unknown compiler
+#   endif
+#endif
+
+/**
+ * \def RK_CPLUSPLUS
+ * \brief Portable replacement for \a __cplusplus.
+ *
+ * Microsoft does it again...
+ */
+#ifndef RK_CPLUSPLUS
+    // MSVC incorrectly reports __cplusplus
+    // ref: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
+#   if RK_COMPILER == RK_COMPILER_MSC
+#       define RK_CPLUSPLUS _MSVC_LANG
+#   else
+#       define RK_CPLUSPLUS __cplusplus
 #   endif
 #endif
 
