@@ -17,7 +17,7 @@ Status Logger::initialize() noexcept
 
     // Create log directory
     if (!directory_exists(s_log_dir.c_str())) {
-        RTK_CHECK(create_directory(s_log_dir.c_str()));
+        RK_CHECK(create_directory(s_log_dir.c_str()));
     }
 
     try {

@@ -7,9 +7,9 @@
 
 int main(int argc, char* argv[])
 {
-    RTK_CHECK(rk::initialize());
-    RTK_CHECK(rk::run());
-    RTK_CHECK(rk::destroy());
+    RK_CHECK(rk::initialize());
+    RK_CHECK(rk::run());
+    RK_CHECK(rk::destroy());
 
     return 0;
 }

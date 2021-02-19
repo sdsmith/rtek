@@ -24,15 +24,15 @@ namespace rk
         Type m_status;
     };
 
-    inline bool StatusCheck(Status status) {
+    inline bool status_check(Status status) {
         return status == Status::OK;
     }
 }
 
-#define RTK_CHECK(V)                        \
+#define RK_CHECK(V)                         \
     do {                                    \
-        ::rk::Status status_ = V;         \
-        if (!::rk::StatusCheck(status_)) { \
+        ::rk::Status status_ = V;           \
+        if (!::rk::status_check(status_)) { \
             return status_;                 \
         }                                   \
     } while (0)

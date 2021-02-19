@@ -9,7 +9,7 @@ Status Rtek_Engine::initialize()
 {
     m_initialized = true;
 
-    RTK_CHECK(Logger::initialize());
+    RK_CHECK(Logger::initialize());
 
     LOG_INFO("Engine initialized\n");
     return Status::OK;
