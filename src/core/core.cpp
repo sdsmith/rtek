@@ -1,11 +1,11 @@
 #include "core/core.h"
 
-#include "core/utility/assert.h"
 #include "core/logging/logging.h"
+#include "core/utility/assert.h"
 
 using namespace rk;
 
-Status Rtek_Engine::initialize() 
+Status Rtek_Engine::initialize()
 {
     m_initialized = true;
 
@@ -29,9 +29,6 @@ Status Rtek_Engine::destroy()
     return Status::OK;
 }
 
-Status Rtek_Engine::run()
-{
-    return Status::OK;
-}
+Status Rtek_Engine::run() { return Status::OK; }
 
 bool Rtek_Engine::m_initialized = false;

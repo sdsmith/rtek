@@ -7,31 +7,29 @@
 
 namespace rk
 {
-    namespace Ecs
+namespace Ecs
+{
+struct Movement_Component_Tuple : public Component_Tuple {
+    const Movement_Component* movement;
+    Transform_Component* transform;
+};
+
+class Movement_System : public System {
+    using Time_Step = Time::Time_Step;
+
+public:
+    std::vector<Movement_Component_Tuple> get_component_tuples() noexcept
     {
-        struct Movement_Component_Tuple : public Component_Tuple
-        {
-            const Movement_Component* movement;
-            Transform_Component* transform;
-        };
-
-        class Movement_System : public System
-        {
-            using Time_Step = Time::Time_Step;
-
-        public:
-            std::vector<Movement_Component_Tuple> get_component_tuples() noexcept
-            {
-                // TODO(sdsmith);
-                return {};
-            }
-
-            void update(Time_Step time_step) noexcept override
-            {
-                for (Movement_Component_Tuple& t : get_component_tuples()) {
-                    t.transform->position += t.movement->velocity;
-                }
-            }
-        };
+        // TODO(sdsmith);
+        return {};
     }
-}
+
+    void update(Time_Step time_step) noexcept override
+    {
+        for (Movement_Component_Tuple& t : get_component_tuples()) {
+            t.transform->position += t.movement->velocity;
+        }
+    }
+};
+} // namespace Ecs
+} // namespace rk

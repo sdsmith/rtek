@@ -5,28 +5,29 @@
 #include <cstring>
 
 #if RK_OS == RK_OS_WINDOWS
-#   define NOMINMAX      // Stop definition of max and min from windows.h
-#   include <Windows.h>
-#   include <strsafe.h>
+#    define NOMINMAX // Stop definition of max and min from windows.h
+#    include <Windows.h>
+#    include <strsafe.h>
 
-#   define PATH_SEPARATOR '\\'
+#    define PATH_SEPARATOR '\\'
 
 namespace rk
 {
-    namespace Platform
-    {
-        void log_windows_error(const LPCTSTR function_name);
+namespace Platform
+{
+void log_windows_error(const LPCTSTR function_name);
 
-        Status create_directory(char const* directory);
-        bool directory_exists(char const* path);
-    }
-}
+Status create_directory(char const* directory);
+bool directory_exists(char const* path);
+} // namespace Platform
+} // namespace rk
 
 #elif defined(__CYGWIN__) && RK_OS != RK_OS_WINDOWS
-#   warning Cygwin is not officially supported
+#    warning Cygwin is not officially supported
 #else
-#   error Unsupported platform
-#   define PATH_SEPARATOR '/'
+#    error Unsupported platform
+#    define PATH_SEPARATOR '/'
 #endif
 
-#define RK_FILENAME (std::strrchr(__FILE__, PATH_SEPARATOR) ? std::strrchr(__FILE__, PATH_SEPARATOR) + 1 : __FILE__)
+#define RK_FILENAME \
+    (std::strrchr(__FILE__, PATH_SEPARATOR) ? std::strrchr(__FILE__, PATH_SEPARATOR) + 1 : __FILE__)

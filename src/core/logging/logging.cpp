@@ -7,7 +7,7 @@ using namespace rk;
 
 bool Logger::s_initialized = false;
 std::mutex Logger::m_log_mutex;
-std::shared_ptr<spdlog::logger> Logger::s_logger{ nullptr };
+std::shared_ptr<spdlog::logger> Logger::s_logger{nullptr};
 std::string Logger::s_log_dir = "log";
 std::string Logger::s_log_file = "rtek.log";
 
@@ -16,18 +16,17 @@ Status Logger::initialize() noexcept
     using namespace Platform;
 
     // Create log directory
-    if (!directory_exists(s_log_dir.c_str())) {
-        RK_CHECK(create_directory(s_log_dir.c_str()));
-    }
+    if (!directory_exists(s_log_dir.c_str())) { RK_CHECK(create_directory(s_log_dir.c_str())); }
 
     try {
         auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
         stderr_sink->set_level(spdlog::level::err);
 
-        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(s_log_dir + "/" + s_log_file, true);
+        auto file_sink =
+            std::make_shared<spdlog::sinks::basic_file_sink_mt>(s_log_dir + "/" + s_log_file, true);
         file_sink->set_level(spdlog::level::trace);
 
-        std::vector<spdlog::sink_ptr> sinks = { stderr_sink, file_sink };
+        std::vector<spdlog::sink_ptr> sinks = {stderr_sink, file_sink};
         s_logger = std::make_shared<spdlog::logger>("rtek", sinks.begin(), sinks.end());
 
         s_initialized = true;
@@ -42,9 +41,7 @@ Status Logger::initialize() noexcept
 
 void Logger::flush() noexcept
 {
-    if (s_initialized) {
-        s_logger->flush();
-    }
+    if (s_initialized) { s_logger->flush(); }
 
     fallback_flush();
 }

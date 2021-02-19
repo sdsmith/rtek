@@ -67,10 +67,7 @@ f32 Vector3::length() const
     return static_cast<f32>(sqrt(squared_length())); // TODO(sdsmith): cast down
 }
 
-f32 Vector3::squared_length() const
-{
-    return vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2];
-}
+f32 Vector3::squared_length() const { return vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]; }
 
 void Vector3::make_unit_vector()
 {
@@ -90,10 +87,7 @@ std::string Vector3::to_string() const
     return ss.str();
 }
 
-std::istream& rk::operator>>(std::istream& is, Vector3& v)
-{
-    return is >> v[0] >> v[1] >> v[2];
-}
+std::istream& rk::operator>>(std::istream& is, Vector3& v) { return is >> v[0] >> v[1] >> v[2]; }
 
 std::ostream& rk::operator<<(std::ostream& os, Vector3 const& v)
 {
@@ -102,14 +96,10 @@ std::ostream& rk::operator<<(std::ostream& os, Vector3 const& v)
 
 bool rk::operator==(Vector3 const& lhs, Vector3 const& rhs)
 {
-    return (lhs[0] == rhs[0]) && (lhs[1] == rhs[1]) &&
-        (lhs[2] == rhs[2]);
+    return (lhs[0] == rhs[0]) && (lhs[1] == rhs[1]) && (lhs[2] == rhs[2]);
 }
 
-bool rk::operator!=(Vector3 const& lhs, Vector3 const& rhs)
-{
-    return !(lhs == rhs);
-}
+bool rk::operator!=(Vector3 const& lhs, Vector3 const& rhs) { return !(lhs == rhs); }
 
 Vector3 rk::operator+(Vector3 const& v1, Vector3 const& v2)
 {
@@ -145,10 +135,7 @@ Vector3 rk::operator*(Vector3 const& v, f32 const c)
     return u;
 }
 
-Vector3 rk::operator*(f32 const c, Vector3 const& v)
-{
-    return v * c;
-}
+Vector3 rk::operator*(f32 const c, Vector3 const& v) { return v * c; }
 
 Vector3 rk::operator/(Vector3 const& v, f32 const c)
 {
@@ -164,9 +151,8 @@ f32 rk::dot(Vector3 const& v1, Vector3 const& v2)
 }
 Vector3 rk::cross(Vector3 const& v1, Vector3 const& v2)
 {
-    return Vector3((v1[1] * v2[2] - v1[2] * v2[1]),
-        (-(v1[0] * v2[2] - v1[2] * v2[0])),
-        (v1[0] * v2[1] - v1[1] * v2[0]));
+    return Vector3((v1[1] * v2[2] - v1[2] * v2[1]), (-(v1[0] * v2[2] - v1[2] * v2[0])),
+                   (v1[0] * v2[1] - v1[1] * v2[0]));
 }
 
 Vector3 rk::unit_vector(Vector3 const& v)
@@ -174,4 +160,3 @@ Vector3 rk::unit_vector(Vector3 const& v)
     RK_ASSERT(v.length() > 0);
     return v / v.length();
 }
-

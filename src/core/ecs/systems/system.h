@@ -2,16 +2,15 @@
 
 namespace rk
 {
-    namespace Ecs
-    {
-        class System
-        {
-            using Time_Step = Time::Time_Step;
+namespace Ecs
+{
+class System {
+    using Time_Step = Time::Time_Step;
 
-        public:
-            virtual void update(Time_Step time_step) = 0;
+public:
+    virtual void update(Time_Step time_step) = 0;
 
-            //void NotifyComponent(Component*)
-        };
-    }
-}
+    // void NotifyComponent(Component*)
+};
+} // namespace Ecs
+} // namespace rk

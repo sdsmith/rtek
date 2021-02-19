@@ -5,15 +5,14 @@
 
 namespace rk
 {
-    class Rtek_Engine
-    {
-    public:
-        static Status initialize();
-        static Status destroy();
+class Rtek_Engine {
+public:
+    static Status initialize();
+    static Status destroy();
 
-        static Status run();
+    static Status run();
 
-    private:
-        static bool m_initialized;
-    };
-}
+private:
+    static bool m_initialized;
+};
+} // namespace rk

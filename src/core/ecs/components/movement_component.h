@@ -4,11 +4,10 @@
 
 namespace rk
 {
-    namespace Ecs
-    {
-        struct Movement_Component : public Component
-        {
-            Vector3 velocity;
-        };
-    }
-}
+namespace Ecs
+{
+struct Movement_Component : public Component {
+    Vector3 velocity;
+};
+} // namespace Ecs
+} // namespace rk
