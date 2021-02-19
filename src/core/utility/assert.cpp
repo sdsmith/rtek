@@ -11,7 +11,7 @@ using namespace rk;
     __debugbreak();
 #elif RK_OS != RK_OS_WINDOWS
 #   if (RK_COMPILER == RK_COMPILER_GCC) || (RK_COMPILER == RK_COMPILER_CLANG)
-#       if TARGET_ARCH_X86
+#       if RK_TARGET_ARCH_X86
     asm("int 3");
 #       else
 #           error Unsupported architecture
