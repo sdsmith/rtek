@@ -5,7 +5,7 @@
 
 using namespace rk;
 
-Status RtekEngine::Initialize() 
+Status Rtek_Engine::initialize() 
 {
     m_initialized = true;
 
@@ -15,7 +15,7 @@ Status RtekEngine::Initialize()
     return Status::OK;
 }
 
-Status RtekEngine::Destroy()
+Status Rtek_Engine::destroy()
 {
     if (!m_initialized) {
         LOG_ERROR("Attempt to destroy uninitialized engine\n");
@@ -29,9 +29,9 @@ Status RtekEngine::Destroy()
     return Status::OK;
 }
 
-Status RtekEngine::Run()
+Status Rtek_Engine::run()
 {
     return Status::OK;
 }
 
-bool RtekEngine::m_initialized = false;
+bool Rtek_Engine::m_initialized = false;

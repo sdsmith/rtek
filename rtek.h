@@ -9,7 +9,7 @@ namespace rk
     constexpr const char* name = "RTEK";
     constexpr Version version = { 0, 0 };
 
-    Status Initialize() { return RtekEngine::Initialize(); }
-    Status Destroy() { return RtekEngine::Destroy(); }
-    Status Run() { return RtekEngine::Run(); }
+    Status initialize() { return Rtek_Engine::initialize(); }
+    Status destroy() { return Rtek_Engine::destroy(); }
+    Status run() { return Rtek_Engine::run(); }
 }
