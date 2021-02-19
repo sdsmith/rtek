@@ -2,10 +2,15 @@
 
 #include "core/platform/platform.h"
 #include "core/utility/status.h"
-#include "spdlog/fmt/bundled/printf.h"
+
+// clang-format off
+// NOTE(sdsmith): @fragile Must come in this order. Consider moving to just the `fmt` lib.
 #include "spdlog/fmt/fmt.h"
+#include "spdlog/fmt/bundled/printf.h"
+// clang-format on
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
 #include <mutex>
 #include <string>
 
@@ -21,11 +26,12 @@
 #        define LOG_INFO(...)
 #        define LOG_DEBUG(...)
 #    else
-#        define LOG_INFO(...) Logger::log_info(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
-#        define LOG_DEBUG(...) Logger::log_debug(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
+#        define LOG_INFO(...) rk::Logger::log_info(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
+#        define LOG_DEBUG(...) \
+            rk::Logger::log_debug(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
 #    endif
-#    define LOG_WARN(...) Logger::log_warn(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
-#    define LOG_ERROR(...) Logger::log_error(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
+#    define LOG_WARN(...) rk::Logger::log_warn(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
+#    define LOG_ERROR(...) rk::Logger::log_error(RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
 #endif
 
 // Define the log macros before platform.h so they can be used
