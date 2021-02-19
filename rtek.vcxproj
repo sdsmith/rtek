@@ -39,6 +39,7 @@
     <ClInclude Include="src\core\logging\logging.h" />
     <ClInclude Include="src\core\math\vector.h" />
     <ClInclude Include="src\core\platform\platform.h" />
+    <ClInclude Include="src\core\rkmisc.h" />
     <ClInclude Include="src\core\types.h" />
     <ClInclude Include="src\core\utility\assert.h" />
     <ClInclude Include="src\core\utility\status.h" />
