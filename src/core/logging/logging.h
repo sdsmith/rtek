@@ -9,14 +9,14 @@
 #include <mutex>
 #include <string>
 
-#ifdef RTK_LOGGING_OFF
+#ifdef RK_LOGGING_OFF
 //  Remove all logging from the engine. Not recommended!
 #   define LOG_INFO(...)
 #   define LOG_DEBUG(...)
 #   define LOG_WARN(...)
 #   define LOG_ERROR(...)
 #else
-#   ifdef RTK_LOGGING_PERF
+#   ifdef RK_LOGGING_PERF
 //      Remove non-critical prints for performance
 #       define LOG_INFO(...)
 #       define LOG_DEBUG(...)
