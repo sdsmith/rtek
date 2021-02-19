@@ -86,10 +86,10 @@
     <ClCompile Include="src\core\platform\platform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\utility\assert.cpp">
+    <ClCompile Include="src\core\math\vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\math\vector.cpp">
+    <ClCompile Include="src\core\utility\assert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
