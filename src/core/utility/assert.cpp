@@ -1,4 +1,4 @@
-#include "assert.h"
+#include "core/utility/assert.h"
 
 #include "core/logging/logging.h"
 #include "core/types.h"
