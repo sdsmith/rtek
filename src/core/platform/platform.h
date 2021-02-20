@@ -9,7 +9,7 @@
 #    include <Windows.h>
 #    include <strsafe.h>
 
-#    define PATH_SEPARATOR '\\'
+#    define RK_PATH_SEPARATOR '\\'
 
 namespace rk
 {
@@ -29,5 +29,6 @@ bool directory_exists(char const* path);
 #    define PATH_SEPARATOR '/'
 #endif
 
-#define RK_FILENAME \
-    (std::strrchr(__FILE__, PATH_SEPARATOR) ? std::strrchr(__FILE__, PATH_SEPARATOR) + 1 : __FILE__)
+#define RK_FILENAME                                                                            \
+    (std::strrchr(__FILE__, RK_PATH_SEPARATOR) ? std::strrchr(__FILE__, RK_PATH_SEPARATOR) + 1 \
+                                               : __FILE__)

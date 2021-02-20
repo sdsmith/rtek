@@ -33,8 +33,8 @@ void Platform::log_windows_error(LPCTSTR function_name)
                     LocalSize(display_buf) / sizeof(TCHAR), TEXT("%s failed with error %d: %s"),
                     function_name, dw, msg_buf);
 
-    static_assert(std::is_same<TCHAR, char>::value,
-                  "Unicode Windows strings are not compatible with the logger");
+    RK_STATIC_ASSERT_MSG((std::is_same<TCHAR, char>::value),
+                         "Unicode Windows strings are not compatible with the logger");
     LOG_ERROR(static_cast<char*>(display_buf));
 
     LocalFree(msg_buf);

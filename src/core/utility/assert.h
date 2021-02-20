@@ -41,14 +41,14 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
 #endif
 
 /**
- * \def STATIC_ASSERT(expr)
+ * \def RK_STATIC_ASSERT(expr)
  * \brief Static assertion.
  *
  * \param expr Expression.
  */
 
 /**
- * \def STATIC_ASSERT_MSG(expr, msg)
+ * \def RK_STATIC_ASSERT_MSG(expr, msg)
  * \brief Static assertion with a custom message on failure.
  *
  * \param expr Expression.
@@ -59,17 +59,17 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
 
 #ifdef RK_CPLUSPLUS
 #    if RK_CPLUSPLUS >= 201103L // >= c++11
-#        define STATIC_ASSERT(expr) static_assert(expr, "static assert failed:" #        expr)
-#        define STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg);
+#        define RK_STATIC_ASSERT(expr) static_assert(expr, "static assert failed:" #        expr)
+#        define RK_STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg);
 #    else
 // no static_assert prior to c++11
 template <bool>
 class Static_Assert;
 template <>
 class Static_Assert<true> {};
-#        define STATIC_ASSERT(expr) \
+#        define RK_STATIC_ASSERT(expr) \
             enum { ASSERT_GLUE(g_assert_fail_, __LINE__) = sizeof(Static_Assert<!!(expr)>) }
-#        define STATIC_ASSERT_MSG(expr, msg) STATIC_ASSERT(expr)
+#        define RK_STATIC_ASSERT_MSG(expr, msg) RK_STATIC_ASSERT(expr)
 #    endif
 #endif
 

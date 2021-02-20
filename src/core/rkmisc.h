@@ -16,10 +16,10 @@ namespace rk
 template <typename ToT, typename FromT>
 ToT type_pun(FromT a)
 {
-    STATIC_ASSERT(std::is_trivially_constructible_v<FromT>);
-    STATIC_ASSERT(std::is_trivially_constructible_v<ToT>);
-    STATIC_ASSERT_MSG(sizeof(FromT) >= sizeof(ToT),
-                      "destination type too small to hold source type");
+    RK_STATIC_ASSERT(std::is_trivially_constructible_v<FromT>);
+    RK_STATIC_ASSERT(std::is_trivially_constructible_v<ToT>);
+    RK_STATIC_ASSERT_MSG(sizeof(FromT) >= sizeof(ToT),
+                         "destination type too small to hold source type");
 
     ToT ret{};
     std::memcpy(&ret, &a, sizeof(ret));
