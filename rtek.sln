@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spdlog", "external\spdlog\_build\spdlog.vcxproj", "{2D2E5D60-A00D-39E1-82A0-622CECE606D2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmt", "external\fmt\_build\fmt.vcxproj", "{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,16 @@ Global
 		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x64.ActiveCfg = Release|x64
 		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x64.Build.0 = Release|x64
 		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x86.ActiveCfg = Release|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Debug|x64.ActiveCfg = Debug|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Debug|x64.Build.0 = Debug|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Debug|x86.ActiveCfg = Debug|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Develop|x64.ActiveCfg = RelWithDebInfo|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Develop|x64.Build.0 = RelWithDebInfo|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Develop|x86.ActiveCfg = RelWithDebInfo|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Develop|x86.Build.0 = RelWithDebInfo|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Release|x64.ActiveCfg = Release|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Release|x64.Build.0 = Release|x64
+		{FCD4CCC3-B227-38CE-BBEE-FC9E9C782803}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

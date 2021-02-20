@@ -63,6 +63,9 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="external\fmt\_build\fmt.vcxproj">
+      <Project>{fcd4ccc3-b227-38ce-bbee-fc9e9c782803}</Project>
+    </ProjectReference>
     <ProjectReference Include="external\spdlog\_build\spdlog.vcxproj">
       <Project>{2d2e5d60-a00d-39e1-82a0-622cece606d2}</Project>
     </ProjectReference>
