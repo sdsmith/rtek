@@ -98,4 +98,22 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
 #    define RK_FUNCNAME __FUNC__
 #endif
 
+/**
+ * \def RK_RESTRICT
+ * \brief Portable `restrict` keyword.
+ *
+ * NOTE: Don't lie to your compiler!
+ *
+ * ref: https://en.wikipedia.org/wiki/Restrict
+ */
+#ifndef RK_RESTRICT
+#    if RK_COMPILER == RK_COMPILER_MSC
+#        define RK_RESTRICT __restrict
+#    elif RK_COMPILER == RK_COMPILER_GCC || RK_COMPILER == RK_COMPILER_CLANG
+#        define RK_RESTRICT __restrict__
+#    else
+#        error Unsupported compiler
+#    endif
+#endif
+
 } // namespace rk
