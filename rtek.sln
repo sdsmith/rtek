@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtek", "rtek.vcxproj", "{CB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B740180F-53C7-48FE-8A83-290198BE798E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spdlog", "external\spdlog\_build\spdlog.vcxproj", "{2D2E5D60-A00D-39E1-82A0-622CECE606D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,6 +31,16 @@ Global
 		{CB3E824A-C14B-40EA-836E-31883A70FB4B}.Release|x64.Build.0 = Release|x64
 		{CB3E824A-C14B-40EA-836E-31883A70FB4B}.Release|x86.ActiveCfg = Release|Win32
 		{CB3E824A-C14B-40EA-836E-31883A70FB4B}.Release|x86.Build.0 = Release|Win32
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Debug|x64.ActiveCfg = Debug|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Debug|x64.Build.0 = Debug|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Debug|x86.ActiveCfg = Debug|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Develop|x64.ActiveCfg = RelWithDebInfo|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Develop|x64.Build.0 = RelWithDebInfo|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Develop|x86.ActiveCfg = RelWithDebInfo|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Develop|x86.Build.0 = RelWithDebInfo|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x64.ActiveCfg = Release|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x64.Build.0 = Release|x64
+		{2D2E5D60-A00D-39E1-82A0-622CECE606D2}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

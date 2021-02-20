@@ -62,6 +62,11 @@
     <None Include=".editorconfig" />
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="external\spdlog\_build\spdlog.vcxproj">
+      <Project>{2d2e5d60-a00d-39e1-82a0-622cece606d2}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{CB3E824A-C14B-40EA-836E-31883A70FB4B}</ProjectGuid>
@@ -161,7 +166,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -177,7 +182,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -192,7 +197,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -211,7 +216,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
@@ -231,7 +236,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -250,7 +255,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RK_ASSERTIONS_ENABLED;RK_TARGET_ARCH_X86;%(PreprocessorDefinitions);SPDLOG_COMPILED_LIB</PreprocessorDefinitions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
