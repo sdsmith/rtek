@@ -289,12 +289,4 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
 
 	# Set rtek as the startup project in Visual Studio
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-	# Output directory
-	# TODO: OUTPUT_DIRECTORY_* properties seem to need a prefix. are they not given one here?
-	set_target_properties(${PROJECT_NAME} PROPERTIES
-		OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-		OUTPUT_DIRECTORY_DEVELOP "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-		OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-	)
 endif()
