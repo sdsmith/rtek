@@ -1,15 +1,12 @@
 cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 
-# TODO: setup for cross compilation
-#set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING "" FORCE)
-
 project(rtek CXX)
 set(PROJECT_NAME rtek)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_CXX_EXTENSIONS OFF)
+
 # CYGWIN and MSYS require compile specific extensions to behave as expected.
 # => -std=c++17 -> -std=gnu++17, for example
 if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
@@ -19,20 +16,8 @@ endif()
 # TODO: check for WIN32 or MSVC?
 # - WIN32 is true for a windows target
 # - MSVC is true for MSVC or compilers emulating the msvc compiler syntax
-
-################################################################################
-# Set target arch type if empty. Visual studio solution generator provides it.
-################################################################################
-# TODO: generalize
-if(NOT CMAKE_VS_PLATFORM_NAME)
-    set(CMAKE_VS_PLATFORM_NAME "x64")
-endif()
-message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
-
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Win32"
-     OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
-endif()
+#   (not necessarily gen-ing VS solution)
+# - CMAKE_GENERATOR will contain substring "Visual Studio" if gen-ing VS solution
 
 ################################################################################
 # Global configuration types
@@ -48,11 +33,6 @@ set(CMAKE_CONFIGURATION_TYPES
 if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 	set(CMAKE_BUILD_TYPE "Develop" CACHE STRING "" FORCE)
 endif()
-
-################################################################################
-# Use solution folders feature
-################################################################################
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 ################################################################################
 # Sub-projects
@@ -114,6 +94,7 @@ set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
 set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
 
+# TODO:
 #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
 #set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
 #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
@@ -123,7 +104,7 @@ set_target_properties(spdlog PROPERTIES
 )
 
 ################################################################################
-# Source groups
+# Project Files
 ################################################################################
 set(no_group_source_files
     ".clang-format"
@@ -170,61 +151,23 @@ set(ALL_CODE_FILES
 )
 
 ################################################################################
-# Target
+# rtek target
 ################################################################################
-
 add_executable(${PROJECT_NAME} ${ALL_CODE_FILES})
+add_dependencies(${PROJECT_NAME} spdlog fmt)
 
-#use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}") # TODO: may have already replaced this
-set(ROOT_NAMESPACE rtek)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-	DEBUG_POSTFIX d
-)
-
-# Set rtek as the startup project in Visual Studio
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-
-set_target_properties("${PROJECT_NAME}" PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
-
-################################################################################
-# Output directory
-################################################################################
-# TODO: OUTPUT_DIRECTORY_* properties seem to need a prefix. are they not given one here?
-set_target_properties(${PROJECT_NAME} PROPERTIES
-	OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-	OUTPUT_DIRECTORY_DEVELOP "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-	OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-	INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
-	INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-)
-
-################################################################################
-# Include directories
-################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
 	"${CMAKE_CURRENT_SOURCE_DIR}/src"
 	"${install_prefix}/include"
 )
 
-################################################################################
-# Compile definitions
-################################################################################
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-	"$<$<CONFIG:Debug>:"
-		"RK_ASSERTIONS_ENABLED"
-		"RK_TARGET_ARCH_X86"
-	">"
-	"$<$<CONFIG:Develop>:"
-		"RK_ASSERTIONS_ENABLED"
-		"RK_TARGET_ARCH_X86"
-	">"
-	"$<$<CONFIG:Release>:"
-		"TARGET_ARCH_X86"
-	">"
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	spdlog::spdlog
+	fmt::fmt
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	DEBUG_POSTFIX d
 )
 
 ################################################################################
@@ -289,8 +232,14 @@ if(MSVC)
 		"/OPT:ICF " # perform identical COMDAT folding
 	)
 
-# TODO: non-msvc builds
+	set_target_properties("${PROJECT_NAME}" PROPERTIES
+		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+	)
+else()
+	# TODO: non-msvc builds
+	message(FATAL_ERROR "Compiler not supported")
 endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
 set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
@@ -300,8 +249,52 @@ set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_f
 set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+	"$<$<CONFIG:Debug>:"
+		"RK_ASSERTIONS_ENABLED"
+		"RK_TARGET_ARCH_X86"
+	">"
+	"$<$<CONFIG:Develop>:"
+		"RK_ASSERTIONS_ENABLED"
+		"RK_TARGET_ARCH_X86"
+	">"
+	"$<$<CONFIG:Release>:"
+		"RK_TARGET_ARCH_X86"
+	">"
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
+	INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
+	INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+)
+
 ################################################################################
-# Dependencies
+# Visual Studio configuration
 ################################################################################
-add_dependencies(${PROJECT_NAME} spdlog fmt)
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog fmt::fmt)
+if (CMAKE_GENERATOR MATCHES "Visual Studio")
+	# Set target arch type if empty. Visual studio solution generator provides it.
+	if(NOT CMAKE_VS_PLATFORM_NAME)
+		set(CMAKE_VS_PLATFORM_NAME "x64")
+	endif()
+	message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
+
+	if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Win32"
+		 OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
+		message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+	endif()
+
+	# Use solution folders
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+	# Set rtek as the startup project in Visual Studio
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+
+	# Output directory
+	# TODO: OUTPUT_DIRECTORY_* properties seem to need a prefix. are they not given one here?
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+		OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
+		OUTPUT_DIRECTORY_DEVELOP "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
+		OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/build/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
+	)
+endif()
