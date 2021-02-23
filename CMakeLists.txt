@@ -83,7 +83,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Sub-projects
 ################################################################################
 # NOTE: Must be an absolute path
-set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/external2) # TODO: change
+set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/external) # TODO: change
 
 # Add external projects directory to the module search path
 list(APPEND CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
@@ -184,9 +184,13 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
+	TMP_DIR ${INSTALL_DIR}/tmp
+	STAMP_DIR ${INSTALL_DIR}/src/fmt-stamp
+	LOG_DIR ${INSTALL_DIR}/src/fmt-stamp
 	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
 	SOURCE_DIR ${INSTALL_PREFIX}/src/fmt
 	BINARY_DIR ${INSTALL_PREFIX}/src/fmt-build
+	INSTALL_DIR ${INSTALL_PREFIX}
 )
 
 set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
@@ -203,9 +207,13 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
+	TMP_DIR ${INSTALL_DIR}/tmp
+	STAMP_DIR ${INSTALL_DIR}/src/spdlog-stamp
+	LOG_DIR ${INSTALL_DIR}/src/spdlog-stamp
 	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
 	SOURCE_DIR ${INSTALL_PREFIX}/src/spdlog
 	BINARY_DIR ${INSTALL_PREFIX}/src/spdlog-build
+	INSTALL_DIR ${INSTALL_PREFIX}
 )
 
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
