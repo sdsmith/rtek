@@ -184,9 +184,9 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
-	TMP_DIR ${INSTALL_DIR}/tmp
-	STAMP_DIR ${INSTALL_DIR}/src/fmt-stamp
-	LOG_DIR ${INSTALL_DIR}/src/fmt-stamp
+	TMP_DIR ${INSTALL_PREFIX}/tmp
+	STAMP_DIR ${INSTALL_PREFIX}/src/fmt-stamp
+	LOG_DIR ${INSTALL_PREFIX}/src/fmt-stamp
 	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
 	SOURCE_DIR ${INSTALL_PREFIX}/src/fmt
 	BINARY_DIR ${INSTALL_PREFIX}/src/fmt-build
@@ -207,9 +207,9 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
-	TMP_DIR ${INSTALL_DIR}/tmp
-	STAMP_DIR ${INSTALL_DIR}/src/spdlog-stamp
-	LOG_DIR ${INSTALL_DIR}/src/spdlog-stamp
+	TMP_DIR ${INSTALL_PREFIX}/tmp
+	STAMP_DIR ${INSTALL_PREFIX}/src/spdlog-stamp
+	LOG_DIR ${INSTALL_PREFIX}/src/spdlog-stamp
 	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
 	SOURCE_DIR ${INSTALL_PREFIX}/src/spdlog
 	BINARY_DIR ${INSTALL_PREFIX}/src/spdlog-build
