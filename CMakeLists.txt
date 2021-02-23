@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 #set(CMAKE_SYSTEM_VERSION 10.0.18362.0 CACHE STRING "" FORCE)
 
 project(rtek CXX)
+set(PROJECT_NAME rtek)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,41 +43,10 @@ set(CMAKE_CONFIGURATION_TYPES
     "Release"
     CACHE STRING "Build configurations" FORCE
 )
-# TODO: setup develop mode
 
-################################################################################
-# Global compiler options
-################################################################################
-# TODO: check if all the overriding is necessary
-if(MSVC)
-    # remove default flags provided with CMake for MSVC
-    set(CMAKE_CXX_FLAGS "")
-    set(CMAKE_CXX_FLAGS_DEBUG "")
-    set(CMAKE_CXX_FLAGS_DEVELOP "")
-    set(CMAKE_CXX_FLAGS_RELEASE "")
-endif()
-
-################################################################################
-# Global linker options
-################################################################################
-if(MSVC)
-    # remove default flags provided with CMake for MSVC
-    set(CMAKE_EXE_LINKER_FLAGS "")
-    set(CMAKE_MODULE_LINKER_FLAGS "")
-    set(CMAKE_SHARED_LINKER_FLAGS "")
-    set(CMAKE_STATIC_LINKER_FLAGS "")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_DEBUG "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEVELOP "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEVELOP "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_DEVELOP "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
+# Default build type
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+	set(CMAKE_BUILD_TYPE "Develop" CACHE STRING "" FORCE)
 endif()
 
 ################################################################################
@@ -94,10 +64,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Sub-projects
 ################################################################################
 # NOTE: Must be an absolute path
-set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/external)
+set(install_prefix ${CMAKE_SOURCE_DIR}/build/external)
 
-# Add external projects directory to the module search path
-list(APPEND CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
+# Add external projects directory to the prefix search path (for find_* functions)
+list(APPEND CMAKE_PREFIX_PATH "${install_prefix}")
 
 include(FetchContent)
 
@@ -120,7 +90,7 @@ include(FetchContent)
 # find_package(spdlog REQUIRED)
 # ```
 function(install_at_config_time dep_name git_repo git_tag build_config cmake_args)
-	set(dep_source_dir ${INSTALL_PREFIX}/src/${dep_name})
+	set(dep_source_dir ${install_prefix}/src/${dep_name})
 	FetchContent_Declare(
 		${dep_name}
 		GIT_REPOSITORY "${git_repo}"
@@ -130,10 +100,10 @@ function(install_at_config_time dep_name git_repo git_tag build_config cmake_arg
 		UPDATE_COMMAND ""
 		PATCH_COMMAND ""
 		TEST_COMMAND ""
-		DOWNLOAD_DIR ${INSTALL_PREFIX}/src
+		DOWNLOAD_DIR ${install_prefix}/src
 		SOURCE_DIR ${dep_source_dir}
 		BINARY_DIR ${dep_source_dir}-build
-		INSTALL_DIR ${INSTALL_PREFIX}
+		INSTALL_DIR ${install_prefix}
 	)
 	FetchContent_GetProperties(${dep_name})
 	if (NOT ${dep_name}_POPULATED)
@@ -148,7 +118,7 @@ function(install_at_config_time dep_name git_repo git_tag build_config cmake_arg
 			COMMAND ${CMAKE_COMMAND}
 				-S ${${dep_name}_SOURCE_DIR}
 				-B ${${dep_name}_BINARY_DIR}
-				-DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}
+				-DCMAKE_INSTALL_PREFIX=${install_prefix}
 				${_cmake_args}
 			WORKING_DIRECTORY ${${dep_name}_BINARY_DIR}
 			COMMAND_ECHO STDOUT
@@ -195,13 +165,13 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
-	TMP_DIR ${INSTALL_PREFIX}/tmp
-	STAMP_DIR ${INSTALL_PREFIX}/src/fmt-stamp
-	LOG_DIR ${INSTALL_PREFIX}/src/fmt-stamp
-	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
-	SOURCE_DIR ${INSTALL_PREFIX}/src/fmt
-	BINARY_DIR ${INSTALL_PREFIX}/src/fmt-build
-	INSTALL_DIR ${INSTALL_PREFIX}
+	TMP_DIR ${install_prefix}/tmp
+	STAMP_DIR ${install_prefix}/src/fmt-stamp
+	LOG_DIR ${install_prefix}/src/fmt-stamp
+	DOWNLOAD_DIR ${install_prefix}/src
+	SOURCE_DIR ${install_prefix}/src/fmt
+	BINARY_DIR ${install_prefix}/src/fmt-build
+	INSTALL_DIR ${install_prefix}
 )
 
 set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
@@ -221,13 +191,13 @@ FetchContent_Declare(
 	UPDATE_COMMAND ""
 	PATCH_COMMAND ""
 	TEST_COMMAND ""
-	TMP_DIR ${INSTALL_PREFIX}/tmp
-	STAMP_DIR ${INSTALL_PREFIX}/src/spdlog-stamp
-	LOG_DIR ${INSTALL_PREFIX}/src/spdlog-stamp
-	DOWNLOAD_DIR ${INSTALL_PREFIX}/src
-	SOURCE_DIR ${INSTALL_PREFIX}/src/spdlog
-	BINARY_DIR ${INSTALL_PREFIX}/src/spdlog-build
-	INSTALL_DIR ${INSTALL_PREFIX}
+	TMP_DIR ${install_prefix}/tmp
+	STAMP_DIR ${install_prefix}/src/spdlog-stamp
+	LOG_DIR ${install_prefix}/src/spdlog-stamp
+	DOWNLOAD_DIR ${install_prefix}/src
+	SOURCE_DIR ${install_prefix}/src/spdlog
+	BINARY_DIR ${install_prefix}/src/spdlog-build
+	INSTALL_DIR ${install_prefix}
 )
 
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
@@ -242,26 +212,6 @@ FetchContent_MakeAvailable(spdlog)
 set_target_properties(spdlog PROPERTIES
 	MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-set(PROJECT_NAME rtek)
 
 ################################################################################
 # Source groups
@@ -348,7 +298,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ################################################################################
 target_include_directories(${PROJECT_NAME} PUBLIC
 	"${CMAKE_CURRENT_SOURCE_DIR}/src"
-	"${INSTALL_PREFIX}/include"
+	"${install_prefix}/include"
 )
 
 ################################################################################
@@ -371,53 +321,78 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 ################################################################################
 # Compile and link options
 ################################################################################
+set(cxx_flags "")
+set(cxx_flags_debug "")
+set(cxx_flags_develop "")
+set(cxx_flags_release "")
+set(exe_linker_flags "")
+set(exe_linker_flags_debug "")
+set(exe_linker_flags_develop "")
+set(exe_linker_flags_release "")
 if(MSVC)
-	# TODO: set the exception unwinding feature for now
-	target_compile_options(${PROJECT_NAME} PRIVATE
-		$<$<CONFIG:Debug>:
-			/Od # disable optimizations
-		>
-		$<$<CONFIG:Develop>:
-			/O2 # maximize speed optimization
-			/Oi # generate intrinsic functions
-			/Gy # function-level linking (COMDAT)
-		>
-		$<$<CONFIG:Release>:
-			/GL # whole program optimization
-			/O2 # maximize speed optimization
-			/Oi # generate intrinsic functions
-			/Gy # function-level linking
-		>
-		/permissive- # use c++ standards conforming compiler behaviour
-		/sdl # enable Security Development Lifecycle checks
-		/W3 # warning level
-		/WX # linker warnings as errors
-		/TP # treat all files on command line as C++ source files
-		/Zi # separate PDB file will all symbolic debug info
-		/EHsc # standard C++ stack unwinding + assumes extern C functions don't throw
+	# TODO: potentially set:
+	# - CMAKE_MODULE_LINKER_FLAGS
+    # - CMAKE_SHARED_LINKER_FLAGS
+    # - CMAKE_STATIC_LINKER_FLAGS
+
+	string(CONCAT cxx_flags
+		"/permissive- " # use c++ standards conforming compiler behaviour
+		"/sdl " 		# enable Security Development Lifecycle checks
+		"/W3 " 			# warning level
+		"/WX " 			# linker warnings as errors
+		"/TP " 			# treat all files on command line as C++ source files
+		"/Zi " 			# separate PDB file will all symbolic debug info
+		# TODO: set the exception unwinding feature for now
+		"/EHsc " 		# standard C++ stack unwinding + assumes extern C functions don't throw
+		# TODO: ban dynamic_cast and typeid and use /GR- to reduce code size
+		"/GR "          # run-time type info. Needed for dynamic_cast or typeid
 	)
-	target_link_options(${PROJECT_NAME} PRIVATE
-		$<$<CONFIG:Debug>:
-			/INCREMENTAL # incremental linking
-		>
-		$<$<CONFIG:Develop>:
-			/INCREMENTAL # incremental linking
-		>
-		$<$<CONFIG:Release>:
-			/OPT:REF # eliminate functions and data the are never referenced
-			/OPT:ICF # perform identical COMDAT folding
-			/INCREMENTAL:NO # no incremental linking
-		>
-		/DEBUG:FULL # generate full debug info in single PDB
+	string(CONCAT cxx_flags_debug
+		"/Od " # disable optimizations
+		"/RTC1 " # runtime error check for value initialization
+	)
+	string(CONCAT cxx_flags_develop
+		# TODO: /Od disables optimizations, making the edit-compile-run loop smaller, but could make the application slow.
+		"/Od " # favor speed optimizations over size
+		"/Oi " # generate intrinsic functions
+		"/Gy " # function-level linking (COMDAT)
+		"/RTC1 " # runtime error check for value initialization
+	)
+	string(CONCAT cxx_flags_release
+		"/GL " # whole program optimization
+		"/O2 " # maximize speed optimization
+		"/Oi " # generate intrinsic functions
+		"/Gy " # function-level linking
 	)
 
-# TODO: non-MSVC builds
+	string(CONCAT exe_linker_flags
+		"/DEBUG:FULL " # generate full debug info in single PDB
+	)
+	string(CONCAT exe_linker_flags_debug
+		"/INCREMENTAL " # incremental linking
+	)
+	string(CONCAT exe_linker_flags_develop
+		"/INCREMENTAL " # incremental linking
+	)
+	string(CONCAT exe_linker_flags_release
+		"/INCREMENTAL:NO " # no incremental linking
+		"/OPT:REF " # eliminate functions and data the are never referenced
+		"/OPT:ICF " # perform identical COMDAT folding
+	)
+
+# TODO: non-msvc builds
 endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
+set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${cxx_flags_release}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${exe_linker_flags}")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_flags_debug}")
+set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
 
 ################################################################################
 # Dependencies
 ################################################################################
 add_dependencies(${PROJECT_NAME} spdlog fmt)
-
-#include(${INSTALL_PREFIX}/lib/cmake/spdlog/spdlogConfigTargets.cmake)
 target_link_libraries(${PROJECT_NAME} PRIVATE spdlog::spdlog fmt::fmt)
