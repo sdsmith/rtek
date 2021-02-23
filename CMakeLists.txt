@@ -94,7 +94,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Sub-projects
 ################################################################################
 # NOTE: Must be an absolute path
-set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/external) # TODO: change
+set(INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/build/external)
 
 # Add external projects directory to the module search path
 list(APPEND CMAKE_PREFIX_PATH "${INSTALL_PREFIX}")
@@ -208,6 +208,9 @@ set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
 set(FMT_TEST OFF CACHE BOOL "fmt build tests")
 set(FMT_INSTALL OFF CACHE BOOL "fmt generate install target")
 FetchContent_MakeAvailable(fmt)
+set_target_properties(fmt PROPERTIES
+	MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+)
 
 FetchContent_Declare(
 	spdlog
@@ -235,9 +238,10 @@ set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
 #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
 #set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
 #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
-#set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO DEVELOP)
 FetchContent_MakeAvailable(spdlog)
-
+set_target_properties(spdlog PROPERTIES
+	MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+)
 
 
 
@@ -262,11 +266,11 @@ set(PROJECT_NAME rtek)
 ################################################################################
 # Source groups
 ################################################################################
-#set(no_group_source_files
-#    ".clang-format"
-#    ".clang-tidy"
-#)
-#source_group("" FILES ${no_group_source_files})
+set(no_group_source_files
+    ".clang-format"
+    ".clang-tidy"
+)
+source_group("" FILES ${no_group_source_files})
 
 set(Header_Files
     "rtek.h"
@@ -290,13 +294,6 @@ set(Header_Files
 )
 source_group("Header Files" FILES ${Header_Files})
 
-#set(Project_Files
-#    ".doxyfile"
-#    ".editorconfig"
-#    "README.md"
-#)
-#source_group("Project Files" FILES ${Project_Files})
-
 set(Source_Files
     "src/core/core.cpp"
     "src/core/ecs/entity_manager.cpp"
@@ -308,10 +305,8 @@ set(Source_Files
 )
 source_group("Source Files" FILES ${Source_Files})
 
-set(ALL_FILES
-#    ${no_group_source_files}
+set(ALL_CODE_FILES
     ${Header_Files}
-#    ${Project_Files}
     ${Source_Files}
 )
 
@@ -319,9 +314,9 @@ set(ALL_FILES
 # Target
 ################################################################################
 
-add_executable(${PROJECT_NAME} ${ALL_FILES})
+add_executable(${PROJECT_NAME} ${ALL_CODE_FILES})
 
-use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
+#use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}") # TODO: may have already replaced this
 set(ROOT_NAMESPACE rtek)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
@@ -330,6 +325,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # Set rtek as the startup project in Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+
+set_target_properties("${PROJECT_NAME}" PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
 
 ################################################################################
 # Output directory
@@ -368,7 +366,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 	"$<$<CONFIG:Release>:"
 		"TARGET_ARCH_X86"
 	">"
-#	"SPDLOG_COMPILED_LIB"
 )
 
 ################################################################################
@@ -378,38 +375,40 @@ if(MSVC)
 	# TODO: set the exception unwinding feature for now
 	target_compile_options(${PROJECT_NAME} PRIVATE
 		$<$<CONFIG:Debug>:
-			/Od;
-			/WX;
-			/TP
+			/Od # disable optimizations
 		>
 		$<$<CONFIG:Develop>:
-			/GL;
-			/O2;
-			/Oi;
-			/Gy
+			/O2 # maximize speed optimization
+			/Oi # generate intrinsic functions
+			/Gy # function-level linking (COMDAT)
 		>
 		$<$<CONFIG:Release>:
-			/O2;
-			/Oi;
-			/Gy
+			/GL # whole program optimization
+			/O2 # maximize speed optimization
+			/Oi # generate intrinsic functions
+			/Gy # function-level linking
 		>
-		/permissive-;
-		/std:c++17;
-		/sdl;
-		/W3;
-		${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-		${DEFAULT_CXX_EXCEPTION_HANDLING}
+		/permissive- # use c++ standards conforming compiler behaviour
+		/sdl # enable Security Development Lifecycle checks
+		/W3 # warning level
+		/WX # linker warnings as errors
+		/TP # treat all files on command line as C++ source files
+		/Zi # separate PDB file will all symbolic debug info
+		/EHsc # standard C++ stack unwinding + assumes extern C functions don't throw
 	)
 	target_link_options(${PROJECT_NAME} PRIVATE
+		$<$<CONFIG:Debug>:
+			/INCREMENTAL # incremental linking
+		>
 		$<$<CONFIG:Develop>:
-			/OPT:REF;
-			/OPT:ICF
+			/INCREMENTAL # incremental linking
 		>
 		$<$<CONFIG:Release>:
-			/OPT:REF;
-			/OPT:ICF
+			/OPT:REF # eliminate functions and data the are never referenced
+			/OPT:ICF # perform identical COMDAT folding
+			/INCREMENTAL:NO # no incremental linking
 		>
-		/DEBUG:FULL
+		/DEBUG:FULL # generate full debug info in single PDB
 	)
 
 # TODO: non-MSVC builds
