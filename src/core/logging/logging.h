@@ -3,11 +3,7 @@
 #include "core/platform/platform.h"
 #include "core/utility/status.h"
 
-// clang-format off
-// NOTE(sdsmith): @fragile Must come in this order. Consider moving to just the `fmt` lib.
-#include "spdlog/fmt/fmt.h"
-#include "spdlog/fmt/bundled/printf.h"
-// clang-format on
+#include "fmt/printf.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
