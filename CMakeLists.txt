@@ -5,6 +5,16 @@ cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 
 project(rtek CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_EXTENSIONS OFF)
+# CYGWIN and MSYS require compile specific extensions to behave as expected.
+# => -std=c++17 -> -std=gnu++17, for example
+if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
+    set(CMAKE_CXX_EXTENSIONS ON)
+endif()
+
 # TODO: check for WIN32 or MSVC?
 # - WIN32 is true for a windows target
 # - MSVC is true for MSVC or compilers emulating the msvc compiler syntax
@@ -32,6 +42,7 @@ set(CMAKE_CONFIGURATION_TYPES
     "Release"
     CACHE STRING "Build configurations" FORCE
 )
+# TODO: setup develop mode
 
 ################################################################################
 # Global compiler options
@@ -226,16 +237,6 @@ set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
 #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
 #set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO DEVELOP)
 FetchContent_MakeAvailable(spdlog)
-
-# TODO: 
-# set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_CXX_EXTENSIONS OFF)
-# # CYGWIN and MSYS require compile specific extensions to behave as expected.
-# # => -std=c++17 -> -std=gnu++17, for example
-# if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
-#     set(CMAKE_CXX_EXTENSIONS ON)
-# endif()
 
 
 
