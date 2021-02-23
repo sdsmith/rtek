@@ -50,12 +50,6 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 ################################################################################
-# Common utils
-################################################################################
-# TODO: investigate
-include(CMake/Utils.cmake)
-
-################################################################################
 # Use solution folders feature
 ################################################################################
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
