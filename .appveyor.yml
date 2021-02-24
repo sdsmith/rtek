@@ -1,12 +1,25 @@
 version: 0.0.{build}
-image: Visual Studio 2017
+
+init:
+- git config --global core.autocrlf true
+
+branches:
+  only:
+  - master
+
+image: Visual Studio 2019
+
 configuration:
 - Debug
+- Develop
 - Release
+
 platform:
 - x64
-install:
-- git submodule update --init --recursive
+
+build_script:
+- cmake -S"." -b".\build" -G"Visual Studio 16 2019"
+- cmake --build build
+
 build:
-  project: rtek.sln
   verbosity: normal
