@@ -93,12 +93,13 @@ set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
 set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
 set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
+set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
 
 # TODO:
 #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
-#set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
 #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
 FetchContent_MakeAvailable(spdlog)
+add_dependencies(spdlog fmt)
 set_target_properties(spdlog PROPERTIES
 	MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
