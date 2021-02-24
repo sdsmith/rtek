@@ -17,9 +17,9 @@ configuration:
 platform:
 - x64
 
-build_script:
-- cmake -S"." -b".\build" -G"Visual Studio 16 2019"
-- cmake --build build
+before_build:
+- cmake -S . -B ./build -G"Visual Studio 16 2019"
 
 build:
+  project: build/rtek.sln
   verbosity: normal
