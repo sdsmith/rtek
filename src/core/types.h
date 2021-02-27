@@ -116,4 +116,13 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
 #    endif
 #endif
 
+/**
+ * \def RK_INTERNAL
+ * \brief Set internal linkage on symbol.
+ *
+ * Replaces the use of 'static' to define internal linkage, because 'static' is a poor keyword
+ * choice.
+ */
+#define RK_INTERNAL static
+
 } // namespace rk
