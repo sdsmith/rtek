@@ -129,6 +129,7 @@ set(Header_Files
     "src/core/rkmisc.h"
     "src/core/types.h"
     "src/core/utility/assert.h"
+    "src/core/utility/no_exception.h"
     "src/core/utility/status.h"
     "src/core/utility/time.h"
     "src/core/utility/version.h"
