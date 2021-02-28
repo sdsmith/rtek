@@ -7,11 +7,12 @@ using namespace rk;
 
 Status Rtek_Engine::initialize()
 {
-    m_initialized = true;
-
     RK_CHECK(Logger::initialize());
+    LOG_INFO("Logger initialized");
+    LOG_INFO("Initilizing engine...");
 
     LOG_INFO("Engine initialized");
+    m_initialized = true;
     return Status::OK;
 }
 
