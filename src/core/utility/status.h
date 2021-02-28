@@ -8,15 +8,15 @@ namespace rk
 class Status {
 public:
     enum Type : s32 {
-        OK = 0,
-        GENERIC_ERROR = 1,
-        API_ERROR = 2,
-        UNSUPPORTED_FUNCTION = 3,
-        LOGIC_ERROR = 4,
-        RUNTIME_ERROR = 5,
-        BAD_ALLOC = 6,
-        EXCEPTION_ERROR = 7,
-        LOGGER_ERROR = 8,
+        ok = 0,
+        generic_error = 1,
+        api_error = 2,
+        unsupported_function = 3,
+        logic_error = 4,
+        runtime_error = 5,
+        bad_alloc = 6,
+        exception_error = 7,
+        logger_error = 8,
     };
 
     constexpr Status(Type status) : m_status(status) {}
@@ -24,11 +24,11 @@ public:
     operator s32() const { return m_status; }
 
 private:
-    Type m_status = GENERIC_ERROR;
+    Type m_status = generic_error;
 };
 
 RK_INTERNAL
-inline bool status_check(Status status) { return status == Status::OK; }
+inline bool status_check(Status status) { return status == Status::ok; }
 } // namespace rk
 
 #define RK_CHECK(V)                                           \

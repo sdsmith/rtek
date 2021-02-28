@@ -10,12 +10,12 @@ class Vector3 {
 public:
     static constexpr int dimension = 3; //!< Dimension of the vector.
 
-    Vector3() : vec{} {}
+    Vector3()  = default;
     Vector3(f32 x, f32 y, f32 z) : vec{{x, y, z}} {}
 
-    f32 x() const;
-    f32 y() const;
-    f32 z() const;
+    [[nodiscard]] f32 x() const;
+    [[nodiscard]] f32 y() const;
+    [[nodiscard]] f32 z() const;
 
     Vector3 const& operator+() const;
     Vector3 operator-() const;
@@ -29,15 +29,15 @@ public:
     Vector3& operator*=(f32 c);
     Vector3& operator/=(f32 c);
 
-    f32 length() const;
-    f32 squared_length() const;
+    [[nodiscard]] f32 length() const;
+    [[nodiscard]] f32 squared_length() const;
     void make_unit_vector();
-    bool is_nan() const;
+    [[nodiscard]] bool is_nan() const;
 
-    std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 
 private:
-    std::array<f32, 3> vec;
+    std::array<f32, 3> vec{};
 };
 
 std::istream& operator>>(std::istream& is, Vector3& v);

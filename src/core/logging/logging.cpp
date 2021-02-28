@@ -13,12 +13,12 @@ std::string Logger::s_log_file = "rtek.log";
 
 Status Logger::initialize() noexcept
 {
-    using namespace Platform;
+    using namespace platform;
 
     // Create log directory
     if (!directory_exists(s_log_dir.c_str())) { RK_CHECK(create_directory(s_log_dir.c_str())); }
 
-    Status status = Status::OK;
+    Status status = Status::ok;
     spdlog_exception_boundary([&]() {
         try {
             auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();

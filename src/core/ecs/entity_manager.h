@@ -7,12 +7,10 @@
 #include <map>
 #include <vector>
 
-namespace rk
-{
-namespace Ecs
+namespace rk::ecs
 {
 class Entity_Manager {
-    using Time_Step = Time::Time_Step;
+    using Time_Step = time::Time_Step;
 
 public:
     void add_entity(Entity_Definition const& def) noexcept;
@@ -26,5 +24,4 @@ private:
     // std::vector<Component*> components;
 };
 
-} // namespace Ecs
 } // namespace rk

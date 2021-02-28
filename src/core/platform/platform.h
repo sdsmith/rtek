@@ -11,15 +11,12 @@
 
 #    define RK_PATH_SEPARATOR '\\'
 
-namespace rk
-{
-namespace Platform
+namespace rk::platform
 {
 void log_windows_error(const LPCTSTR function_name);
 
 Status create_directory(char const* directory);
 bool directory_exists(char const* path);
-} // namespace Platform
 } // namespace rk
 
 #elif defined(__CYGWIN__) && RK_OS != RK_OS_WINDOWS

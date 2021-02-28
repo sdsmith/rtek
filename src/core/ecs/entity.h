@@ -3,9 +3,7 @@
 #include <map>
 #include <vector>
 
-namespace rk
-{
-namespace Ecs
+namespace rk::ecs
 {
 /*
 using Entity_Id_Base_Type = s32;
@@ -28,5 +26,4 @@ struct Entity
 */
 
 class Entity_Definition {}; // TODO(sdsmith):
-} // namespace Ecs
 } // namespace rk

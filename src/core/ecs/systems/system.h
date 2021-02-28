@@ -1,16 +1,13 @@
 #include "core/utility/time.h"
 
-namespace rk
-{
-namespace Ecs
+namespace rk::ecs
 {
 class System {
-    using Time_Step = Time::Time_Step;
+    using Time_Step = time::Time_Step;
 
 public:
     virtual void update(Time_Step time_step) = 0;
 
     // void NotifyComponent(Component*)
 };
-} // namespace Ecs
 } // namespace rk

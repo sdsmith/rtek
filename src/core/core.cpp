@@ -13,23 +13,23 @@ Status Rtek_Engine::initialize()
 
     LOG_INFO("Engine initialized");
     m_initialized = true;
-    return Status::OK;
+    return Status::ok;
 }
 
 Status Rtek_Engine::destroy()
 {
     if (!m_initialized) {
         LOG_ERROR("Attempt to destroy uninitialized engine");
-        return Status::API_ERROR;
+        return Status::api_error;
     }
 
     m_initialized = false;
 
     LOG_INFO("Engine destroyed");
     Logger::flush();
-    return Status::OK;
+    return Status::ok;
 }
 
-Status Rtek_Engine::run() { return Status::OK; }
+Status Rtek_Engine::run() { return Status::ok; }
 
 bool Rtek_Engine::m_initialized = false;

@@ -1,8 +1,5 @@
-namespace rk
-{
-namespace Ecs
+namespace rk::ecs
 {
 class Component {};
 struct Component_Tuple {};
-} // namespace Ecs
 } // namespace rk

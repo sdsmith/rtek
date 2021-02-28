@@ -9,7 +9,7 @@ using namespace rk;
 
 #if RK_OS == RK_OS_WINDOWS
 
-void Platform::log_windows_error(LPCTSTR function_name)
+void platform::log_windows_error(LPCTSTR function_name)
 {
     // Retrieve error message from system
     //
@@ -41,7 +41,7 @@ void Platform::log_windows_error(LPCTSTR function_name)
     LocalFree(display_buf);
 }
 
-Status Platform::create_directory(char const* directory)
+Status platform::create_directory(char const* directory)
 {
     // TODO: support creating all parent directories
     RK_ASSERT(directory);
@@ -49,13 +49,13 @@ Status Platform::create_directory(char const* directory)
 
     if (!CreateDirectoryA(directory, nullptr)) {
         log_windows_error(TEXT("CreateDirectoryA"));
-        return Status::GENERIC_ERROR;
+        return Status::generic_error;
     }
 
-    return Status::OK;
+    return Status::ok;
 }
 
-bool Platform::directory_exists(char const* path)
+bool platform::directory_exists(char const* path)
 {
     DWORD attribs = GetFileAttributes(static_cast<LPCTSTR>(path));
     return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));
