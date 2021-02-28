@@ -1,13 +1,13 @@
 #include "core/logging/logging.h"
 
 #include "core/utility/assert.h"
+#include "spdlog/spdlog.h"
 #include <string>
 
 using namespace rk;
 
 bool Logger::s_initialized = false;
-std::mutex Logger::m_log_mutex;
-std::shared_ptr<spdlog::logger> Logger::s_logger{nullptr};
+std::mutex Logger::m_fallback_log_mutex;
 std::string Logger::s_log_dir = "log";
 std::string Logger::s_log_file = "rtek.log";
 
@@ -28,8 +28,10 @@ Status Logger::initialize() noexcept
                 s_log_dir + "/" + s_log_file, true);
             file_sink->set_level(spdlog::level::trace);
 
-            std::vector<spdlog::sink_ptr> sinks = {stderr_sink, file_sink};
-            s_logger = std::make_shared<spdlog::logger>("rtek", sinks.begin(), sinks.end());
+            std::array<spdlog::sink_ptr, 2> sinks = {stderr_sink, file_sink};
+            spdlog::set_default_logger(
+                std::make_shared<spdlog::logger>("rtek", sinks.begin(), sinks.end()));
+            spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%F] [%l] %s:%#:%!: %v");
 
             s_initialized = true;
 
@@ -45,8 +47,7 @@ Status Logger::initialize() noexcept
 void Logger::flush() noexcept
 {
     spdlog_exception_boundary([&]() {
-        if (s_initialized) { s_logger->flush(); }
-
+        if (s_initialized) { spdlog::default_logger_raw()->flush(); }
         fallback_flush();
     });
 }
