@@ -266,3 +266,4 @@ Develop
 /.cache
 .\#*
 /_deps
+compile_commands.json
