@@ -10,10 +10,11 @@ FetchContent_Declare(
     glad
     URL "${CMAKE_CURRENT_SOURCE_DIR}/glad.zip"
     TMP_DIR ${CMAKE_SOURCE_DIR}/build/external/tmp
-    STAMP_DIR ${CMAKE_SOURCE_DIR}/build/external/glad-stamp
-    LOG_DIR ${CMAKE_SOURCE_DIR}/build/external/glad-stamp
+    STAMP_DIR ${CMAKE_SOURCE_DIR}/build/external/src/glad-stamp
+    LOG_DIR ${CMAKE_SOURCE_DIR}/build/external/src/glad-stamp
     DOWNLOAD_DIR ${CMAKE_SOURCE_DIR}/build/external/src
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/build/external/src/glad
+    BINARY_DIR ${CMAKE_SOURCE_DIR}/build/external/src/glad-build
 )
 FetchContent_MakeAvailable(glad)
 
@@ -38,7 +39,11 @@ set(all_code_files
 set_source_files_properties(${source_files} PROPERTIES LANGUAGE CXX)
 add_library(glad STATIC ${all_code_files})
 target_include_directories(glad SYSTEM PUBLIC
-    #    "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/build/include>"
     "$<BUILD_INTERFACE:${glad_extract_dir}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+set_target_properties(glad PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/external/src/glad-build"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/external/src/glad-build"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/external/src/glad-build"
 )
