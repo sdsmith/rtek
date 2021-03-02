@@ -104,6 +104,33 @@ set_target_properties(spdlog PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
 
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY "https://github.com/glfw/glfw.git"
+    GIT_TAG "3.3.3"
+    GIT_SHALLOW 1
+    GIT_PROGRESS 1
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    TEST_COMMAND ""
+    TMP_DIR ${install_prefix}/tmp
+    STAMP_DIR ${install_prefix}/src/glfw-stamp
+    LOG_DIR ${install_prefix}/src/glfw-stamp
+    DOWNLOAD_DIR ${install_prefix}/src
+    SOURCE_DIR ${install_prefix}/src/glfw
+    BINARY_DIR ${install_prefix}/src/glfw-build
+    INSTALL_DIR ${install_prefix}
+)
+
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "glfw build examples")
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "glfw build tests")
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "glfw build docs")
+set(GLFW_INSTALL OFF CACHE BOOL "glfw generate install target")
+FetchContent_MakeAvailable(glfw)
+set_target_properties(glfw PROPERTIES
+    MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+)
+
 ################################################################################
 # Project Files
 ################################################################################
@@ -156,7 +183,7 @@ set(ALL_CODE_FILES
 # rtek target
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_CODE_FILES})
-add_dependencies(${PROJECT_NAME} spdlog fmt)
+add_dependencies(${PROJECT_NAME} spdlog fmt glfw)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -166,6 +193,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
     fmt::fmt
+    glfw
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
