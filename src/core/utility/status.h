@@ -17,6 +17,7 @@ public:
         bad_alloc = 6,
         exception_error = 7,
         logger_error = 8,
+        renderer_error = 9,
     };
 
     constexpr Status(Type status) : m_status(status) {}
