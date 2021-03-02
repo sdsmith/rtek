@@ -117,7 +117,7 @@ set(no_group_source_files
 )
 source_group("" FILES ${no_group_source_files})
 
-set(Header_Files
+set(header_files
     "rtek.h"
     "src/core/core.h"
     "src/core/ecs/components/component.h"
@@ -138,9 +138,9 @@ set(Header_Files
     "src/core/utility/time.h"
     "src/core/utility/version.h"
 )
-source_group("Header Files" FILES ${Header_Files})
+source_group("Header Files" FILES ${header_files})
 
-set(Source_Files
+set(source_files
     "src/core/core.cpp"
     "src/core/ecs/entity_manager.cpp"
     "src/core/logging/logging.cpp"
@@ -149,17 +149,17 @@ set(Source_Files
     "src/core/utility/assert.cpp"
     "src/test/main_test.cpp"
 )
-source_group("Source Files" FILES ${Source_Files})
+source_group("Source Files" FILES ${source_files})
 
-set(ALL_CODE_FILES
-    ${Header_Files}
-    ${Source_Files}
+set(all_code_files
+    ${header_files}
+    ${source_files}
 )
 
 ################################################################################
 # rtek target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_CODE_FILES})
+add_executable(${PROJECT_NAME} ${all_code_files})
 add_dependencies(${PROJECT_NAME} spdlog fmt glfw)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
