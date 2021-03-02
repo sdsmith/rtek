@@ -159,7 +159,7 @@ set(all_code_files
 # rtek target
 ################################################################################
 add_executable(${PROJECT_NAME} ${all_code_files})
-add_dependencies(${PROJECT_NAME} spdlog fmt glfw)
+add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -169,6 +169,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
     fmt::fmt
     glfw
+    glad
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

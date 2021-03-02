@@ -114,9 +114,8 @@
 #endif
 
 #if RK_LOG_LEVEL <= RK_LOG_LEVEL_CRITICAL
-#    define LOG_CRITICAL(...)                                                                   \
-        ::rk::Logger::log_critical(spdlog::level::critical, RK_FILENAME, __LINE__, RK_FUNCNAME, \
-                                   __VA_ARGS__)
+#    define LOG_CRITICAL(...) \
+        ::rk::Logger::log(spdlog::level::critical, RK_FILENAME, __LINE__, RK_FUNCNAME, __VA_ARGS__)
 #else
 #    define LOG_CRITICAL(...) static_cast<void>(0)
 #endif
