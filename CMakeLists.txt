@@ -37,13 +37,9 @@ endif()
 ################################################################################
 # Sub-projects
 ################################################################################
-# NOTE: Must be an absolute path
-set(install_prefix ${CMAKE_SOURCE_DIR}/build/external)
-
-# Add external projects directory to the prefix search path (for find_* functions)
-list(APPEND CMAKE_PREFIX_PATH "${install_prefix}")
-
 include(FetchContent)
+
+set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content" FORCE)
 
 FetchContent_Declare(
     fmt
@@ -54,13 +50,6 @@ FetchContent_Declare(
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     TEST_COMMAND ""
-    TMP_DIR ${install_prefix}/tmp
-    STAMP_DIR ${install_prefix}/src/fmt-stamp
-    LOG_DIR ${install_prefix}/src/fmt-stamp
-    DOWNLOAD_DIR ${install_prefix}/src
-    SOURCE_DIR ${install_prefix}/src/fmt
-    BINARY_DIR ${install_prefix}/src/fmt-build
-    INSTALL_DIR ${install_prefix}
 )
 
 set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
@@ -80,13 +69,6 @@ FetchContent_Declare(
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     TEST_COMMAND ""
-    TMP_DIR ${install_prefix}/tmp
-    STAMP_DIR ${install_prefix}/src/spdlog-stamp
-    LOG_DIR ${install_prefix}/src/spdlog-stamp
-    DOWNLOAD_DIR ${install_prefix}/src
-    SOURCE_DIR ${install_prefix}/src/spdlog
-    BINARY_DIR ${install_prefix}/src/spdlog-build
-    INSTALL_DIR ${install_prefix}
 )
 
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
@@ -113,13 +95,6 @@ FetchContent_Declare(
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     TEST_COMMAND ""
-    TMP_DIR ${install_prefix}/tmp
-    STAMP_DIR ${install_prefix}/src/glfw-stamp
-    LOG_DIR ${install_prefix}/src/glfw-stamp
-    DOWNLOAD_DIR ${install_prefix}/src
-    SOURCE_DIR ${install_prefix}/src/glfw
-    BINARY_DIR ${install_prefix}/src/glfw-build
-    INSTALL_DIR ${install_prefix}
 )
 
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "glfw build examples")
@@ -189,7 +164,6 @@ add_dependencies(${PROJECT_NAME} spdlog fmt glfw)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${install_prefix}/include"
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
