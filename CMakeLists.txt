@@ -131,6 +131,8 @@ set_target_properties(glfw PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
 
+add_subdirectory(external/glad)
+
 ################################################################################
 # Project Files
 ################################################################################
