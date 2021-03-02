@@ -118,7 +118,6 @@ set(no_group_source_files
 source_group("" FILES ${no_group_source_files})
 
 set(header_files
-    "rtek.h"
     "src/core/core.h"
     "src/core/ecs/components/component.h"
     "src/core/ecs/components/movement_component.h"
@@ -147,7 +146,7 @@ set(source_files
     "src/core/math/vector.cpp"
     "src/core/platform/platform.cpp"
     "src/core/utility/assert.cpp"
-    "src/test/main_test.cpp"
+    "src/main.cpp"
 )
 source_group("Source Files" FILES ${source_files})
 
