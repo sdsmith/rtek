@@ -35,7 +35,7 @@ public:
     [[nodiscard]] Status setup_gl_api();
 
     /**
-     * Swap frame buffers.
+     * \brief Swap frame buffers.
      */
     [[nodiscard]] Status swap_buffers() const noexcept;
 
