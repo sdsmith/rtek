@@ -10,7 +10,7 @@ namespace rk
 /**
  * \brief Stops all exceptions and converts them to status codes.
  *
- * Usage: DOC(sdsmith): TODO(sdsmith):
+ * Usage:
  * \code{.cpp}
  * Status foo(int a, int b, bool* out) {
  *     auto r = exception_boundary([&]() {
@@ -38,22 +38,22 @@ auto exception_boundary(F&& f) noexcept -> std::variant<decltype(f()), Status>
         return f();
     } catch (const std::logic_error& e) {
         LOG_ERROR(e.what());
-        return Status::LOGIC_ERROR;
+        return Status::logic_error;
     } catch (const std::runtime_error& e) {
         LOG_ERROR(e.what());
-        return Status::RUNTIME_ERROR;
+        return Status::runtime_error;
     } catch (const std::bad_alloc& e) {
         LOG_ERROR(e.what());
-        return Status::BAD_ALLOC;
+        return Status::bad_alloc;
     } catch (const std::bad_exception& e) {
         LOG_ERROR(e.what());
-        return Status::EXCEPTION_ERROR;
+        return Status::exception_error;
     } catch (const std::exception& e) {
         LOG_ERROR("Unhandled exception: {}", e.what());
-        return Status::GENERIC_ERROR;
+        return Status::generic_error;
     } catch (...) {
         LOG_ERROR("Unknown exception occured");
-        return Status::GENERIC_ERROR;
+        return Status::generic_error;
     }
 }
 
