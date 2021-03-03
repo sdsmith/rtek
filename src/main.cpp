@@ -4,9 +4,10 @@
 
 int main(int argc, char* argv[])
 {
-    RK_CHECK(rk::Rtek_Engine::initialize());
-    RK_CHECK(rk::Rtek_Engine::run());
-    RK_CHECK(rk::Rtek_Engine::destroy());
+    rk::Rtek_Engine engine;
+    RK_CHECK(engine.initialize());
+    RK_CHECK(engine.run());
+    RK_CHECK(engine.destroy());
 
     return 0;
 }

@@ -1,18 +1,25 @@
 #pragma once
 
+#include "core/platform/input_manager.h"
+#include "core/platform/window_manager.h"
+#include "core/renderer/renderer.h"
 #include "core/types.h"
 #include "core/utility/status.h"
+#include <memory>
 
 namespace rk
 {
 class Rtek_Engine {
 public:
-    static Status initialize();
-    static Status destroy();
+    Status initialize() noexcept;
+    Status destroy() noexcept;
 
-    static Status run();
+    Status run() noexcept;
 
 private:
     static bool m_initialized;
+    std::unique_ptr<Window_Manager> m_window_mgr;
+    std::unique_ptr<Input_Manager> m_input_mgr;
+    std::unique_ptr<Renderer> m_renderer;
 };
 } // namespace rk

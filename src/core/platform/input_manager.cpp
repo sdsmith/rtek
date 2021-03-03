@@ -1,0 +1,160 @@
+#include "core/platform/input_manager.h"
+#include "core/logging/logging.h"
+#include "core/types.h"
+#include "core/utility/status.h"
+
+using namespace rk;
+
+Game_Input Input_Manager::buffer_input = Input_Manager::zeroed_input;
+
+RK_INTERNAL
+constexpr bool is_shift_key_active(s32 modifier_keys) noexcept
+{
+    return modifier_keys & GLFW_MOD_SHIFT;
+}
+
+RK_INTERNAL
+constexpr bool is_ctrl_key_active(s32 modifier_keys) noexcept
+{
+    return modifier_keys & GLFW_MOD_CONTROL;
+}
+
+RK_INTERNAL
+constexpr bool is_alt_key_active(s32 modifier_keys) noexcept
+{
+    return modifier_keys & GLFW_MOD_ALT;
+}
+
+RK_INTERNAL
+constexpr bool is_super_key_active(s32 modifier_keys) noexcept
+{
+    return modifier_keys & GLFW_MOD_SUPER;
+}
+
+RK_INTERNAL
+constexpr bool is_capslock_key_active(s32 modifier_keys)
+{
+    return modifier_keys & GLFW_MOD_CAPS_LOCK;
+}
+
+RK_INTERNAL
+constexpr bool is_numlock_key_active(s32 modifier_keys)
+{
+    return modifier_keys & GLFW_MOD_NUM_LOCK;
+}
+
+Status Input_Manager::initialize() noexcept { return Status::ok; }
+
+Status Input_Manager::destroy() noexcept { return Status::ok; }
+
+/**
+ * \brief Update button with state change.
+ */
+RK_INTERNAL
+void update_input_button(Game_Input_Button& button, bool button_down) noexcept
+{
+    button.ended_down = button_down;
+    button.half_transitions++;
+}
+
+/**
+ * \brief Process physical keyboard keys.
+ *
+ * \param window Window that recieved the event.
+ * \param key Keyboard key that was pressed/released. Set to \a GLFW_KEY_UNKNOWN when a platform
+ * specific key is pressed. See \a scancode in this case.
+ * \param scancode System-specific scancode of the key.
+ * \param action Type of key event.
+ * \param mods Bit field describing active modifier keys.
+ */
+RK_INTERNAL
+void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, s32 action,
+                                     s32 mods)
+{
+    RK_ASSERT(window);
+
+    // action: GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT
+
+    Game_Input_Controller& keyboard = Input_Manager::buffer_input.controllers[Controller::keyboard];
+    Game_State& game_state = Input_Manager::buffer_input.state;
+
+    // Ignore GLFW_REPEAT when processing physical keys.
+    //
+    // NOTE(sdsmith): A GLFW_RELEASE event will be sent once the key is released regardless of if
+    // GLFW_REPEAT is sent.
+    // ref: https://discourse.glfw.org/t/key-callback-not-registering-every-key-press/1438/4
+    if (action == GLFW_REPEAT) { return; }
+
+    const bool key_down = action == GLFW_PRESS;
+    RK_ASSERT(key_down || action == GLFW_RELEASE);
+
+    switch (key) {
+        // case GLFW_KEY_SPACE:
+        case GLFW_KEY_W: update_input_button(keyboard.up(), key_down); break;
+        case GLFW_KEY_A: update_input_button(keyboard.left(), key_down); break;
+        case GLFW_KEY_S: update_input_button(keyboard.down(), key_down); break;
+        case GLFW_KEY_D: update_input_button(keyboard.right(), key_down); break;
+        case GLFW_KEY_ESCAPE:
+            if (!key_down) { game_state.request_quit = true; }
+            break;
+        case GLFW_KEY_UNKNOWN: LOG_INFO("Unknown key pressed with scancode {}", scancode); break;
+        default: break;
+    }
+}
+
+GLFWkeyfun Input_Manager::get_keyboard_event_callback() const noexcept
+{
+    return process_keyboard_event_callback;
+}
+
+Game_Input& Input_Manager::get_input() noexcept { return *m_new_input; }
+
+Status Input_Manager::process_new_input() noexcept
+{
+    prepare_for_new_input();
+    glfwPollEvents();
+    RK_CHECK(platform::glfw::handle_error());
+
+    // Update our new input with the input collected this cycle.
+    *m_new_input = buffer_input;
+
+    return Status::ok;
+}
+
+/**
+ * \brief Prepare for the new input from a new cycle.
+ */
+void Input_Manager::prepare_for_new_input() noexcept
+{
+    // Save last input state (now old)
+    std::swap(m_new_input, m_old_input);
+
+    Game_State& new_game_state = m_new_input->state;
+    Game_Input_Controller& new_keyboard = m_new_input->controllers[Controller::keyboard];
+    Game_Input_Controller& old_keyboard = m_old_input->controllers[Controller::keyboard];
+
+    // Reset toggles
+    new_game_state.toggle_pause = false;
+
+    // Zero new keyboard
+    new_keyboard = zeroed_input.controllers[Controller::keyboard];
+
+    Game_Input_Button* new_button = nullptr;
+    Game_Input_Button* old_button = nullptr;
+
+    for (s32 button_index = 0; button_index < new_keyboard.buttons.size(); ++button_index) {
+        new_button = &new_keyboard.buttons[button_index];
+        old_button = &old_keyboard.buttons[button_index];
+
+        // Start down if ended down on last input
+        new_button->started_down = old_button->ended_down;
+
+        // Since input has not been processed yet, there are no half transitions
+        // ie. We ended down if we started down (updated during input
+        // processing)
+        new_button->ended_down = new_button->started_down;
+    }
+
+    // Set the buffer_input to the new input
+    buffer_input = *m_new_input;
+}
