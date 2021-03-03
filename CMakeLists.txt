@@ -126,6 +126,7 @@ set(header_files
     "src/core/ecs/entity_manager.h"
     "src/core/ecs/systems/movement_system.h"
     "src/core/ecs/systems/system.h"
+    "src/core/hid/input.h"
     "src/core/logging/logging.h"
     "src/core/math/vector.h"
     "src/core/platform/platform.h"
