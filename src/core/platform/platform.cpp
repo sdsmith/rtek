@@ -41,7 +41,7 @@ void platform::log_windows_error(LPCTSTR function_name)
     LocalFree(display_buf);
 }
 
-Status platform::create_directory(char const* directory)
+Status platform::fs::create_directory(char const* directory)
 {
     // TODO: support creating all parent directories
     RK_ASSERT(directory);
@@ -55,7 +55,7 @@ Status platform::create_directory(char const* directory)
     return Status::ok;
 }
 
-bool platform::directory_exists(char const* path)
+bool platform::fs::directory_exists(char const* path)
 {
     DWORD attribs = GetFileAttributes(static_cast<LPCTSTR>(path));
     return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));

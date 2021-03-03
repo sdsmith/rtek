@@ -15,9 +15,12 @@ namespace rk::platform
 {
 void log_windows_error(const LPCTSTR function_name);
 
+namespace fs // filesystem
+{
 Status create_directory(char const* directory);
 bool directory_exists(char const* path);
-} // namespace rk
+} // namespace fs
+} // namespace rk::platform
 
 #elif defined(__CYGWIN__) && RK_OS != RK_OS_WINDOWS
 #    warning Cygwin is not officially supported

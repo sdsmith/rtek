@@ -16,7 +16,9 @@ Status Logger::initialize() noexcept
     using namespace platform;
 
     // Create log directory
-    if (!directory_exists(s_log_dir.c_str())) { RK_CHECK(create_directory(s_log_dir.c_str())); }
+    if (!fs::directory_exists(s_log_dir.c_str())) {
+        RK_CHECK(fs::create_directory(s_log_dir.c_str()));
+    }
 
     Status status = Status::ok;
     spdlog_exception_boundary([&]() {
