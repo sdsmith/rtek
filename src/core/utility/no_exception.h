@@ -57,4 +57,15 @@ auto exception_boundary(F&& f) noexcept -> std::variant<decltype(f()), Status>
     }
 }
 
+/**
+ * \def RK_CHECK_EXB
+ * \brief \a RK_CHECK equivalent for \a exception_boundary whose functions don't return a value,
+ * only a status code.
+ */
+#define RK_CHECK_EXB(V)                                                            \
+    do {                                                                           \
+        auto _ret = V;                                                             \
+        auto _p_status = std::get_if<Status>(&_ret);                               \
+        if (_p_status && *_p_status != ::rk::Status::ok) { RK_CHECK(*_p_status); } \
+    } while (0)
 } // namespace rk

@@ -3,6 +3,7 @@
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
 #include "core/utility/assert.h"
+#include "core/utility/no_exception.h"
 
 using namespace rk;
 
@@ -16,13 +17,24 @@ Status Rtek_Engine::initialize() noexcept
     RK_CHECK(platform::glfw::initialize());
 
     LOG_INFO("Initializing the window manager...");
-    m_window_mgr = std::make_unique<Window_Manager>();
+    RK_CHECK_EXB(exception_boundary([&]() {
+        m_window_mgr = std::make_unique<Window_Manager>();
+        return Status::ok;
+    }));
     RK_CHECK(m_window_mgr->initialize());
+
     LOG_INFO("Initializing the input manager...");
-    m_input_mgr = std::make_unique<Input_Manager>();
+    RK_CHECK_EXB(exception_boundary([&]() {
+        m_input_mgr = std::make_unique<Input_Manager>();
+        return Status::ok;
+    }));
     RK_CHECK(m_input_mgr->initialize());
+
     LOG_INFO("Initializing the renderer...");
-    m_renderer = std::make_unique<Renderer>();
+    RK_CHECK_EXB(exception_boundary([&]() {
+        m_renderer = std::make_unique<Renderer>();
+        return Status::ok;
+    }));
     RK_CHECK(m_renderer->initialize());
 
     LOG_INFO("Initializing rendering context...");
