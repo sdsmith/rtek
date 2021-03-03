@@ -149,8 +149,11 @@ void update_input_button(Game_Input_Button& button, bool button_down) noexcept
  * \param action Type of key event.
  * \param mods Bit field describing active modifier keys.
  */
-void process_keyboard_event(GLFWwindow* window, s32 key, s32 scancode, s32 action, s32 mods)
+void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, s32 action,
+                                     s32 mods)
 {
+    RK_ASSERT(window);
+
     // action: GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT
 
     Game_Input_Controller& keyboard = new_input->controllers[Controller::keyboard];
@@ -207,6 +210,8 @@ Status Rtek_Engine::initialize()
     }
     RK_CHECK_GLFW(glfwMakeContextCurrent(window));
     RK_CHECK_GLFW(glfwSetFramebufferSizeCallback(window, framebuffer_size_callback));
+    glfwSetKeyCallback(window, process_keyboard_event_callback);
+    handle_glfw_error();
 
     // Initialize GLAD with the OS-specific OGL func pointers
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
@@ -216,15 +221,12 @@ Status Rtek_Engine::initialize()
     glViewport(0, 0, window_w, window_h);
     LOG_INFO("OpenGL context initialized: OpenGL {}.{} core", glctx_ver_major, glctx_ver_minor);
 
-    glfwSetKeyCallback(window, process_keyboard_event);
-    handle_glfw_error();
-
     // TODO(sdsmith): move to `run`
     // TODO(sdsmith): probs don't want to rely on glfwwindowshouldclose
     bool running = true;
     while (!glfwWindowShouldClose(window) && running) {
-        prepare_for_new_input(); // TODO(sdsmith): might need to lock with the callback
-        // glfwPollEvents();
+        prepare_for_new_input();
+        glfwPollEvents();
 
         Game_Input const input = get_input();
         running = !input.state.request_quit;
