@@ -17,6 +17,8 @@ public:
      * \brief Prepare for a window creation.
      *
      * The type of rendering being done requires a specific type of window context.
+     *
+     * \see Renderer::setup_gl_api
      */
     [[nodiscard]] Status prepare_window() noexcept;
 
@@ -26,10 +28,15 @@ public:
     void set_window(GLFWwindow* window) noexcept;
 
     /**
-     * DOC(sdsmith):
+     * \brief Set up the environment for the graphics library API.
+     *
+     * Must be called before rendering can take place.
      */
     [[nodiscard]] Status setup_gl_api();
 
+    /**
+     * Swap frame buffers.
+     */
     [[nodiscard]] Status swap_buffers() const noexcept;
 
     [[nodiscard]] GLFWframebuffersizefun get_framebuffer_size_callback() const noexcept;

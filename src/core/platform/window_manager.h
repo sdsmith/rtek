@@ -13,7 +13,7 @@ public:
     Status destroy() noexcept;
 
     /**
-     * DOC(sdsmith):
+     * \brief Create a window and rendering context.
      */
     Status create_window(const char* title, s32 window_w, s32 window_h, Renderer& renderer,
                          Input_Manager& input_mgr);
