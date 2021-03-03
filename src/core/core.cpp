@@ -156,8 +156,15 @@ void process_keyboard_event(GLFWwindow* window, s32 key, s32 scancode, s32 actio
     Game_Input_Controller& keyboard = new_input->controllers[Controller::keyboard];
     Game_State& game_state = new_input->state;
 
-    // TODO(sdsmith): GLFW_REPEAT the right thing?
-    const bool key_down = action == GLFW_PRESS || action == GLFW_REPEAT;
+    // Ignore GLFW_REPEAT when processing physical keys.
+    //
+    // NOTE(sdsmith): A GLFW_RELEASE event will be sent once the key is released regardless of if
+    // GLFW_REPEAT is sent.
+    // ref: https://discourse.glfw.org/t/key-callback-not-registering-every-key-press/1438/4
+    if (action == GLFW_REPEAT) { return; }
+
+    const bool key_down = action == GLFW_PRESS;
+    RK_ASSERT(key_down || action == GLFW_RELEASE);
 
     switch (key) {
         // case GLFW_KEY_SPACE:
