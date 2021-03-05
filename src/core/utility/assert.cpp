@@ -27,5 +27,5 @@ using namespace rk;
 
 void rk::report_assertion_failure(char const* expr, char const* file, s32 line)
 {
-    LOG_ERROR("%s:%d: Assertion \"%s\" failed\n", file, line, expr);
+    LOG_ERROR("{}:{}: Assertion \"{}\" failed\n", file, line, expr);
 }
