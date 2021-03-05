@@ -9,6 +9,7 @@
 #include "fmt/chrono.h"
 #include "fmt/core.h"
 
+#include <cassert>
 #include <exception>
 #include <iostream>
 #include <memory>
