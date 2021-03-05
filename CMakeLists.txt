@@ -108,6 +108,22 @@ set_target_properties(glfw PROPERTIES
 
 add_subdirectory(external/glad)
 
+FetchContent_Declare(
+    sdslib
+    GIT_REPOSITORY "https://github.com/sdsmith/sdslib-cpp.git"
+    GIT_TAG origin/master
+    GIT_PROGRESS 1
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    TEST_COMMAND ""
+)
+
+set(SDSLIB_BUILD_TESTS OFF CACHE BOOL "sdslib build tests")
+FetchContent_MakeAvailable(sdslib)
+set_target_properties(sdslib PROPERTIES
+    MAP_IMPORTED_CONFIG_DEVELOP Debug
+)
+
 ################################################################################
 # Project Files
 ################################################################################
@@ -168,7 +184,7 @@ set(all_code_files
 # rtek target
 ################################################################################
 add_executable(${PROJECT_NAME} ${all_code_files})
-add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad)
+add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad sdslib)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -179,6 +195,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     fmt::fmt
     glfw
     glad
+    sdslib
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
