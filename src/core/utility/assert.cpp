@@ -2,6 +2,7 @@
 
 #include "core/logging/logging.h"
 #include "core/types.h"
+#include <cassert>
 
 using namespace rk;
 
@@ -27,5 +28,11 @@ using namespace rk;
 
 void rk::report_assertion_failure(char const* expr, char const* file, s32 line)
 {
+    assert(expr);
+    assert(file);
+
     LOG_ERROR("{}:{}: Assertion \"{}\" failed\n", file, line, expr);
+
+    // We are going down, flush
+    Logger::flush();
 }
