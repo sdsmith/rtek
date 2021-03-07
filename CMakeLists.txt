@@ -3,25 +3,17 @@ cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 project(rtek CXX)
 set(PROJECT_NAME rtek)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+message(STATUS "Build RTek")
 
-# CYGWIN and MSYS require compile specific extensions to behave as expected.
-# => -std=c++17 -> -std=gnu++17, for example
-if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
-    set(CMAKE_CXX_EXTENSIONS ON)
-endif()
-
-# TODO: check for WIN32 or MSVC?
+# TODO(sdsmith): check for WIN32 or MSVC?
 # - WIN32 is true for a windows target
 # - MSVC is true for MSVC or compilers emulating the msvc compiler syntax
 #   (not necessarily gen-ing VS solution)
 # - CMAKE_GENERATOR will contain substring "Visual Studio" if gen-ing VS solution
 
-################################################################################
+# ---------------------------------------------------------------------------------------
 # Global configuration types
-################################################################################
+# ---------------------------------------------------------------------------------------
 set(CMAKE_CONFIGURATION_TYPES
     "Debug"
     "Develop"
@@ -34,9 +26,143 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Develop" CACHE STRING "" FORCE)
 endif()
 
-################################################################################
+# ---------------------------------------------------------------------------------------
+# Set RTEK_MASTER_PROJECT to ON if we are building rtek
+# ---------------------------------------------------------------------------------------
+# Check if rtek is being used directly or via add_subdirectory, but allow overriding
+if (NOT DEFINED RTEK_MASTER_PROJECT)
+    if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        set(RTEK_MASTER_PROJECT ON)
+    else()
+        set(RTEK_MASTER_PROJECT OFF)
+    endif()
+endif()
+
+# ---------------------------------------------------------------------------------------
+# Compile and link options
+# ---------------------------------------------------------------------------------------
+if (NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+set(CMAKE_CXX_EXTENSIONS OFF)
+# CYGWIN and MSYS require compile specific extensions to behave as expected.
+# => -std=c++17 -> -std=gnu++17, for example
+if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
+    set(CMAKE_CXX_EXTENSIONS ON)
+endif()
+
+if (RTEK_MASTER_PROJECT EQUAL ON)
+    set(cxx_flags "")
+    set(cxx_flags_debug "")
+    set(cxx_flags_develop "")
+    set(cxx_flags_release "")
+    set(exe_linker_flags "")
+    set(exe_linker_flags_debug "")
+    set(exe_linker_flags_develop "")
+    set(exe_linker_flags_release "")
+    if(MSVC)
+        # TODO: potentially set:
+        # - CMAKE_MODULE_LINKER_FLAGS
+        # - CMAKE_SHARED_LINKER_FLAGS
+        # - CMAKE_STATIC_LINKER_FLAGS
+
+        string(CONCAT cxx_flags
+            "/permissive- " # use c++ standards conforming compiler behaviour
+            "/sdl "                 # enable Security Development Lifecycle checks
+            "/W3 "                  # warning level
+            "/WX "                  # linker warnings as errors
+            "/TP "                  # treat all files on command line as C++ source files
+            "/Zi "                  # separate PDB file will all symbolic debug info
+            # TODO: set the exception unwinding feature for now
+            "/EHsc "                # standard C++ stack unwinding + assumes extern C functions don't throw
+            # TODO: ban dynamic_cast and typeid and use /GR- to reduce code size
+            "/GR "          # run-time type info. Needed for dynamic_cast or typeid
+            )
+        string(CONCAT cxx_flags_debug
+            "/Od " # disable optimizations
+            "/RTC1 " # runtime error check for value initialization
+            )
+        string(CONCAT cxx_flags_develop
+            # TODO: /Od disables optimizations, making the edit-compile-run loop smaller, but could make the application slow.
+            "/Od " # favor speed optimizations over size
+            "/Oi " # generate intrinsic functions
+            "/Gy " # function-level linking (COMDAT)
+            "/RTC1 " # runtime error check for value initialization
+            )
+        string(CONCAT cxx_flags_release
+            "/GL " # whole program optimization
+            "/O2 " # maximize speed optimization
+            "/Oi " # generate intrinsic functions
+            "/Gy " # function-level linking
+            )
+
+        string(CONCAT exe_linker_flags
+            "/DEBUG:FULL " # generate full debug info in single PDB
+            )
+        string(CONCAT exe_linker_flags_debug
+            "/INCREMENTAL " # incremental linking
+            )
+        string(CONCAT exe_linker_flags_develop
+            "/INCREMENTAL " # incremental linking
+            )
+        string(CONCAT exe_linker_flags_release
+            "/INCREMENTAL:NO " # no incremental linking
+            "/OPT:REF " # eliminate functions and data the are never referenced
+            "/OPT:ICF " # perform identical COMDAT folding
+            )
+
+        set_target_properties("${PROJECT_NAME}" PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+            )
+    else()
+        # TODO: non-msvc builds
+        message(FATAL_ERROR "Compiler not supported")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
+    set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${cxx_flags_release}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${exe_linker_flags}")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_flags_debug}")
+    set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
+endif()
+
+# ---------------------------------------------------------------------------------------
+# User options
+# ---------------------------------------------------------------------------------------
+set(RK_LOG_LEVEL RK_LOG_LEVEL_INFO CACHE STRING "Log level compiled into the application. One of \
+RK_LOG_LEVEL_{OFF, TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL}. Levels listed in order of least to \
+most precendence. Levels of equals or less precedence are removed.")
+# Possible values displayed on GUI for RK_LOG_LEVEL
+set_property(CACHE RK_LOG_LEVEL PROPERTY STRINGS
+    RK_LOG_LEVEL_OFF
+    RK_LOG_LEVEL_TRACE
+    RK_LOG_LEVEL_DEBUG
+    RK_LOG_LEVEL_INFO
+    RK_LOG_LEVEL_WARN
+    RK_LOG_LEVEL_ERROR
+    RK_LOG_LEVEL_CRITICAL
+)
+option(RK_LOGGING_OFF "Remove all logging. Takes precedence over `RK_LOG_LEVEL`." OFF)
+option(RK_LOGGING_PERF "Compile in minimal logging (for performance). Takes precedence over `RK_LOG_LEVEL`." OFF)
+
+option(RK_OGL_DEBUG "Display debug messages from OpenGL, including errors." OFF)
+set(RK_SHADER_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders" CACHE STRING
+    "Directory containing all the shaders. Prepended to the path of the shader being opened.")
+
+message(STATUS "Build type      : " ${CMAKE_BUILD_TYPE})
+message(STATUS "C++ standard    : " ${CMAKE_CXX_STANDARD})
+message(STATUS "OpenGL debug ctx: " ${RK_OGL_DEBUG})
+message(STATUS "Shader base dir : " ${RK_SHADER_BASE_DIR})
+
+# ---------------------------------------------------------------------------------------
 # Sub-projects
-################################################################################
+# ---------------------------------------------------------------------------------------
+message(STATUS "Build subprojects...")
 include(FetchContent)
 
 set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content" FORCE)
@@ -76,7 +202,6 @@ set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
 set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
 set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
-
 # TODO:
 #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
 #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
@@ -124,9 +249,9 @@ set_target_properties(sdslib PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP Debug
 )
 
-################################################################################
+# ---------------------------------------------------------------------------------------
 # Project Files
-################################################################################
+# ---------------------------------------------------------------------------------------
 set(no_group_source_files
     ".clang-format"
     ".clang-tidy"
@@ -180,16 +305,15 @@ set(all_code_files
     ${source_files}
 )
 
-################################################################################
+# ---------------------------------------------------------------------------------------
 # rtek target
-################################################################################
+# ---------------------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} ${all_code_files})
-add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad sdslib)
-
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
+add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad sdslib)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
     fmt::fmt
@@ -202,85 +326,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     DEBUG_POSTFIX d
 )
 
-################################################################################
-# Compile and link options
-################################################################################
-set(cxx_flags "")
-set(cxx_flags_debug "")
-set(cxx_flags_develop "")
-set(cxx_flags_release "")
-set(exe_linker_flags "")
-set(exe_linker_flags_debug "")
-set(exe_linker_flags_develop "")
-set(exe_linker_flags_release "")
-if(MSVC)
-    # TODO: potentially set:
-    # - CMAKE_MODULE_LINKER_FLAGS
-    # - CMAKE_SHARED_LINKER_FLAGS
-    # - CMAKE_STATIC_LINKER_FLAGS
-
-    string(CONCAT cxx_flags
-        "/permissive- " # use c++ standards conforming compiler behaviour
-        "/sdl "                 # enable Security Development Lifecycle checks
-        "/W3 "                  # warning level
-        "/WX "                  # linker warnings as errors
-        "/TP "                  # treat all files on command line as C++ source files
-        "/Zi "                  # separate PDB file will all symbolic debug info
-        # TODO: set the exception unwinding feature for now
-        "/EHsc "                # standard C++ stack unwinding + assumes extern C functions don't throw
-        # TODO: ban dynamic_cast and typeid and use /GR- to reduce code size
-        "/GR "          # run-time type info. Needed for dynamic_cast or typeid
-    )
-    string(CONCAT cxx_flags_debug
-        "/Od " # disable optimizations
-        "/RTC1 " # runtime error check for value initialization
-    )
-    string(CONCAT cxx_flags_develop
-        # TODO: /Od disables optimizations, making the edit-compile-run loop smaller, but could make the application slow.
-        "/Od " # favor speed optimizations over size
-        "/Oi " # generate intrinsic functions
-        "/Gy " # function-level linking (COMDAT)
-        "/RTC1 " # runtime error check for value initialization
-    )
-    string(CONCAT cxx_flags_release
-        "/GL " # whole program optimization
-        "/O2 " # maximize speed optimization
-        "/Oi " # generate intrinsic functions
-        "/Gy " # function-level linking
-    )
-
-    string(CONCAT exe_linker_flags
-        "/DEBUG:FULL " # generate full debug info in single PDB
-    )
-    string(CONCAT exe_linker_flags_debug
-        "/INCREMENTAL " # incremental linking
-    )
-    string(CONCAT exe_linker_flags_develop
-        "/INCREMENTAL " # incremental linking
-    )
-    string(CONCAT exe_linker_flags_release
-        "/INCREMENTAL:NO " # no incremental linking
-        "/OPT:REF " # eliminate functions and data the are never referenced
-        "/OPT:ICF " # perform identical COMDAT folding
-    )
-
-    set_target_properties("${PROJECT_NAME}" PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-    )
-else()
-    # TODO: non-msvc builds
-    message(FATAL_ERROR "Compiler not supported")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
-set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${cxx_flags_release}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${exe_linker_flags}")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_flags_debug}")
-set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
-
+# Build type configs
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
     "RK_ASSERTIONS_ENABLED"
@@ -294,16 +340,32 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "RK_TARGET_ARCH_X86"
     ">"
 )
-
 set_target_properties(${PROJECT_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
     INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
     INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
 )
 
-################################################################################
+# Exposed cmake option feature toggles
+if (RK_LOG_LEVEL)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOG_LEVEL=${RK_LOG_LEVEL})
+endif()
+if (RK_LOGGING_OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOGGING_OFF)
+endif()
+if (RK_LOGGING_PERF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOGGING_PERF)
+endif()
+if (RK_OGL_DEBUG)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_OGL_DEBUG)
+endif()
+if (RK_SHADER_BASE_DIR)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_SHADER_BASE_DIR="${RK_SHADER_BASE_DIR}")
+endif()
+
+# ---------------------------------------------------------------------------------------
 # Visual Studio configuration
-################################################################################
+# ---------------------------------------------------------------------------------------
 if (CMAKE_GENERATOR MATCHES "Visual Studio")
     # Set target arch type if empty. Visual studio solution generator provides it.
     if(NOT CMAKE_VS_PLATFORM_NAME)

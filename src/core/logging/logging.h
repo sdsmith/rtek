@@ -53,6 +53,10 @@
 #define RK_LOG_LEVEL_ERROR SPDLOG_LEVEL_ERROR
 #define RK_LOG_LEVEL_CRITICAL SPDLOG_LEVEL_CRITICAL
 
+#if defined(RK_LOGGING_OFF) && defined(RK_LOGGING_PERF)
+#    error Must defined either RK_LOGGING_OFF or RK_LOGGING_PERF. Not both.
+#endif
+
 #ifdef RK_LOGGING_OFF
 #    define RK_LOG_LEVEL RK_LOG_LEVEL_OFF
 #elif defined(RK_LOGGING_PERF)

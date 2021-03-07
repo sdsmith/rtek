@@ -1,4 +1,5 @@
 #include "core/platform/input_manager.h"
+
 #include "core/logging/logging.h"
 #include "core/types.h"
 #include "core/utility/status.h"
@@ -89,12 +90,25 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
     RK_ASSERT(key_down || action == GLFW_RELEASE);
 
     switch (key) {
-        // case GLFW_KEY_SPACE:
-        case GLFW_KEY_W: update_input_button(keyboard.up(), key_down); break;
-        case GLFW_KEY_A: update_input_button(keyboard.left(), key_down); break;
-        case GLFW_KEY_S: update_input_button(keyboard.down(), key_down); break;
-        case GLFW_KEY_D: update_input_button(keyboard.right(), key_down); break;
+            // case GLFW_KEY_SPACE:
+        case GLFW_KEY_W:
+            LOG_INFO("Input key: W (scancode {})", scancode);
+            update_input_button(keyboard.up(), key_down);
+            break;
+        case GLFW_KEY_A:
+            LOG_INFO("Input key: A (scancode {})", scancode);
+            update_input_button(keyboard.left(), key_down);
+            break;
+        case GLFW_KEY_S:
+            LOG_INFO("Input key: S (scancode {})", scancode);
+            update_input_button(keyboard.down(), key_down);
+            break;
+        case GLFW_KEY_D:
+            LOG_INFO("Input key: D (scancode {})", scancode);
+            update_input_button(keyboard.right(), key_down);
+            break;
         case GLFW_KEY_ESCAPE:
+            LOG_INFO("Input key: ESC (scancode {})", scancode);
             if (!key_down) { game_state.request_quit = true; }
             break;
         case GLFW_KEY_UNKNOWN: LOG_INFO("Unknown key pressed with scancode {}", scancode); break;
