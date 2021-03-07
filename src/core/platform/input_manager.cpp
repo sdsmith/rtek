@@ -58,6 +58,20 @@ void update_input_button(Game_Input_Button& button, bool button_down) noexcept
     button.half_transitions++;
 }
 
+RK_INTERNAL
+char const* to_string_glfw_action(s32 action)
+{
+    switch (action) {
+        case GLFW_PRESS: return "pressed";
+        case GLFW_RELEASE: return "released";
+        case GLFW_REPEAT: return "repeat";
+    }
+
+    LOG_ERROR("Unknown GLFW key action: {}", action);
+    RK_ASSERT(0);
+    return "unknown";
+}
+
 /**
  * \brief Process physical keyboard keys.
  *
@@ -76,6 +90,12 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
 
     // action: GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT
 
+    // @perf:
+    char const* name = glfwGetKeyName(key, 0);
+    if (!name) { name = "n/a"; }
+    platform::glfw::handle_error();
+    LOG_INFO("Input key: {} {} (scancode {})", name, to_string_glfw_action(action), scancode);
+
     Game_Input_Controller& keyboard = Input_Manager::buffer_input.controllers[Controller::keyboard];
     Game_State& game_state = Input_Manager::buffer_input.state;
 
@@ -91,24 +111,11 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
 
     switch (key) {
             // case GLFW_KEY_SPACE:
-        case GLFW_KEY_W:
-            LOG_INFO("Input key: W (scancode {})", scancode);
-            update_input_button(keyboard.up(), key_down);
-            break;
-        case GLFW_KEY_A:
-            LOG_INFO("Input key: A (scancode {})", scancode);
-            update_input_button(keyboard.left(), key_down);
-            break;
-        case GLFW_KEY_S:
-            LOG_INFO("Input key: S (scancode {})", scancode);
-            update_input_button(keyboard.down(), key_down);
-            break;
-        case GLFW_KEY_D:
-            LOG_INFO("Input key: D (scancode {})", scancode);
-            update_input_button(keyboard.right(), key_down);
-            break;
+        case GLFW_KEY_W: update_input_button(keyboard.up(), key_down); break;
+        case GLFW_KEY_A: update_input_button(keyboard.left(), key_down); break;
+        case GLFW_KEY_S: update_input_button(keyboard.down(), key_down); break;
+        case GLFW_KEY_D: update_input_button(keyboard.right(), key_down); break;
         case GLFW_KEY_ESCAPE:
-            LOG_INFO("Input key: ESC (scancode {})", scancode);
             if (!key_down) { game_state.request_quit = true; }
             break;
         case GLFW_KEY_UNKNOWN: LOG_INFO("Unknown key pressed with scancode {}", scancode); break;
