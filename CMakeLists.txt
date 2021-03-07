@@ -165,7 +165,11 @@ message(STATUS "Shader base dir : " ${RK_SHADER_BASE_DIR})
 message(STATUS "Build subprojects...")
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content")
+# WAR(https://gitlab.kitware.com/cmake/cmake/-/issues/21889): Don't set the
+# fetchcontent base directory outside of the build directory. It will lead to
+# frequent downloads of these repos with the current cmake setup, but what am I
+# to do other than change how dependencies are handled?
+# set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content")
 
 FetchContent_Declare(
     fmt
