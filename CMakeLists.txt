@@ -165,7 +165,7 @@ message(STATUS "Shader base dir : " ${RK_SHADER_BASE_DIR})
 message(STATUS "Build subprojects...")
 include(FetchContent)
 
-set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content" FORCE)
+set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content")
 
 FetchContent_Declare(
     fmt
