@@ -33,6 +33,6 @@ void rk::report_assertion_failure(char const* expr, char const* file, s32 line)
 
     LOG_ERROR("{}:{}: Assertion \"{}\" failed\n", file, line, expr);
 
-    // We are going down, flush
-    Logger::flush();
+    // We are going down, flush logger
+    Logger::emergency_shutdown();
 }

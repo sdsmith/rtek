@@ -133,6 +133,7 @@ Status Rtek_Engine::run() noexcept
         RK_CHECK(m_renderer->handle_ogl_error());
 
         RK_CHECK(m_renderer->swap_buffers());
+        Logger::flush(); // @perf: do this on an async thread
     }
 
     glDeleteVertexArrays(1, &vao);

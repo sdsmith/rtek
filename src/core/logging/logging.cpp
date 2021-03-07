@@ -35,6 +35,9 @@ Status Logger::initialize() noexcept
                 std::make_shared<spdlog::logger>("rtek", sinks.begin(), sinks.end()));
             spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%F] [%l] %s:%#:%!: %v");
 
+            // @perf: Flush whenever warn or higher message comes in
+            get_default_logger()->flush_on(spdlog::level::warn);
+
             s_initialized = true;
 
         } catch (const spdlog::spdlog_ex& e) {
@@ -60,6 +63,8 @@ std::string Logger::sconcat(char const* a, char const* b) noexcept(false)
     assert(b);
     return std::string(a) + std::string(b);
 }
+
+spdlog::logger* Logger::get_default_logger() noexcept { return spdlog::default_logger_raw(); }
 
 void Logger::fallback_flush() noexcept
 {

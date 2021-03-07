@@ -157,6 +157,16 @@ public:
 
     static void flush() noexcept;
 
+    static void emergency_shutdown() noexcept
+    {
+        // Flush async loggers manually is done as part of spdlog shutdown. Expecting immediate
+        // shutdown and no more logs!
+        // ref: https://github.com/gabime/spdlog/wiki/7.-Flush-policy
+        spdlog::shutdown();
+
+        s_initialized = false;
+    }
+
 private:
     static bool s_initialized;
     static std::mutex m_fallback_log_mutex;
@@ -164,6 +174,8 @@ private:
     static std::string s_log_file;
 
     static std::string sconcat(char const* a, char const* b) noexcept(false);
+
+    static spdlog::logger* get_default_logger() noexcept;
 
     /**
      * \brief Exception boundary for spdlog.
