@@ -7,6 +7,7 @@
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
 #include "fmt/core.h"
+#include <cstring>
 #include <fstream>
 #include <iterator>
 
@@ -196,9 +197,16 @@ Status Renderer::setup_gl_api() noexcept
     // better debugging. By default is is async, which has no guarantees that it
     // is called on the same thread or at the same time that the message was
     // created. Async is faster.
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(ogl_debug_callback, nullptr /*user_param*/);
+
+    // Enable all messages
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+
+    char const* khr_debug_msg = "Setup KHR_debug message callback";
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, -1,
+                         GL_DEBUG_SEVERITY_NOTIFICATION, std::strlen(khr_debug_msg), khr_debug_msg);
     RK_CHECK(handle_ogl_error());
 #endif
 
