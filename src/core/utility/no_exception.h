@@ -10,7 +10,7 @@ namespace rk
 /**
  * \brief Stops all exceptions and converts them to status codes.
  *
- * Usage: DOC(sdsmith): TODO(sdsmith):
+ * Usage:
  * \code{.cpp}
  * Status foo(int a, int b, bool* out) {
  *     auto r = exception_boundary([&]() {
@@ -38,23 +38,34 @@ auto exception_boundary(F&& f) noexcept -> std::variant<decltype(f()), Status>
         return f();
     } catch (const std::logic_error& e) {
         LOG_ERROR(e.what());
-        return Status::LOGIC_ERROR;
+        return Status::logic_error;
     } catch (const std::runtime_error& e) {
         LOG_ERROR(e.what());
-        return Status::RUNTIME_ERROR;
+        return Status::runtime_error;
     } catch (const std::bad_alloc& e) {
         LOG_ERROR(e.what());
-        return Status::BAD_ALLOC;
+        return Status::bad_alloc;
     } catch (const std::bad_exception& e) {
         LOG_ERROR(e.what());
-        return Status::EXCEPTION_ERROR;
+        return Status::exception_error;
     } catch (const std::exception& e) {
         LOG_ERROR("Unhandled exception: {}", e.what());
-        return Status::GENERIC_ERROR;
+        return Status::generic_error;
     } catch (...) {
         LOG_ERROR("Unknown exception occured");
-        return Status::GENERIC_ERROR;
+        return Status::generic_error;
     }
 }
 
+/**
+ * \def RK_CHECK_EXB
+ * \brief \a RK_CHECK equivalent for \a exception_boundary whose functions don't return a value,
+ * only a status code.
+ */
+#define RK_CHECK_EXB(V)                                                            \
+    do {                                                                           \
+        auto _ret = V;                                                             \
+        auto _p_status = std::get_if<Status>(&_ret);                               \
+        if (_p_status && *_p_status != ::rk::Status::ok) { RK_CHECK(*_p_status); } \
+    } while (0)
 } // namespace rk

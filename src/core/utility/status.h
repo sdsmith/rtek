@@ -20,6 +20,7 @@ public:
         renderer_error = 9,
         platform_error = 10,
         window_error = 11,
+        io_error = 12,
     };
 
     constexpr Status(Type status) : m_status(status) {}

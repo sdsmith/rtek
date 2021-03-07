@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/types.h"
 #include "core/utility/assert.h"
 #include "core/utility/status.h"
 
@@ -19,8 +20,32 @@
 #include <GLFW/glfw3.h>
 // clang-format on
 
-// Check that glfw primitive types match the engines
+// Check that glfw peimitives types match the engine's
 RK_STATIC_ASSERT_MSG(sizeof(int) == sizeof(rk::s32), "glfw sizes don't match");
+
+// Check that OpenGL primitives match the engine's
+RK_STATIC_ASSERT_MSG(sizeof(GLboolean) == sizeof(bool), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLchar) == sizeof(char), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLbyte) == sizeof(rk::s8), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLubyte) == sizeof(rk::u8), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLshort) == sizeof(rk::s16), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLushort) == sizeof(rk::u16), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLint) == sizeof(rk::s32), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLuint) == sizeof(rk::u32), "OpenGL sizes don't match");
+// GLfixed
+RK_STATIC_ASSERT_MSG(sizeof(GLint64) == sizeof(rk::s64), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLuint64) == sizeof(rk::u64), "OpenGL sizes don't match");
+RK_STATIC_ASSERT_MSG(sizeof(GLsizei) == sizeof(rk::s32), "OpenGL sizes don't match");
+// GLenum
+// GLintptr
+// GLsizeiptr
+// GLsync
+// GLbitfield
+// GLhalf
+RK_STATIC_ASSERT_MSG(sizeof(GLfloat) == sizeof(rk::f32), "OpenGL sizes don't match");
+// GLclampf
+RK_STATIC_ASSERT_MSG(sizeof(GLdouble) == sizeof(rk::f64), "OpenGL sizes don't match");
+// GLclampd
 
 /**
  * \file glfw.h
