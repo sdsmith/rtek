@@ -13,15 +13,16 @@ void glfw_error_callback(s32 error_code, char const* description)
     // TODO(sdsmith): if using GLFW from multiple threads, this needs to support that
     RK_ASSERT(description);
     RK_ASSERT(error_code != GLFW_NO_ERROR);
-    LOG_ERROR("glfw failed with error code {}: {}", error_code, description);
+    LOG_ERROR("glfw failed with error code {:#010x}: {}", error_code, description);
 }
 
 Status platform::glfw::handle_error() noexcept
 {
-    if (glfwGetError(nullptr) == GLFW_NO_ERROR) { return Status::ok; }
-
-    platform::glfw::destroy();
-    return Status::platform_error;
+    switch (glfwGetError(nullptr)) {
+        case GLFW_NO_ERROR: return Status::ok;
+        case GLFW_INVALID_VALUE: return Status::invalid_value;
+        default: platform::glfw::destroy(); return Status::platform_error;
+    }
 }
 
 // TODO(sdsmith): make class and keep an m_initialized bool around

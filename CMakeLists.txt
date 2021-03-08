@@ -309,6 +309,7 @@ set(source_files
     "src/core/platform/window_manager.cpp"
     "src/core/renderer/renderer.cpp"
     "src/core/utility/assert.cpp"
+    "src/core/utility/status.cpp"
     "src/main.cpp"
 )
 source_group("Source Files" FILES ${source_files})

@@ -93,7 +93,19 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
     // @perf:
     char const* name = glfwGetKeyName(key, 0);
     if (!name) { name = "n/a"; }
-    platform::glfw::handle_error();
+    const Status glfw_status = platform::glfw::handle_error();
+    if (glfw_status != Status::ok) {
+        if (glfw_status == Status::invalid_value) {
+            // Likely invalid scancode. Don't process it.
+            return;
+        } else {
+            // @error: It failed, but there is not much we can do here because it's a void return
+            // callback
+            LOG_ERROR("GLFW failed with status '{}' while processing keyboard events",
+                      to_string(glfw_status));
+            return;
+        }
+    }
     LOG_INFO("Input key: {} {} (scancode {})", name, to_string_glfw_action(action), scancode);
 
     Game_Input_Controller& keyboard = Input_Manager::buffer_input.controllers[Controller::keyboard];

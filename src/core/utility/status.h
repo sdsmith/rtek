@@ -21,6 +21,7 @@ public:
         platform_error = 10,
         window_error = 11,
         io_error = 12,
+        invalid_value = 13,
     };
 
     constexpr Status(Type status) : m_status(status) {}
@@ -30,6 +31,8 @@ public:
 private:
     Type m_status = generic_error;
 };
+
+char const* to_string(Status const& status) noexcept;
 
 RK_INTERNAL
 inline bool status_check(Status status) { return status == Status::ok; }
