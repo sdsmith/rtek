@@ -153,11 +153,19 @@ option(RK_LOGGING_PERF "Compile in minimal logging (for performance). Takes prec
 option(RK_OGL_DEBUG "Display debug messages from OpenGL, including errors." OFF)
 set(RK_SHADER_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders" CACHE STRING
     "Directory containing all the shaders. Prepended to the path of the shader being opened.")
+option(RK_REQUEST_HIGH_PERF_RENDERER "Ask for a high performance renderer. For systems with an iGPU and dGPU, this typically means the dGPU." ON)
 
-message(STATUS "Build type      : " ${CMAKE_BUILD_TYPE})
-message(STATUS "C++ standard    : " ${CMAKE_CXX_STANDARD})
-message(STATUS "OpenGL debug ctx: " ${RK_OGL_DEBUG})
-message(STATUS "Shader base dir : " ${RK_SHADER_BASE_DIR})
+message(STATUS "Build options:")
+message(STATUS "  Build type      : " ${CMAKE_BUILD_TYPE})
+message(STATUS "  C++ standard    : " ${CMAKE_CXX_STANDARD})
+message(STATUS "Rendering options:")
+message(STATUS "  OpenGL debug ctx: " ${RK_OGL_DEBUG})
+message(STATUS "  Shader base dir : " ${RK_SHADER_BASE_DIR})
+message(STATUS "  High performance: " ${RK_REQUEST_HIGH_PERF_RENDERER})
+message(STATUS "Logging options:")
+message(STATUS "  RK_LOG_LEVEL    : " ${RK_LOG_LEVEL})
+message(STATUS "  RK_LOGGING_OFF  : " ${RK_LOGGING_OFF})
+message(STATUS "  RK_LOGGING_PERF : " ${RK_LOGGING_PERF})
 
 # ---------------------------------------------------------------------------------------
 # Sub-projects
@@ -278,6 +286,7 @@ set(header_files
     "src/core/platform/input_manager.h"
     "src/core/platform/platform.h"
     "src/core/platform/window_manager.h"
+    "src/core/renderer/request_high_perf_renderer.h"
     "src/core/renderer/renderer.h"
     "src/core/rkmisc.h"
     "src/core/types.h"
@@ -365,6 +374,9 @@ if (RK_OGL_DEBUG)
 endif()
 if (RK_SHADER_BASE_DIR)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RK_SHADER_BASE_DIR="${RK_SHADER_BASE_DIR}")
+endif()
+if (RK_REQUEST_HIGH_PERF_RENDERER)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_REQUEST_HIGH_PERF_RENDERER)
 endif()
 
 # ---------------------------------------------------------------------------------------

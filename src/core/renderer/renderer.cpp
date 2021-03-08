@@ -7,9 +7,13 @@
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
 #include "fmt/core.h"
+#include "sds/string.h"
 #include <cstring>
 #include <fstream>
 #include <iterator>
+
+// Ask for a high performance renderer
+#include "core/renderer/request_high_perf_renderer.h"
 
 /**
  * \def RK_SHADER_BASE_DIR
@@ -184,8 +188,16 @@ Status Renderer::setup_gl_api() noexcept
         return Status::renderer_error;
     }
 
+    // Print renderer information
+    LOG_INFO(
+        "Renderer info:\n"
+        "  Vendor       : {}\n"
+        "  Renderer     : {}\n"
+        "  Graphics API : OpenGL {}",
+        glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
+
     // Check that we are in a debug context
-    s32 ctx_flags;
+    s32 ctx_flags = 0;
     glGetIntegerv(GL_CONTEXT_FLAGS, &ctx_flags);
     bool const is_ogl_debug_ctx = (ctx_flags & GL_CONTEXT_FLAG_DEBUG_BIT);
     LOG_INFO("OpenGL debug context: {}", (is_ogl_debug_ctx ? "true" : "false"));
@@ -210,8 +222,13 @@ Status Renderer::setup_gl_api() noexcept
     RK_CHECK(handle_ogl_error());
 #endif
 
-    s32 window_w = -1;
-    s32 window_h = -1;
+    LOG_INFO(
+        "OpenGL context info:\n"
+        "  Debug: {}",
+        sds::to_string(is_ogl_debug_ctx));
+
+    s32 window_w = 0;
+    s32 window_h = 0;
     glfwGetWindowSize(m_window, &window_w, &window_h);
     RK_CHECK(platform::glfw::handle_error());
     glViewport(0, 0, window_w, window_h);

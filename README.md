@@ -42,3 +42,4 @@ Logging:
 Graphics:
 - `RK_OGL_DEBUG`: Display debug messages from OpenGL, including errors.
 - `RK_SHADER_BASE_DIR`: Directory containing all the shaders. Prepended to the path of the shader being opened.
+- `RK_REQUEST_HIGH_PERF_RENDERER`: Ask for a high performance renderer. For systems with an iGPU and dGPU, this typically means the dGPU.
