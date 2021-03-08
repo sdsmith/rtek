@@ -4,7 +4,7 @@
 #include "core/platform/glfw.h"
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
-#include <sdslib/array/make_array.h>
+#include "sds/array/make_array.h"
 
 using namespace rk;
 
