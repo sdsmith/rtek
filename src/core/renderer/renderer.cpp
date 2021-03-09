@@ -43,11 +43,7 @@ Status Renderer::prepare_window() noexcept
     return platform::glfw::handle_error();
 }
 
-void Renderer::set_window(GLFWwindow* window) noexcept
-{
-    RK_ASSERT(window);
-    m_window = window;
-}
+void Renderer::set_window(Window& window) noexcept { m_window = &window; }
 
 /**
  * \brief Convert an OpenGL error to a string.
@@ -180,7 +176,9 @@ void GLAPIENTRY ogl_debug_callback(GLenum source, GLenum type, u32 id, GLenum se
 Status Renderer::setup_gl_api() noexcept
 {
     // Renderer's window must be the current rendering context.
-    RK_ASSERT(m_window == glfwGetCurrentContext() && platform::glfw::handle_error() == Status::ok);
+    bool is_current_context = false;
+    RK_CHECK(m_window->is_current_context(is_current_context));
+    RK_ASSERT(is_current_context);
 
     // Initialize GLAD with the OS-specific OpenGL function pointers
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
@@ -236,8 +234,7 @@ Status Renderer::setup_gl_api() noexcept
 
     s32 window_w = 0;
     s32 window_h = 0;
-    glfwGetWindowSize(m_window, &window_w, &window_h);
-    RK_CHECK(platform::glfw::handle_error());
+    RK_CHECK(m_window->get_window_size(window_w, window_h));
     glViewport(0, 0, window_w, window_h);
 
     LOG_INFO("OpenGL context initialized: {}", get_gl_api_version());
@@ -253,11 +250,7 @@ void Renderer::draw_wireframe(bool enable) const noexcept
     }
 }
 
-Status Renderer::swap_buffers() const noexcept
-{
-    glfwSwapBuffers(m_window);
-    return platform::glfw::handle_error();
-}
+Status Renderer::swap_buffers() const noexcept { return m_window->swap_buffers(); }
 
 /**
  * \brief Window resize callback function.

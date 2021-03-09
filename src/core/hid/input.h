@@ -30,12 +30,17 @@ struct Game_State {
     bool request_quit;
 };
 
+struct Window_Settings {
+    bool fullscreen = false;
+};
+
 struct Graphics_Settings {
     /** Draw wirefram objects. */
     bool wireframe = false;
 };
 
 struct Game_Settings {
+    Window_Settings window;
     Graphics_Settings graphics;
 };
 

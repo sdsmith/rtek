@@ -133,6 +133,9 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
         case GLFW_KEY_F7:
             if (!key_down) { game_settings.graphics.wireframe = !game_settings.graphics.wireframe; }
             break;
+        case GLFW_KEY_F11:
+            if (!key_down) { game_settings.window.fullscreen = !game_settings.window.fullscreen; }
+            break;
         case GLFW_KEY_ESCAPE:
             if (!key_down) { game_state.request_quit = true; }
             break;

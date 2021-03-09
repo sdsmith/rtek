@@ -154,18 +154,25 @@ Status Rtek_Engine::run() noexcept
 
     glClearColor(0.4f, 0.4f, 0.7f, 1.0f);
 
+    Window& window = m_window_mgr->get_window();
+
     bool running = true;
-    while (!m_window_mgr->should_close_window() && running) {
-        RK_CHECK(m_input_mgr->process_new_input());
+    while (!window.should_close_window() && running) {
+        { // Input
+            RK_CHECK(m_input_mgr->process_new_input());
 
-        Game_Input const& input = m_input_mgr->get_input();
-        running = !input.state.request_quit;
-        if (!running) { break; }
+            Game_Input const& input = m_input_mgr->get_input();
+            Window_Settings const& window_settings = input.settings.window;
+            Graphics_Settings const& graphics_settings = input.settings.graphics;
 
-        Graphics_Settings const& graphics_settings = input.settings.graphics;
-        m_renderer->draw_wireframe(graphics_settings.wireframe);
+            running = !input.state.request_quit;
+            if (!running) { break; }
 
-        { // Draw
+            RK_CHECK(window.set_fullscreen(window_settings.fullscreen));
+            m_renderer->draw_wireframe(graphics_settings.wireframe);
+        }
+
+        { // Rendering
             glClear(GL_COLOR_BUFFER_BIT);
 
             glUseProgram(shader_program);

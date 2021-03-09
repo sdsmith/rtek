@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/platform/glfw.h"
+#include "core/platform/window.h"
 #include "core/utility/status.h"
 #include <string>
 
@@ -18,6 +19,7 @@ public:
      *
      * The type of rendering being done requires a specific type of window context.
      *
+     * \see Window_Manager::create_window
      * \see Renderer::setup_gl_api
      */
     [[nodiscard]] Status prepare_window() noexcept;
@@ -25,7 +27,7 @@ public:
     /**
      * \brief Set the window with the render context.
      */
-    void set_window(GLFWwindow* window) noexcept;
+    void set_window(Window& window) noexcept;
 
     /**
      * \brief Handle an OpenGL error. Return ok if no error.
@@ -61,7 +63,7 @@ public:
     [[nodiscard]] Status compile_shader(char const* name, u32 shader_id) const noexcept;
 
 private:
-    GLFWwindow* m_window = nullptr;
+    Window* m_window = nullptr;
     static constexpr s32 m_ogl_ctx_version_major = 4;
     static constexpr s32 m_ogl_ctx_version_minor = 6;
 };
