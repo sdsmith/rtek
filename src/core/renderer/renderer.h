@@ -40,6 +40,11 @@ public:
     [[nodiscard]] Status setup_gl_api() noexcept;
 
     /**
+     * \brief Draw wireframe primitives in any subsequent draw calls.
+     */
+    void draw_wireframe(bool enable) const noexcept;
+
+    /**
      * \brief Swap frame buffers.
      */
     [[nodiscard]] Status swap_buffers() const noexcept;

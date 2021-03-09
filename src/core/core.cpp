@@ -162,6 +162,9 @@ Status Rtek_Engine::run() noexcept
         running = !input.state.request_quit;
         if (!running) { break; }
 
+        Graphics_Settings const& graphics_settings = input.settings.graphics;
+        m_renderer->draw_wireframe(graphics_settings.wireframe);
+
         { // Draw
             glClear(GL_COLOR_BUFFER_BIT);
 

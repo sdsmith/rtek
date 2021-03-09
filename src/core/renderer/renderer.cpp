@@ -237,6 +237,15 @@ Status Renderer::setup_gl_api() noexcept
     return Status::ok;
 }
 
+void Renderer::draw_wireframe(bool enable) const noexcept
+{
+    if (enable) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
 Status Renderer::swap_buffers() const noexcept
 {
     glfwSwapBuffers(m_window);

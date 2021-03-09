@@ -6,7 +6,7 @@
 
 using namespace rk;
 
-Game_Input Input_Manager::buffer_input = Input_Manager::zeroed_input;
+Game_Input Input_Manager::input_buffer = Input_Manager::zeroed_input;
 
 RK_INTERNAL
 constexpr bool is_shift_key_active(s32 modifier_keys) noexcept
@@ -108,8 +108,11 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
     }
     LOG_INFO("Input key: {} {} (scancode {})", name, to_string_glfw_action(action), scancode);
 
-    Game_Input_Controller& keyboard = Input_Manager::buffer_input.controllers[Controller::keyboard];
-    Game_State& game_state = Input_Manager::buffer_input.state;
+    Game_Input& input_buf = Input_Manager::input_buffer;
+
+    Game_Input_Controller& keyboard = input_buf.controllers[Controller::keyboard];
+    Game_State& game_state = input_buf.state;
+    Game_Settings& game_settings = input_buf.settings;
 
     // Ignore GLFW_REPEAT when processing physical keys.
     //
@@ -127,6 +130,9 @@ void process_keyboard_event_callback(GLFWwindow* window, s32 key, s32 scancode, 
         case GLFW_KEY_A: update_input_button(keyboard.left(), key_down); break;
         case GLFW_KEY_S: update_input_button(keyboard.down(), key_down); break;
         case GLFW_KEY_D: update_input_button(keyboard.right(), key_down); break;
+        case GLFW_KEY_F7:
+            if (!key_down) { game_settings.graphics.wireframe = !game_settings.graphics.wireframe; }
+            break;
         case GLFW_KEY_ESCAPE:
             if (!key_down) { game_state.request_quit = true; }
             break;
@@ -149,7 +155,7 @@ Status Input_Manager::process_new_input() noexcept
     RK_CHECK(platform::glfw::handle_error());
 
     // Update our new input with the input collected this cycle.
-    *m_new_input = buffer_input;
+    *m_new_input = input_buffer;
 
     return Status::ok;
 }
@@ -163,11 +169,14 @@ void Input_Manager::prepare_for_new_input() noexcept
     std::swap(m_new_input, m_old_input);
 
     Game_State& new_game_state = m_new_input->state;
+    Game_Settings& new_game_settings = m_new_input->settings;
+    Game_Settings& old_game_settings = m_old_input->settings;
     Game_Input_Controller& new_keyboard = m_new_input->controllers[Controller::keyboard];
     Game_Input_Controller& old_keyboard = m_old_input->controllers[Controller::keyboard];
 
-    // Reset toggles
-    new_game_state.toggle_pause = false;
+    // Carry the settings over
+    // TODO(sdsmith): @perf: Should settings be their own object?
+    new_game_settings = old_game_settings;
 
     // Zero new keyboard
     new_keyboard = zeroed_input.controllers[Controller::keyboard];
@@ -188,6 +197,6 @@ void Input_Manager::prepare_for_new_input() noexcept
         new_button->ended_down = new_button->started_down;
     }
 
-    // Set the buffer_input to the new input
-    buffer_input = *m_new_input;
+    // Initialize the input buffer with any relevant state from the last cycle
+    Input_Manager::input_buffer = *m_new_input;
 }

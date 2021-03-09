@@ -28,11 +28,20 @@ struct Game_Input_Controller {
 
 struct Game_State {
     bool request_quit;
-    bool toggle_pause;
+};
+
+struct Graphics_Settings {
+    /** Draw wirefram objects. */
+    bool wireframe = false;
+};
+
+struct Game_Settings {
+    Graphics_Settings graphics;
 };
 
 struct Game_Input {
     Game_State state;
+    Game_Settings settings;
     std::array<Game_Input_Controller, 1> controllers;
 };
 } // namespace rk

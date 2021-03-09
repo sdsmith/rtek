@@ -26,7 +26,7 @@ public:
     Status process_new_input() noexcept;
 
     /** Input for the current cycle. Populated by the keyboard input callback. */
-    static Game_Input buffer_input;
+    static Game_Input input_buffer;
 
 private:
     std::array<Game_Input, 2> m_input;
