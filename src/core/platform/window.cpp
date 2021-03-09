@@ -41,6 +41,9 @@ Status Window::initialize(char const* title, s32 width, s32 height) noexcept
     // window was on for fullscreen/window toggle
     m_monitor = glfwGetPrimaryMonitor();
 
+    // Set user data associated with window to `this`. Retrievable with `glfwGetMonitorUserPointer`.
+    glfwSetMonitorUserPointer(m_monitor, this);
+
     // TODO(sdsmith): these aren't actually needed AFIAK because the m_window_{size,pos} are only
     // used to store the last non-fullscreen values so we can exit fullscreen and return to the old
     // layout.

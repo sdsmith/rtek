@@ -3,10 +3,48 @@
 #include "GLFW/glfw3.h"
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
+#include "core/types.h"
 
 using namespace rk;
 
-Status Window_Manager::initialize() noexcept { return Status::ok; }
+/**
+ * \brief Called when the monitor configuration has changed.
+ */
+RK_INTERNAL
+void monitor_configuration_callback(GLFWmonitor* monitor, s32 event)
+{
+    RK_ASSERT(monitor);
+
+    // event: GLFW_CONNECTED, GLFW_DISCONNECTED
+
+    Window* window = static_cast<Window*>(glfwGetMonitorUserPointer(monitor));
+
+    switch (event) {
+        case GLFW_CONNECTED:
+            LOG_INFO("Monitor '{}' connected", glfwGetMonitorName(monitor));
+            // TODO(sdsmith): check if there is a new primary and if we should change monitors.
+            break;
+
+        case GLFW_DISCONNECTED: {
+            LOG_INFO("Monitor '{}' disconnected", glfwGetMonitorName(monitor));
+            if (window) {
+                // TODO(sdsmith): A window we use has been disconnected
+            }
+        } break;
+
+        default:
+            LOG_CRITICAL("Unknown GLFW monitor action on monitor '': {}",
+                         glfwGetMonitorName(monitor), event);
+            RK_ASSERT(0);
+    }
+}
+
+Status Window_Manager::initialize() noexcept
+{
+    glfwSetMonitorCallback(monitor_configuration_callback);
+
+    return platform::glfw::handle_error();
+}
 
 Status Window_Manager::destroy() noexcept { return Status::ok; }
 
