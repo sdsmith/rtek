@@ -4,6 +4,7 @@
 #include "core/platform/glfw.h"
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
+#include "sds/array.h"
 #include "sds/array/make_array.h"
 
 using namespace rk;
@@ -104,16 +105,54 @@ Status Rtek_Engine::run() noexcept
         glBindVertexArray(vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(f32), vertices.data(),
-                     GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sds::byte_size(vertices), vertices.data(), GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), nullptr);
         glEnableVertexAttribArray(0);
 
+        // glVertexAttribPointer registered the vbo as the vertex attributes buffer. Can safely
+        // unbind.
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindVertexArray(0); // unbind
+        glBindVertexArray(0);
     }
+
+    constexpr auto rectangle_vertices = sds::make_array<f32>(0.5f, 0.5f, 0.0f,   // top right
+                                                             0.5f, -0.5f, 0.0f,  // bottom right
+                                                             -0.5f, -0.5f, 0.0f, // bottom left
+                                                             -0.5f, 0.5f, 0.0f   // top left
+    );
+
+    constexpr auto rectangle_indicies = sds::make_array<u32>(0U, 1U, 3U, // 1st
+                                                             1U, 2U, 3U  // 2nd
+    );
+
+    u32 rectangle_vao = 0;
+    u32 rectangle_vbo = 0;
+    u32 rectangle_ebo = 0;
+    glGenVertexArrays(1, &rectangle_vao);
+    glGenBuffers(1, &rectangle_vbo);
+    glGenBuffers(1, &rectangle_ebo);
+
+    { // Config rectangle vao
+        glBindVertexArray(rectangle_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, rectangle_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sds::byte_size(rectangle_vertices), rectangle_vertices.data(),
+                     GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangle_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sds::byte_size(rectangle_indicies),
+                     rectangle_indicies.data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), nullptr);
+        glEnableVertexAttribArray(0);
+
+        // glVertexAttribPointer registered the vbo as the vertex attributes buffer. Can safely
+        // unbind.
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindVertexArray(0);
+    }
+
+    glClearColor(0.4f, 0.4f, 0.7f, 1.0f);
 
     bool running = true;
     while (!m_window_mgr->should_close_window() && running) {
@@ -123,14 +162,19 @@ Status Rtek_Engine::run() noexcept
         running = !input.state.request_quit;
         if (!running) { break; }
 
-        glClearColor(0.4f, 0.4f, 0.7f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        { // Draw
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        // Prepare to draw
-        glUseProgram(shader_program);
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        RK_CHECK(m_renderer->handle_ogl_error());
+            glUseProgram(shader_program);
+
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
+            glBindVertexArray(rectangle_vao);
+            glDrawElements(GL_TRIANGLES, rectangle_indicies.size(), GL_UNSIGNED_INT, nullptr);
+
+            glBindVertexArray(0);
+        }
 
         RK_CHECK(m_renderer->swap_buffers());
         Logger::flush(); // @perf: do this on an async thread
@@ -138,6 +182,8 @@ Status Rtek_Engine::run() noexcept
 
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &rectangle_vao);
+    glDeleteBuffers(1, &rectangle_vbo);
     glDeleteProgram(shader_program);
 
     return Status::ok;
