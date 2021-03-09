@@ -5,23 +5,6 @@
 
 using namespace rk;
 
-// void Window::window_resize_callback(GLFWwindow* glfw_window, s32 window_w, s32 window_h) noexcept
-// {
-//     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
-//     RK_ASSERT(window);
-//     window->resize(window_w, window_h);
-// }
-
-// void Window::resize(s32 width, s32 height) noexcept
-// {
-//     // TODO(sdsmith): update the viewport
-//     if (!is_fullscreen()) {
-//         // Update the location of the non-fullscreen window
-//         m_window_size[0] = width;
-//         m_window_size[1] = height;
-//     }
-// }
-
 Status Window::initialize(char const* title, s32 width, s32 height) noexcept
 {
     m_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
@@ -33,9 +16,6 @@ Status Window::initialize(char const* title, s32 width, s32 height) noexcept
 
     // Set user data associated with window to `this`. Retrievable with `glfwGetWindowUserPointer`.
     glfwSetWindowUserPointer(m_window, this);
-
-    // TODO(sdsmith): necessary?
-    // glfwSetWindowSizeCallback(m_window, window_resize_callback);
 
     // TODO(sdsmith): only supports using the primary monitor. Support using the last monitor the
     // window was on for fullscreen/window toggle
