@@ -222,6 +222,13 @@ Status Renderer::setup_gl_api() noexcept
     RK_CHECK(handle_ogl_error());
 #endif
 
+    // Explicitly set counter-clockwise winding order
+    glFrontFace(GL_CCW);
+
+    // Enable face culling
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
     LOG_INFO(
         "OpenGL context info:\n"
         "  Debug: {}",

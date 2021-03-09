@@ -123,8 +123,8 @@ Status Rtek_Engine::run() noexcept
                                                              -0.5f, 0.5f, 0.0f   // top left
     );
 
-    constexpr auto rectangle_indicies = sds::make_array<u32>(0U, 1U, 3U, // 1st
-                                                             1U, 2U, 3U  // 2nd
+    constexpr auto rectangle_indicies = sds::make_array<u32>(3U, 1U, 0U, // 1st
+                                                             3U, 2U, 1U  // 2nd
     );
 
     u32 rectangle_vao = 0;
