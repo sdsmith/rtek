@@ -2,6 +2,7 @@
 
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
+#include "core/renderer/opengl/shader_program.h"
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
 #include "sds/array.h"
@@ -70,28 +71,8 @@ Status Rtek_Engine::destroy() noexcept
 
 Status Rtek_Engine::run() noexcept
 {
-    u32 shader_program = glCreateProgram();
-    { // Create shader program
-        u32 vert_shader = glCreateShader(GL_VERTEX_SHADER);
-        RK_CHECK(m_renderer->compile_shader("identity.vert", vert_shader));
-
-        u32 frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        RK_CHECK(m_renderer->compile_shader("identity.frag", frag_shader));
-
-        glAttachShader(shader_program, vert_shader);
-        glAttachShader(shader_program, frag_shader);
-        glLinkProgram(shader_program);
-
-        s32 link_success = 0;
-        glGetProgramiv(shader_program, GL_LINK_STATUS, &link_success);
-        if (!link_success) {
-            LOG_ERROR("Failed to link program {}: {}", shader_program,
-                      m_renderer->get_program_info_log(shader_program));
-        }
-
-        glDeleteShader(vert_shader);
-        glDeleteShader(frag_shader);
-    }
+    Shader_Program simple_shader("identity.vert", "identity.frag");
+    RK_CHECK(simple_shader.compile());
 
     constexpr auto vertices =
         sds::make_array<f32>(-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f);
@@ -175,7 +156,7 @@ Status Rtek_Engine::run() noexcept
         { // Rendering
             glClear(GL_COLOR_BUFFER_BIT);
 
-            glUseProgram(shader_program);
+            simple_shader.use();
 
             glBindVertexArray(vao);
             glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -194,7 +175,7 @@ Status Rtek_Engine::run() noexcept
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &rectangle_vao);
     glDeleteBuffers(1, &rectangle_vbo);
-    glDeleteProgram(shader_program);
+    simple_shader.destroy(); // not explicitly necessary, but good practice
 
     return Status::ok;
 }

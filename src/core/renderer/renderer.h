@@ -55,13 +55,6 @@ public:
 
     [[nodiscard]] std::string get_gl_api_version() const noexcept;
 
-    [[nodiscard]] std::string get_program_info_log(u32 id) const noexcept;
-
-    /**
-     * Get the content of a shader file.
-     */
-    [[nodiscard]] Status compile_shader(char const* name, u32 shader_id) const noexcept;
-
 private:
     Window* m_window = nullptr;
     static constexpr s32 m_ogl_ctx_version_major = 4;
