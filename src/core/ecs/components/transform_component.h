@@ -2,9 +2,9 @@
 
 #include "core/math/vector.h"
 
-namespace rk::Ecs
+namespace rk::ecs
 {
 struct Transform_Component : public Component {
     Vector3 position;
 };
-} // namespace rk
+} // namespace rk::ecs

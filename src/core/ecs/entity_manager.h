@@ -24,4 +24,4 @@ private:
     // std::vector<Component*> components;
 };
 
-} // namespace rk
+} // namespace rk::ecs

@@ -10,4 +10,4 @@ public:
 
     // void NotifyComponent(Component*)
 };
-} // namespace rk
+} // namespace rk::ecs

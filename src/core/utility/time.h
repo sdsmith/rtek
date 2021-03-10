@@ -3,4 +3,4 @@
 namespace rk::time
 {
 using Time_Step = f32;
-} // namespace rk
+} // namespace rk::time

@@ -2,9 +2,9 @@
 
 #include "core/math/vector.h"
 
-namespace rk::Ecs
+namespace rk::ecs
 {
 struct Movement_Component : public Component {
     Vector3 velocity;
 };
-} // namespace rk
+} // namespace rk::ecs

@@ -10,7 +10,7 @@ class Vector3 {
 public:
     static constexpr int dimension = 3; //!< Dimension of the vector.
 
-    Vector3()  = default;
+    Vector3() = default;
     Vector3(f32 x, f32 y, f32 z) : vec{{x, y, z}} {}
 
     [[nodiscard]] f32 x() const;

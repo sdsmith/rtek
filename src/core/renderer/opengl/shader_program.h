@@ -20,15 +20,15 @@ private:
 
     // TODO(sdsmith): risky to hold string pointers since they might be temps. This solves itself
     // once we have resource ids.
-    const char *m_vert_shader_path = nullptr;
-    const char *m_frag_shader_path = nullptr;
+    const char* m_vert_shader_path = nullptr;
+    const char* m_frag_shader_path = nullptr;
 
 public:
     /**
      * \brief Set the shaders to be used with the shader prorgam.
      */
     // TODO(sdsmith): @perf: replace with resource id
-    Shader_Program(char const *vert_shader_path, char const *frag_shader_path) noexcept;
+    Shader_Program(char const* vert_shader_path, char const* frag_shader_path) noexcept;
     ~Shader_Program() noexcept;
 
     /**

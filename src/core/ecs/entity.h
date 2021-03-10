@@ -26,4 +26,4 @@ struct Entity
 */
 
 class Entity_Definition {}; // TODO(sdsmith):
-} // namespace rk
+} // namespace rk::ecs
