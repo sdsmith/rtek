@@ -5,8 +5,8 @@
 #include "core/renderer/opengl/shader_program.h"
 #include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
-#include "sds/array.h"
-#include "sds/array/make_array.h"
+#include <sds/array.h>
+#include <sds/array/make_array.h>
 
 using namespace rk;
 

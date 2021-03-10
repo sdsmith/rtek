@@ -6,9 +6,9 @@
 
 #include "core/platform/platform.h"
 #include "core/utility/status.h"
-#include "fmt/chrono.h"
-#include "fmt/core.h"
 
+#include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <cassert>
 #include <exception>
 #include <iostream>
@@ -70,9 +70,9 @@
 
 // NOTE(sdsmith): SPDLOG_ACTIVE_LEVEL must be set before spdlog.h is included.
 #define SPDLOG_ACTIVE_LEVEL RK_LOG_LEVEL
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/spdlog.h"
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 // Use the follow macros for logging
 //
