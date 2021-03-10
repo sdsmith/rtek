@@ -2,7 +2,7 @@
 
 #include "core/platform/glfw.h"
 #include "core/platform/window.h"
-#include "core/utility/status.h"
+#include "core/status.h"
 #include <string>
 
 namespace rk

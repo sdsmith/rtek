@@ -1,6 +1,6 @@
 #include "core/ecs/entity_manager.h"
 
-#include "core/utility/assert.h"
+#include "core/assert.h"
 
 using namespace rk::ecs;
 

@@ -1,7 +1,7 @@
 #include "core/renderer/opengl/shader_program.h"
 
+#include "core/assert.h"
 #include "core/logging/logging.h"
-#include "core/utility/assert.h"
 #include "core/utility/no_exception.h"
 #include <glad/glad.h>
 #include <fstream>

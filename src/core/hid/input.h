@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/types.h"
-#include "core/utility/assert.h"
 #include <array>
 #include <cstddef>
 

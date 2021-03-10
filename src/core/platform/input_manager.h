@@ -2,7 +2,7 @@
 
 #include "core/hid/input.h"
 #include "core/platform/glfw.h"
-#include "core/utility/status.h"
+#include "core/status.h"
 
 namespace rk
 {

@@ -2,7 +2,6 @@
 
 #include "core/logging/logging.h"
 #include "core/types.h"
-#include "core/utility/status.h"
 
 using namespace rk;
 

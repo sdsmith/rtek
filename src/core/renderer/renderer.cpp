@@ -1,9 +1,9 @@
 #include "core/renderer/renderer.h"
 
+#include "core/assert.h"
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
 #include "core/types.h"
-#include "core/utility/assert.h"
 #include <fmt/core.h>
 #include <glad/glad.h>
 #include <sds/string.h>

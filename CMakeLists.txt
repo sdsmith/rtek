@@ -271,6 +271,7 @@ set(no_group_source_files
 source_group("" FILES ${no_group_source_files})
 
 set(header_files
+    "src/core/assert.h"
     "src/core/core.h"
     "src/core/ecs/components/component.h"
     "src/core/ecs/components/movement_component.h"
@@ -291,16 +292,16 @@ set(header_files
     "src/core/renderer/request_high_perf_renderer.h"
     "src/core/renderer/renderer.h"
     "src/core/rkmisc.h"
+    "src/core/status.h"
     "src/core/types.h"
-    "src/core/utility/assert.h"
     "src/core/utility/no_exception.h"
-    "src/core/utility/status.h"
     "src/core/utility/time.h"
-    "src/core/utility/version.h"
+    "src/core/version.h"
 )
 source_group("Header Files" FILES ${header_files})
 
 set(source_files
+    "src/core/assert.cpp"
     "src/core/core.cpp"
     "src/core/ecs/entity_manager.cpp"
     "src/core/logging/logging.cpp"
@@ -312,8 +313,7 @@ set(source_files
     "src/core/platform/window_manager.cpp"
     "src/core/renderer/opengl/shader_program.cpp"
     "src/core/renderer/renderer.cpp"
-    "src/core/utility/assert.cpp"
-    "src/core/utility/status.cpp"
+    "src/core/status.cpp"
     "src/main.cpp"
 )
 source_group("Source Files" FILES ${source_files})

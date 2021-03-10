@@ -1,6 +1,6 @@
 #include "core/core.h"
-#include "core/utility/status.h"
-#include "core/utility/version.h"
+#include "core/status.h"
+#include "core/version.h"
 
 int main(int argc, char* argv[])
 {

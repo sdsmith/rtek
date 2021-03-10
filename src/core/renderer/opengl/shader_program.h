@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/utility/status.h"
+#include "core/status.h"
 
 namespace rk
 {

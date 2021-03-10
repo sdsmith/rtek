@@ -4,7 +4,7 @@
 #include "core/platform/input_manager.h"
 #include "core/platform/window.h"
 #include "core/renderer/renderer.h"
-#include "core/utility/status.h"
+#include "core/status.h"
 
 namespace rk
 {

@@ -2,8 +2,8 @@
 
 #include <type_traits>
 
+#include "core/assert.h"
 #include "core/logging/logging.h"
-#include "core/utility/assert.h"
 
 using namespace rk;
 

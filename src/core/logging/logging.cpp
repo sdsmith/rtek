@@ -1,6 +1,6 @@
 #include "core/logging/logging.h"
 
-#include "core/utility/assert.h"
+#include "core/assert.h"
 #include <spdlog/spdlog.h>
 #include <string>
 

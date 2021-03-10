@@ -1,6 +1,6 @@
 #include "core/math/vector.h"
 
-#include "core/utility/assert.h"
+#include "core/assert.h"
 #include <cassert>
 #include <cmath>
 #include <sstream>

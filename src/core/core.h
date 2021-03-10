@@ -3,8 +3,8 @@
 #include "core/platform/input_manager.h"
 #include "core/platform/window_manager.h"
 #include "core/renderer/renderer.h"
+#include "core/status.h"
 #include "core/types.h"
-#include "core/utility/status.h"
 #include <memory>
 
 namespace rk

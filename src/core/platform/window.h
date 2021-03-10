@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/platform/glfw.h"
-#include "core/utility/status.h"
+#include "core/status.h"
 #include <array>
 
 namespace rk

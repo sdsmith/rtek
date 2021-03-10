@@ -5,7 +5,7 @@
  */
 
 #include "core/platform/platform.h"
-#include "core/utility/status.h"
+#include "core/status.h"
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>

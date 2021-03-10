@@ -1,7 +1,7 @@
 #pragma once
 
+#include "core/status.h"
 #include "core/types.h"
-#include "core/utility/status.h"
 #include <cstring>
 
 #if RK_OS == RK_OS_WINDOWS

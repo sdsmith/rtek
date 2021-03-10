@@ -1,4 +1,4 @@
-#include "core/utility/status.h"
+#include "core/status.h"
 
 char const* rk::to_string(Status const& status) noexcept
 {

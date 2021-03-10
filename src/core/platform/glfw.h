@@ -1,8 +1,8 @@
 #pragma once
 
+#include "core/assert.h"
+#include "core/status.h"
 #include "core/types.h"
-#include "core/utility/assert.h"
-#include "core/utility/status.h"
 
 // clang-format off
 //
