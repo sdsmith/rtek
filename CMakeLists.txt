@@ -271,6 +271,7 @@ set(no_group_source_files
 source_group("" FILES ${no_group_source_files})
 
 set(header_files
+    "external/stb/include/stb/stb_image.h"
     "src/core/assert.h"
     "src/core/core.h"
     "src/core/ecs/components/component.h"
@@ -314,6 +315,7 @@ set(source_files
     "src/core/renderer/opengl/shader_program.cpp"
     "src/core/renderer/renderer.cpp"
     "src/core/status.cpp"
+    "src/core/utility/stb.cpp"
     "src/main.cpp"
 )
 source_group("Source Files" FILES ${source_files})
@@ -329,6 +331,7 @@ set(all_code_files
 add_executable(${PROJECT_NAME} ${all_code_files})
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include"
 )
 
 add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad sdslib)
