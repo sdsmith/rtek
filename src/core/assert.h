@@ -19,11 +19,11 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
  *
  * Meant for assertions that should be run in production.
  */
-#define RK_CRITICAL_ASSERT(expr)                             \
-    if (expr) {                                              \
-    } else {                                                 \
-        report_assertion_failure(#expr, __FILE__, __LINE__); \
-        debug_break();                                       \
+#define RK_CRITICAL_ASSERT(expr)                                   \
+    if (expr) {                                                    \
+    } else {                                                       \
+        ::rk::report_assertion_failure(#expr, __FILE__, __LINE__); \
+        ::rk::debug_break();                                       \
     }
 
 /**
