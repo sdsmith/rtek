@@ -155,9 +155,13 @@ set(RK_SHADER_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders" CACHE STRING
     "Directory containing all the shaders. Prepended to the path of the shader being opened.")
 option(RK_REQUEST_HIGH_PERF_RENDERER "Ask for a high performance renderer. For systems with an iGPU and dGPU, this typically means the dGPU." ON)
 
+set(RK_DATA_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data" CACHE STRING "Directory containing data for the engine to consume")
+
 message(STATUS "Build options:")
 message(STATUS "  Build type      : " ${CMAKE_BUILD_TYPE})
 message(STATUS "  C++ standard    : " ${CMAKE_CXX_STANDARD})
+message(STATUS "General options:")
+message(STATUS "  Data dir        : " ${RK_DATA_BASE_DIR})
 message(STATUS "Rendering options:")
 message(STATUS "  OpenGL debug ctx: " ${RK_OGL_DEBUG})
 message(STATUS "  Shader base dir : " ${RK_SHADER_BASE_DIR})
@@ -170,6 +174,13 @@ message(STATUS "  RK_LOGGING_PERF : " ${RK_LOGGING_PERF})
 # ---------------------------------------------------------------------------------------
 # Sub-projects
 # ---------------------------------------------------------------------------------------
+# Set the install prefix
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/_deps" CACHE PATH "..." FORCE)
+endif()
+# Add install location to find_* search path
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}")
+
 message(STATUS "Build subprojects...")
 include(FetchContent)
 
@@ -385,6 +396,9 @@ if (RK_SHADER_BASE_DIR)
 endif()
 if (RK_REQUEST_HIGH_PERF_RENDERER)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RK_REQUEST_HIGH_PERF_RENDERER)
+endif()
+if (RK_DATA_BASE_DIR)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_DATA_BASE_DIR="${RK_DATA_BASE_DIR}")
 endif()
 
 # ---------------------------------------------------------------------------------------

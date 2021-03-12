@@ -6,6 +6,14 @@
 
 using namespace rk;
 
+/**
+ * \def RK_DATA_BASE_DIR
+ * \brief Base path to the data directory.
+ */
+#ifndef RK_DATA_BASE_DIR
+#    define RK_DATA_BASE_DIR "data"
+#endif
+
 Status Window_Manager::initialize() noexcept { return Status::ok; }
 
 Status Window_Manager::destroy() noexcept { return Status::ok; }
