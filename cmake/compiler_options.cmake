@@ -1,13 +1,16 @@
-# log all *_INIT variables
-get_cmake_property(_varNames VARIABLES)
-list (REMOVE_DUPLICATES _varNames)
-list (SORT _varNames)
-foreach (_varName ${_varNames})
-    if (_varName MATCHES "_INIT$")
-        message(STATUS "${_varName}=${${_varName}}")
-    endif()
-endforeach()
+option(RTEK_PRINT_CMAKE_INIT_VARS "Print CMAKE default init variables" OFF)
 
+if (RTEK_PRINT_CMAKE_INIT_VARS)
+    # log all *_INIT variables
+    get_cmake_property(_varNames VARIABLES)
+    list (REMOVE_DUPLICATES _varNames)
+    list (SORT _varNames)
+    foreach (_varName ${_varNames})
+        if (_varName MATCHES "_INIT$")
+            message(STATUS "${_varName}=${${_varName}}")
+        endif()
+    endforeach()
+endif()
 
 # Clear all the defaults from MSVC
 if (MSVC)
