@@ -149,6 +149,7 @@ set_property(CACHE RK_LOG_LEVEL PROPERTY STRINGS
 )
 option(RK_LOGGING_OFF "Remove all logging. Takes precedence over `RK_LOG_LEVEL`." OFF)
 option(RK_LOGGING_PERF "Compile in minimal logging (for performance). Takes precedence over `RK_LOG_LEVEL`." OFF)
+option(RK_LOG_FIXME "Print out fix me and the reason they should be fixed as they are encountered." OFF)
 
 option(RK_OGL_DEBUG "Display debug messages from OpenGL, including errors." OFF)
 set(RK_SHADER_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders" CACHE STRING
@@ -170,6 +171,7 @@ message(STATUS "Logging options:")
 message(STATUS "  RK_LOG_LEVEL    : " ${RK_LOG_LEVEL})
 message(STATUS "  RK_LOGGING_OFF  : " ${RK_LOGGING_OFF})
 message(STATUS "  RK_LOGGING_PERF : " ${RK_LOGGING_PERF})
+message(STATUS "  RK_LOG_FIXME   : " ${RK_LOG_FIXME})
 
 # ---------------------------------------------------------------------------------------
 # Sub-projects
@@ -306,6 +308,7 @@ set(header_files
     "src/core/rkmisc.h"
     "src/core/status.h"
     "src/core/types.h"
+    "src/core/utility/fixme.h"
     "src/core/utility/no_exception.h"
     "src/core/utility/time.h"
     "src/core/version.h"
@@ -387,6 +390,9 @@ if (RK_LOGGING_OFF)
 endif()
 if (RK_LOGGING_PERF)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOGGING_PERF)
+endif()
+if (RK_LOG_FIXME)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOG_FIXME)
 endif()
 if (RK_OGL_DEBUG)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RK_OGL_DEBUG)
