@@ -4,6 +4,7 @@
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
 #include "core/renderer/opengl/shader_program.h"
+#include "core/utility/fixme.h"
 #include "core/utility/no_exception.h"
 #include <sds/array.h>
 #include <sds/array/make_array.h>
@@ -162,7 +163,10 @@ Status Rtek_Engine::run() noexcept
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             glBindVertexArray(rectangle_vao);
-            glDrawElements(GL_TRIANGLES, rectangle_indicies.size(), GL_UNSIGNED_INT, nullptr);
+            glDrawElements(
+                GL_TRIANGLES,
+                fixme::scast<s32>(rectangle_indicies.size(), "replace std::array and avoid size_t"),
+                GL_UNSIGNED_INT, nullptr);
 
             glBindVertexArray(0);
         }

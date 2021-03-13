@@ -4,6 +4,7 @@
 #include "core/logging/logging.h"
 #include "core/platform/glfw.h"
 #include "core/types.h"
+#include "core/utility/fixme.h"
 #include <fmt/core.h>
 #include <glad/glad.h>
 #include <sds/string.h>
@@ -212,8 +213,9 @@ Status Renderer::setup_gl_api() noexcept
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
     char const* khr_debug_msg = "Setup KHR_debug message callback";
-    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, -1,
-                         GL_DEBUG_SEVERITY_NOTIFICATION, std::strlen(khr_debug_msg), khr_debug_msg);
+    glDebugMessageInsert(
+        GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, -1, GL_DEBUG_SEVERITY_NOTIFICATION,
+        fixme::scast<s32>(std::strlen(khr_debug_msg), "replace strlen"), khr_debug_msg);
     RK_CHECK(handle_ogl_error());
 #endif
 
