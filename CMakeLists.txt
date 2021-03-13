@@ -92,7 +92,7 @@ message(STATUS "Logging options:")
 message(STATUS "  RK_LOG_LEVEL    : " ${RK_LOG_LEVEL})
 message(STATUS "  RK_LOGGING_OFF  : " ${RK_LOGGING_OFF})
 message(STATUS "  RK_LOGGING_PERF : " ${RK_LOGGING_PERF})
-message(STATUS "  RK_LOG_FIXME   : " ${RK_LOG_FIXME})
+message(STATUS "  RK_LOG_FIXME    : " ${RK_LOG_FIXME})
 
 # ---------------------------------------------------------------------------------------
 # Compile and link options
@@ -148,7 +148,9 @@ if (RTEK_MASTER_PROJECT)
 
         string(CONCAT exe_linker_flags
             "/DEBUG:FULL " # generate full debug info in single PDB
-            "/SUBSYSTEM:WINDOWS " # Spawn as a window application, not a console app
+            # NOTE(sdsmith): You would think this needs to be done here, but it
+            # somehow gets ignored. Need to specify `WIN32` in `add_executable`.
+            # "/SUBSYSTEM:WINDOWS " # Spawn as a window application, not a console app
             "/ENTRY:mainCRTStartup " # Use `main` instead of `WinMain`
             )
         string(CONCAT exe_linker_flags_debug
@@ -355,7 +357,22 @@ set(all_code_files
 # ---------------------------------------------------------------------------------------
 # rtek target
 # ---------------------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ${all_code_files})
+if (WIN32)
+    # Create a GUI windows application
+    #
+    # NOTE(sdsmith): Attempts to make the executable a windows GUI application
+    # has not been trivial. Setting the linker flag /SUBSYSTEM:WINDOWS should
+    # work in theory. When making a Visual Studio solution it ends up being set
+    # correctly and having the correct behaviour (ie not opening a
+    # console). When building with a makefile generator, a sneaky
+    # /subsystem:console gets appended to the linker flags, thereby overriding
+    # the early /SUBSYSTEM:WINDOWS. Unfortunately, it looks like the only way to
+    # get rid of this is to specify the 'WIN32' in add_executable.
+    add_executable(${PROJECT_NAME} WIN32 ${all_code_files})
+else()
+    add_executable(${PROJECT_NAME} ${all_code_files})
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     "${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include"
