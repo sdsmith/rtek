@@ -2,8 +2,56 @@
 
 #include "GLFW/glfw3.h"
 #include "core/logging/logging.h"
+#include "core/utility/fixme.h"
+#include <stb/stb_image.h>
+#include <array>
 
 using namespace rk;
+
+/**
+ * \brief Load image at the given path intended as a window icon into the given GLFW image
+ * struct.
+ *
+ * \param path Path relative to \a RK_DATA_BASE_DIR.
+ */
+RK_INTERNAL
+Status load_window_icon(char const* path, GLFWimage& img) noexcept
+{
+    RK_ASSERT(path);
+
+    s32 num_channels = 0;
+    img.pixels = stbi_load(fmt::format("{}/{}", RK_DATA_BASE_DIR, path).c_str(), &img.width,
+                           &img.height, &num_channels, 0);
+    if (!img.pixels) {
+        LOG_ERROR(stbi_failure_reason());
+        return Status::io_error;
+    }
+
+    RK_ASSERT(num_channels == 4); // glfwSetWindowIcon requires RGBA (4 channel) image format
+    return Status::ok;
+}
+
+Status Window::set_window_icon() noexcept
+{
+    RK_ASSERT(m_window);
+
+    std::array<GLFWimage, 4> icons;
+
+    RK_CHECK(load_window_icon("assets/icons/rtek_16.png", icons[0]));
+    RK_CHECK(load_window_icon("assets/icons/rtek_32.png", icons[1]));
+    RK_CHECK(load_window_icon("assets/icons/rtek_48.png", icons[2]));
+    RK_CHECK(load_window_icon("assets/icons/rtek_256.png", icons[3]));
+
+    glfwSetWindowIcon(m_window,
+                      fixme::scast<s32>(icons.size(), "replace std::array and avoid size_t"),
+                      icons.data());
+    RK_CHECK(platform::glfw::handle_error());
+
+    // NOTE(sdsmith): GLFW copies the images, so they can be deleted
+    for (GLFWimage& img : icons) { stbi_image_free(img.pixels); }
+
+    return Status::ok;
+}
 
 Status Window::initialize(char const* title, s32 width, s32 height) noexcept
 {
@@ -13,6 +61,8 @@ Status Window::initialize(char const* title, s32 width, s32 height) noexcept
         platform::glfw::destroy();
         return Status::window_error;
     }
+
+    RK_CHECK(set_window_icon());
 
     // Set user data associated with window to `this`. Retrievable with `glfwGetWindowUserPointer`.
     glfwSetWindowUserPointer(m_window, this);

@@ -39,5 +39,7 @@ private:
 
     GLFWwindow* m_window = nullptr;
     GLFWmonitor* m_monitor = nullptr;
+
+    [[nodiscard]] Status set_window_icon() noexcept;
 };
 } // namespace rk
