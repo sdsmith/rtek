@@ -8,4 +8,7 @@
 // Supported image formats
 #define STBI_ONLY_PNG
 
+// Better failure messages
+#define STBI_FAILURE_USERMSG
+
 #include <stb/stb_image.h>
