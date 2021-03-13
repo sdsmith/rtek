@@ -208,73 +208,87 @@ include(FetchContent)
 # set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content")
 
 message(STATUS "Dependency: fmt...")
-FetchContent_Declare(
-    fmt
-    GIT_REPOSITORY "https://github.com/fmtlib/fmt"
-    GIT_TAG "7.1.3"
-    GIT_SHALLOW 1
-    GIT_PROGRESS 1
-    UPDATE_COMMAND ""
-    PATCH_COMMAND ""
-    TEST_COMMAND ""
-)
-set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
-set(FMT_TEST OFF CACHE BOOL "fmt build tests")
-set(FMT_INSTALL OFF CACHE BOOL "fmt generate install target")
-FetchContent_MakeAvailable(fmt)
-set_target_properties(fmt PROPERTIES
-    MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
-)
-get_target_property(fmt_version fmt VERSION)
-# NOTE(sdsmith): fmt prints its version
+set(fmt_version "7.1.3")
+find_package(fmt ${fmt_version} QUIET)
+if (NOT fmt_FOUND)
+    message(STATUS "fmt package not found, creating dependency install target")
+    FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY "https://github.com/fmtlib/fmt"
+        GIT_TAG ${fmt_version}
+        GIT_SHALLOW 1
+        GIT_PROGRESS 1
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ""
+        TEST_COMMAND ""
+        )
+    set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
+    set(FMT_TEST OFF CACHE BOOL "fmt build tests")
+    set(FMT_INSTALL ON CACHE BOOL "fmt generate install target")
+    FetchContent_MakeAvailable(fmt)
+    set_target_properties(fmt PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+        )
+    get_target_property(fmt_version fmt VERSION)
+    # NOTE(sdsmith): fmt prints its version
+endif()
 
 message(STATUS "Dependency: spdlog...")
-FetchContent_Declare(
-    spdlog
-    GIT_REPOSITORY "https://github.com/gabime/spdlog"
-    GIT_TAG "v1.8.2"
-    GIT_SHALLOW 1
-    GIT_PROGRESS 1
-    UPDATE_COMMAND ""
-    PATCH_COMMAND ""
-    TEST_COMMAND ""
-)
-set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
-set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
-set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
-set(SPDLOG_INSTALL OFF CACHE BOOL "spdlog generate install target")
-set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
-# TODO:
-#set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
-#set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
-FetchContent_MakeAvailable(spdlog)
-add_dependencies(spdlog fmt)
-set_target_properties(spdlog PROPERTIES
-    MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
-    )
-# NOTE(sdsmith): spdlog prints its version
+set(spdlog_version "1.8.2")
+find_package(spdlog ${spdlog_version} QUIET)
+if (NOT spdlog_FOUND)
+    message(STATUS "spdlog package not found, creating dependency install target")
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY "https://github.com/gabime/spdlog"
+        GIT_TAG "v${spdlog_version}"
+        GIT_SHALLOW 1
+        GIT_PROGRESS 1
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ""
+        TEST_COMMAND ""
+        )
+    set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
+    set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
+    set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
+    set(SPDLOG_INSTALL ON CACHE BOOL "spdlog generate install target")
+    set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
+    # TODO:
+    #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
+    #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
+    FetchContent_MakeAvailable(spdlog)
+    add_dependencies(spdlog fmt)
+    set_target_properties(spdlog PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+        )
+    # NOTE(sdsmith): spdlog prints its version
+endif()
 
 message(STATUS "Dependency: glfw...")
 set(glfw_version "3.3.3")
-FetchContent_Declare(
-    glfw
-    GIT_REPOSITORY "https://github.com/glfw/glfw.git"
-    GIT_TAG ${glfw_version}
-    GIT_SHALLOW 1
-    GIT_PROGRESS 1
-    UPDATE_COMMAND ""
-    PATCH_COMMAND ""
-    TEST_COMMAND ""
-)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "glfw build examples")
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "glfw build tests")
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "glfw build docs")
-set(GLFW_INSTALL OFF CACHE BOOL "glfw generate install target")
-FetchContent_MakeAvailable(glfw)
-set_target_properties(glfw PROPERTIES
-    MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
-)
-message(STATUS "glfw version: " ${glfw_version})
+find_package(glfw3 ${glfw_version} QUIET)
+if (NOT glfw3_FOUND)
+    message(STATUS "glfw package not found, creating install target")
+    FetchContent_Declare(
+        glfw
+        GIT_REPOSITORY "https://github.com/glfw/glfw.git"
+        GIT_TAG ${glfw_version}
+        GIT_SHALLOW 1
+        GIT_PROGRESS 1
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ""
+        TEST_COMMAND ""
+        )
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "glfw build examples")
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "glfw build tests")
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "glfw build docs")
+    set(GLFW_INSTALL ON CACHE BOOL "glfw generate install target")
+    FetchContent_MakeAvailable(glfw)
+    set_target_properties(glfw PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+        )
+    message(STATUS "glfw version: " ${glfw_version})
+endif()
 
 message(STATUS "Dependency: sdslib...")
 FetchContent_Declare(
@@ -286,7 +300,6 @@ FetchContent_Declare(
     PATCH_COMMAND ""
     TEST_COMMAND ""
 )
-
 set(SDSLIB_BUILD_TESTS OFF CACHE BOOL "sdslib build tests")
 FetchContent_MakeAvailable(sdslib)
 set_target_properties(sdslib PROPERTIES
@@ -391,7 +404,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include"
 )
 
-add_dependencies(${PROJECT_NAME} spdlog fmt glfw glad sdslib)
+add_dependencies(${PROJECT_NAME} spdlog::spdlog fmt::fmt glfw glad sdslib)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     spdlog::spdlog
     fmt::fmt

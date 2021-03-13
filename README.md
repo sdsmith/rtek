@@ -4,26 +4,47 @@ Experimental game engine.
 
 ## Building the project
 
-### Windows
+### Platform: Windows
 
 > Note: The commands that follow assume you are working in Cygwin.
 
 Visual Studio solution:
-```
+```sh
 cmake -S. -B./build -G"Visual Studio 16 2019"
 ```
 
 The solution is present in the `build` folder.
 
 To make a compilation database (`compile_commands.json`) for external tools:
-```
+```sh
 cmake -S. -B./build -G"NMake Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ```
 
 Only the configure step is required to make the compilation database. For ease of integration, make a symlink to it in the root of the project:
-```
+```sh
 ln -s ./build/compile_commands.json compile_commands.json
 ```
+
+### Dependency Installation
+
+> Note: Dependency installation is not necessary. However, it will result in dependencies being downloaded each time the build directory is blown away.
+
+To avoid having dependencies re-downloaded when the `build` directory is deleted, dependencies can be installed through cmake.
+
+```sh
+# Configure cmake with generator of choice, for example:
+cmake -S. -B./build -G"Visual Studio 16 2019"
+
+# Build
+cmake --build build
+
+# Install dependencies
+cmake --install build
+```
+
+By default this installs them to a `_deps` in the root of the repository.
+
+Next time cmake configuration is done, the packages will be picked up from the `_deps` location. Very helpful if you need to blow away `build` or when a file is added/removed from the project.
 
 ## Feature Toggles
 
