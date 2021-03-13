@@ -189,7 +189,7 @@ message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEVELOP: " ${CMAKE_EXE_LINKER_FLAGS_DEVEL
 message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASE: " ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
 
 # ---------------------------------------------------------------------------------------
-# Sub-projects
+# External Projects
 # ---------------------------------------------------------------------------------------
 # Set the install prefix
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -207,6 +207,7 @@ include(FetchContent)
 # to do other than change how dependencies are handled?
 # set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/_deps" CACHE STRING "location prefix for downloaded/extracted content")
 
+message(STATUS "Dependency: fmt...")
 FetchContent_Declare(
     fmt
     GIT_REPOSITORY "https://github.com/fmtlib/fmt"
@@ -217,7 +218,6 @@ FetchContent_Declare(
     PATCH_COMMAND ""
     TEST_COMMAND ""
 )
-
 set(FMT_DOC OFF CACHE BOOL "fmt generate docs")
 set(FMT_TEST OFF CACHE BOOL "fmt build tests")
 set(FMT_INSTALL OFF CACHE BOOL "fmt generate install target")
@@ -225,7 +225,10 @@ FetchContent_MakeAvailable(fmt)
 set_target_properties(fmt PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
+get_target_property(fmt_version fmt VERSION)
+# NOTE(sdsmith): fmt prints its version
 
+message(STATUS "Dependency: spdlog...")
 FetchContent_Declare(
     spdlog
     GIT_REPOSITORY "https://github.com/gabime/spdlog"
@@ -236,7 +239,6 @@ FetchContent_Declare(
     PATCH_COMMAND ""
     TEST_COMMAND ""
 )
-
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "spdlog build example")
 set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "spdlog build benchmarks")
 set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
@@ -249,19 +251,21 @@ FetchContent_MakeAvailable(spdlog)
 add_dependencies(spdlog fmt)
 set_target_properties(spdlog PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
-)
+    )
+# NOTE(sdsmith): spdlog prints its version
 
+message(STATUS "Dependency: glfw...")
+set(glfw_version "3.3.3")
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY "https://github.com/glfw/glfw.git"
-    GIT_TAG "3.3.3"
+    GIT_TAG ${glfw_version}
     GIT_SHALLOW 1
     GIT_PROGRESS 1
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     TEST_COMMAND ""
 )
-
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "glfw build examples")
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "glfw build tests")
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "glfw build docs")
@@ -270,9 +274,9 @@ FetchContent_MakeAvailable(glfw)
 set_target_properties(glfw PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
 )
+message(STATUS "glfw version: " ${glfw_version})
 
-add_subdirectory(external/glad)
-
+message(STATUS "Dependency: sdslib...")
 FetchContent_Declare(
     sdslib
     GIT_REPOSITORY "https://github.com/sdsmith/sdslib-cpp.git"
@@ -288,6 +292,15 @@ FetchContent_MakeAvailable(sdslib)
 set_target_properties(sdslib PROPERTIES
     MAP_IMPORTED_CONFIG_DEVELOP Debug
 )
+message(STATUS "sdslib version: WIP")
+
+# ---------------------------------------------------------------------------------------
+# External Projects built with this project
+# ---------------------------------------------------------------------------------------
+
+# NOTE(sdsmith): See also stb, which is directly included
+
+add_subdirectory(external/glad)
 
 # ---------------------------------------------------------------------------------------
 # Project Files
