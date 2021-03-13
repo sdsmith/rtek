@@ -20,7 +20,7 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
  * Meant for assertions that should be run in production.
  */
 #define RK_CRITICAL_ASSERT(expr)                                   \
-    if (expr) {                                                    \
+    if RK_LIKELY (expr) {                                          \
     } else {                                                       \
         ::rk::report_assertion_failure(#expr, __FILE__, __LINE__); \
         ::rk::debug_break();                                       \
@@ -58,9 +58,9 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
 #define ASSERT_GLUE(a, b) _ASSERT_GLUE(a, b)
 
 #ifdef RK_CPLUSPLUS
-#    if RK_CPLUSPLUS >= 201103L // >= c++11
-#        define RK_STATIC_ASSERT(expr) static_assert(expr, "static assert failed:" #        expr)
-#        define RK_STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg);
+#    if RK_CPLUSPLUS >= RK_CPLUSPLUS_11
+#        define RK_STATIC_ASSERT(expr) static_assert(RK_LIKELY(expr), "static assert failed:" #        expr)
+#        define RK_STATIC_ASSERT_MSG(expr, msg) static_assert(RK_LIKELY(expr), msg);
 #    else
 // no static_assert prior to c++11
 template <bool>

@@ -79,6 +79,11 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
  * Microsoft does it again...
  */
 #ifndef RK_CPLUSPLUS
+#    define RK_CPLUSPLUS_11 201103L
+#    define RK_CPLUSPLUS_14 201402L
+#    define RK_CPLUSPLUS_17 201703L
+#    define RK_CPLUSPLUS_20 202002L
+
 // MSVC incorrectly reports __cplusplus
 // ref: https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
 #    if RK_COMPILER == RK_COMPILER_MSC
@@ -124,5 +129,49 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
  * choice.
  */
 #define RK_INTERNAL static
+
+/**
+ * \def RK_LIKELY
+ * \brief Portable `likely` branch attribute for if statements. Does not work on case statements.
+ *
+ * Usage: `if RK_LIKELY(...) { ... }`
+ */
+/**
+ * \def RK_UNLIKELY
+ * \brief Portable `unlikely` branch attribute for if statements. Does not work on case statements.
+ *
+ * Usage: `if RK_UNLIKELY(...) { ... }`
+ */
+
+#ifndef RK_LIKELY
+#    if RK_CPLUSPLUS >= RK_CPLUSPLUS_20
+// C++20 supports the attribute
+#        define RK_LIKELY(x) (x) [[likely]]
+#    elif RK_COMPILER == RK_COMPILER_GCC || RK_COMPILER == RK_COMPILER_CLANG
+#        define RK_LIKELY(x) (__builtin_expect(!!(x), 1))
+#    else
+#        define RK_LIKELY(x) (x)
+#    endif
+#endif
+
+#ifndef RK_UNLIKELY
+#    if RK_CPLUSPLUS >= RK_CPLUSPLUS_20
+// C++20 supports the attribute
+#        define RK_UNLIKELY(x) (x) [[unlikely]]
+#    elif RK_COMPILER == RK_COMPILER_GCC || RK_COMPILER == RK_COMPILER_CLANG
+#        define RK_UNLIKELY(x) (__builtin_expect(!!(x), 0))
+#    else
+#        define RK_UNLIKELY(x) (x)
+#    endif
+#endif
+
+// TODO(sdsmith): @cpp20: The c++20 attribute [[likely/unlikely]] has a different syntax for usage
+// on ifs vs switch cases. It also differs from usage with the previous __builtin_expect. This means
+// to support switch cases portably there would need to be a separate marco from
+// RK_LIKELY/RK_UNLIKELY and it would need to be duplicated; once on the switch condition and once
+// on the case. This is annoying and fragil. There is no easy way to enfornce that this happens or
+// that the attributes match (ie likely on the conditional and unlikely on a case statement would be
+// problematic!). In lieu of this, I'm going to not make RK_LIKELY_CASE for now. One day we could
+// switch to C++20 and be done with it.
 
 } // namespace rk
