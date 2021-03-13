@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
+set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_LIST_DIR}/cmake/compiler_options.cmake")
 
 project(rtek CXX)
 set(PROJECT_NAME rtek)
@@ -92,6 +93,98 @@ message(STATUS "  RK_LOG_LEVEL    : " ${RK_LOG_LEVEL})
 message(STATUS "  RK_LOGGING_OFF  : " ${RK_LOGGING_OFF})
 message(STATUS "  RK_LOGGING_PERF : " ${RK_LOGGING_PERF})
 message(STATUS "  RK_LOG_FIXME   : " ${RK_LOG_FIXME})
+
+# ---------------------------------------------------------------------------------------
+# Compile and link options
+# ---------------------------------------------------------------------------------------
+
+if (RTEK_MASTER_PROJECT)
+    set(cxx_flags "")
+    set(cxx_flags_debug "")
+    set(cxx_flags_develop "")
+    set(cxx_flags_release "")
+    set(exe_linker_flags "")
+    set(exe_linker_flags_debug "")
+    set(exe_linker_flags_develop "")
+    set(exe_linker_flags_release "")
+    if(MSVC)
+        # TODO: potentially set:
+        # - CMAKE_MODULE_LINKER_FLAGS
+        # - CMAKE_SHARED_LINKER_FLAGS
+        # - CMAKE_STATIC_LINKER_FLAGS
+
+        string(CONCAT cxx_flags
+            "/DWIN32 "
+            "/D_WINDOWS "
+            "/permissive- " # use c++ standards conforming compiler behaviour
+            "/sdl "                 # enable Security Development Lifecycle checks
+            "/W3 "                  # warning level
+            "/WX "                  # linker warnings as errors
+            "/TP "                  # treat all files on command line as C++ source files
+            "/Zi "                  # separate PDB file will all symbolic debug info
+            # TODO: set the exception unwinding feature for now
+            "/EHsc "                # standard C++ stack unwinding + assumes extern C functions don't throw
+            # TODO: ban dynamic_cast and typeid and use /GR- to reduce code size
+            "/GR "          # run-time type info. Needed for dynamic_cast or typeid
+            )
+        string(CONCAT cxx_flags_debug
+            "/Od " # disable optimizations
+            "/RTC1 " # runtime error check for value initialization
+            )
+        string(CONCAT cxx_flags_develop
+            # TODO: /Od disables optimizations, making the edit-compile-run loop smaller, but could make the application slow.
+            "/Od " # favor speed optimizations over size
+            "/Oi " # generate intrinsic functions
+            "/Gy " # function-level linking (COMDAT)
+            "/RTC1 " # runtime error check for value initialization
+            )
+        string(CONCAT cxx_flags_release
+            "/GL " # whole program optimization
+            "/O2 " # maximize speed optimization
+            "/Oi " # generate intrinsic functions
+            "/Gy " # function-level linking
+            "/DNDEBUG "
+            )
+
+        string(CONCAT exe_linker_flags
+            "/DEBUG:FULL " # generate full debug info in single PDB
+            "/SUBSYSTEM:WINDOWS " # Spawn as a window application, not a console app
+            "/ENTRY:mainCRTStartup " # Use `main` instead of `WinMain`
+            )
+        string(CONCAT exe_linker_flags_debug
+            "/INCREMENTAL " # incremental linking
+            )
+        string(CONCAT exe_linker_flags_develop
+            "/INCREMENTAL " # incremental linking
+            )
+        string(CONCAT exe_linker_flags_release
+            "/INCREMENTAL:NO " # no incremental linking
+            "/OPT:REF " # eliminate functions and data the are never referenced
+            "/OPT:ICF " # perform identical COMDAT folding
+            )
+    else()
+        # TODO: non-msvc builds
+        message(FATAL_ERROR "Compiler not supported")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
+    set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${cxx_flags_release}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${exe_linker_flags}")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_flags_debug}")
+    set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
+endif()
+
+message(STATUS "CMAKE_CXX_FLAGS               : " ${CMAKE_CXX_FLAGS})
+message(STATUS "CMAKE_CXX_FLAGS_DEBUG         : " ${CMAKE_CXX_FLAGS_DEBUG})
+message(STATUS "CMAKE_CXX_FLAGS_DEVELOP       : " ${CMAKE_CXX_FLAGS_DEVELOP})
+message(STATUS "CMAKE_CXX_FLAGS_RELEASE       : " ${CMAKE_CXX_FLAGS_RELEASE})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS        : " ${CMAKE_EXE_LINKER_FLAGS})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEBUG  : " ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEVELOP: " ${CMAKE_EXE_LINKER_FLAGS_DEVELOP})
+message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASE: " ${CMAKE_EXE_LINKER_FLAGS_RELEASE})
 
 # ---------------------------------------------------------------------------------------
 # Sub-projects
@@ -299,6 +392,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
     INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
     INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
 )
 
 # Exposed cmake option feature toggles
@@ -325,90 +419,6 @@ if (RK_REQUEST_HIGH_PERF_RENDERER)
 endif()
 if (RK_DATA_BASE_DIR)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RK_DATA_BASE_DIR="${RK_DATA_BASE_DIR}")
-endif()
-
-# ---------------------------------------------------------------------------------------
-# Compile and link options
-# ---------------------------------------------------------------------------------------
-
-if (RTEK_MASTER_PROJECT)
-    set(cxx_flags "")
-    set(cxx_flags_debug "")
-    set(cxx_flags_develop "")
-    set(cxx_flags_release "")
-    set(exe_linker_flags "")
-    set(exe_linker_flags_debug "")
-    set(exe_linker_flags_develop "")
-    set(exe_linker_flags_release "")
-    if(MSVC)
-        # TODO: potentially set:
-        # - CMAKE_MODULE_LINKER_FLAGS
-        # - CMAKE_SHARED_LINKER_FLAGS
-        # - CMAKE_STATIC_LINKER_FLAGS
-
-        string(CONCAT cxx_flags
-            "/permissive- " # use c++ standards conforming compiler behaviour
-            "/sdl "                 # enable Security Development Lifecycle checks
-            "/W3 "                  # warning level
-            "/WX "                  # linker warnings as errors
-            "/TP "                  # treat all files on command line as C++ source files
-            "/Zi "                  # separate PDB file will all symbolic debug info
-            # TODO: set the exception unwinding feature for now
-            "/EHsc "                # standard C++ stack unwinding + assumes extern C functions don't throw
-            # TODO: ban dynamic_cast and typeid and use /GR- to reduce code size
-            "/GR "          # run-time type info. Needed for dynamic_cast or typeid
-            )
-        string(CONCAT cxx_flags_debug
-            "/Od " # disable optimizations
-            "/RTC1 " # runtime error check for value initialization
-            )
-        string(CONCAT cxx_flags_develop
-            # TODO: /Od disables optimizations, making the edit-compile-run loop smaller, but could make the application slow.
-            "/Od " # favor speed optimizations over size
-            "/Oi " # generate intrinsic functions
-            "/Gy " # function-level linking (COMDAT)
-            "/RTC1 " # runtime error check for value initialization
-            )
-        string(CONCAT cxx_flags_release
-            "/GL " # whole program optimization
-            "/O2 " # maximize speed optimization
-            "/Oi " # generate intrinsic functions
-            "/Gy " # function-level linking
-            )
-
-        string(CONCAT exe_linker_flags
-            "/DEBUG:FULL " # generate full debug info in single PDB
-            "/SUBSYSTEM:WINDOWS " # Spawn as a window application, not a console app
-            "/ENTRY:mainCRTStartup " # Use `main` instead of `WinMain`
-            )
-        string(CONCAT exe_linker_flags_debug
-            "/INCREMENTAL " # incremental linking
-            )
-        string(CONCAT exe_linker_flags_develop
-            "/INCREMENTAL " # incremental linking
-            )
-        string(CONCAT exe_linker_flags_release
-            "/INCREMENTAL:NO " # no incremental linking
-            "/OPT:REF " # eliminate functions and data the are never referenced
-            "/OPT:ICF " # perform identical COMDAT folding
-            )
-
-        set_target_properties("${PROJECT_NAME}" PROPERTIES
-            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-            )
-    else()
-        # TODO: non-msvc builds
-        message(FATAL_ERROR "Compiler not supported")
-    endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
-    set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${cxx_flags_release}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${exe_linker_flags}")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} ${exe_linker_flags_debug}")
-    set(CMAKE_EXE_LINKER_FLAGS_DEVELOP "${CMAKE_EXE_LINKER_FLAGS_DEVELOP} ${exe_linker_flags_develop}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
 endif()
 
 # ---------------------------------------------------------------------------------------

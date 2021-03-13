@@ -1,0 +1,31 @@
+# log all *_INIT variables
+get_cmake_property(_varNames VARIABLES)
+list (REMOVE_DUPLICATES _varNames)
+list (SORT _varNames)
+foreach (_varName ${_varNames})
+    if (_varName MATCHES "_INIT$")
+        message(STATUS "${_varName}=${${_varName}}")
+    endif()
+endforeach()
+
+
+# Clear all the defaults from MSVC
+if (MSVC)
+    set(CMAKE_C_FLAGS_INIT "")
+    set(CMAKE_CXX_FLAGS_INIT "")
+    set(CMAKE_C_FLAGS_DEBUG_INIT "")
+    set(CMAKE_CXX_FLAGS_DEBUG_INIT "")
+    set(CMAKE_C_FLAGS_RELEASE_INIT "")
+    set(CMAKE_CXX_FLAGS_RELEASE_INIT "")
+    set(CMAKE_C_FLAGS "")
+    set(CMAKE_CXX_FLAGS "")
+    set(CMAKE_C_FLAGS_DEBUG "")
+    set(CMAKE_CXX_FLAGS_DEBUG "")
+    set(CMAKE_C_FLAGS_RELEASE "")
+    set(CMAKE_CXX_FLAGS_RELEASE "")
+
+    # set(CMAKE_C_STANDARD_LIBRARIES_INIT "")
+    # set(CMAKE_CXX_STANDARD_LIBRARIES_INIT "")
+    # set(CMAKE_C_STANDARD_LIBRARIES "")
+    # set(CMAKE_CXX_STANDARD_LIBRARIES "")
+endif()
