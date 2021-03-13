@@ -196,7 +196,6 @@ Status Renderer::setup_gl_api() noexcept
     s32 ctx_flags = 0;
     glGetIntegerv(GL_CONTEXT_FLAGS, &ctx_flags);
     bool const is_ogl_debug_ctx = (ctx_flags & GL_CONTEXT_FLAG_DEBUG_BIT);
-    LOG_INFO("OpenGL debug context: {}", (is_ogl_debug_ctx ? "true" : "false"));
 
 #ifdef RK_OGL_DEBUG
     RK_ASSERT(is_ogl_debug_ctx);
