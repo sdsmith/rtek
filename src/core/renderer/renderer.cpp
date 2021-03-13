@@ -236,7 +236,7 @@ Status Renderer::setup_gl_api() noexcept
     RK_CHECK(m_window->get_window_size(window_w, window_h));
     glViewport(0, 0, window_w, window_h);
 
-    LOG_INFO("OpenGL context initialized: {}", get_gl_api_version());
+    LOG_INFO("OpenGL context initialized");
     return Status::ok;
 }
 
@@ -265,9 +265,4 @@ void framebuffer_size_callback(GLFWwindow* window, s32 width, s32 height) noexce
 GLFWframebuffersizefun Renderer::get_framebuffer_size_callback() const noexcept
 {
     return framebuffer_size_callback;
-}
-
-std::string Renderer::get_gl_api_version() const noexcept
-{
-    return fmt::format("OpenGL {}.{} core", m_ogl_ctx_version_major, m_ogl_ctx_version_minor);
 }

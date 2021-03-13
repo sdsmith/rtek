@@ -53,8 +53,6 @@ public:
 
     [[nodiscard]] GLFWframebuffersizefun get_framebuffer_size_callback() const noexcept;
 
-    [[nodiscard]] std::string get_gl_api_version() const noexcept;
-
 private:
     Window* m_window = nullptr;
     static constexpr s32 m_ogl_ctx_version_major = 4;
