@@ -29,6 +29,8 @@ ln -s ./build/compile_commands.json compile_commands.json
 
 > Note: Dependency installation is not necessary. However, it will result in dependencies being downloaded each time the build directory is blown away.
 
+> Warning: Changes to dependency configurations will require a deletion of the installed dependency and a rebuild.
+
 To avoid having dependencies re-downloaded when the `build` directory is deleted, dependencies can be installed through cmake.
 
 ```sh
