@@ -170,8 +170,8 @@ public:
 private:
     static bool s_initialized;
     static std::mutex m_fallback_log_mutex;
-    static std::string s_log_dir;
-    static std::string s_log_file;
+    static uchar const* s_log_dir;
+    static uchar const* s_log_file;
 
     static std::string sconcat(char const* a, char const* b) noexcept(false);
 
@@ -239,7 +239,7 @@ private:
 
     template <typename... Args>
     static void fallback_log_error(char const* file_name, long line_no, char const* func_name,
-                                   char const* msg, Args const&... args) noexcept
+                                   Args const&... args) noexcept
     {
         fallback_log(stderr, file_name, line_no, func_name, args...);
     }

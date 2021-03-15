@@ -2,6 +2,40 @@
 
 #include <cstdint>
 
+/**
+ * \def RK_OS
+ * \brief Operating system being compiled on.
+ *
+ * Has a value from one of \a RK_OS_*.
+ * Usage: `#if RK_OS == RK_OS_WINDOWS`
+ */
+#ifndef RK_OS
+#    define RK_OS_WINDOWS 1
+#    define RK_OS_LINUX 2
+#    define RK_OS_MAC 3
+
+#    if defined(_WIN32)
+#        define RK_OS RK_OS_WINDOWS
+#    elif defined(__linux__)
+#        define RK_OS RK_OS_LINUX
+#    elif defined(__APPLE__)
+#        define RK_OS RK_OS_MAC
+#    else
+#        error Unknown operating system
+#    endif
+#endif
+
+#if RK_OS == RK_OS_WINDOWS
+// Unicode support
+#    ifndef _UNICODE
+#        define _UNICODE
+#    endif
+#    ifndef UNICODE
+#        define UNICODE
+#    endif
+#    include <Windows.h>
+#endif
+
 namespace rk
 {
 using s8 = int8_t;
@@ -25,28 +59,49 @@ constexpr auto operator""_MB(u64 s) { return s * 1024_KB; }
 
 constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
 
-/**
- * \def RK_OS
- * \brief Operating system being compiled on.
- *
- * Has a value from one of \a RK_OS_*.
- * Usage: `#if RK_OS == RK_OS_WINDOWS`
- */
-#ifndef RK_OS
-#    define RK_OS_WINDOWS 1
-#    define RK_OS_LINUX 2
-#    define RK_OS_MAC 3
+// ---------------------------------------------------------------------------------------
+// Unicode support
+// ---------------------------------------------------------------------------------------
 
-#    if defined(_WIN32)
-#        define RK_OS RK_OS_WINDOWS
-#    elif defined(__linux__)
-#        define RK_OS RK_OS_LINUX
-#    elif defined(__APPLE__)
-#        define RK_OS RK_OS_MAC
-#    else
-#        error Unknown operating system
-#    endif
+#if RK_OS == RK_OS_WINDOWS
+/**
+ * \brief Unicode character.
+ *
+ * On Windows, wchar_t is two bytes for UTF-16. Other platforms use wchar_t as 4 bytes to support
+ * UTF-32. Use Window's \a WCHAR to support their 'unique' unicode scheme and support their unicode
+ * functions.
+ *
+ * \see _u
+ */
+using uchar = WCHAR;
+#    define RK_I_UC(x) L##x // UTF-16 encoding
+#elif RK_OS == RK_OS_LINUX
+/**
+ * \brief Unicode character.
+ *
+ * On linux, just use UTF-8 since it's so much easier and better supported.
+ *
+ * \see _u
+ */
+using uchar = char;
+#    define RK_I_UC(x) = u8##x // UTF-8 encoding
+#else
+#    error Unsupported OS
 #endif
+
+/**
+ * \def UC
+ * \brief String litteral prefix for unicode strings.
+ *
+ * Will define the appropriate encoding based on the unicode settings.
+ *
+ * Usage: `UC("hello world")`
+ *
+ * \see uchar
+ */
+#define UC(x) RK_I_UC(x)
+
+// ---------------------------------------------------------------------------------------
 
 /**
  * \def RK_COMPILER
@@ -92,6 +147,12 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
 #        define RK_CPLUSPLUS __cplusplus
 #    endif
 #endif
+
+/**
+ * \def RK_FILENAME
+ * \brief Name of the current file.
+ */
+#define RK_FILENAME __FILE__
 
 /**
  * \def RK_FUNCNAME
@@ -173,5 +234,21 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
 // that the attributes match (ie likely on the conditional and unlikely on a case statement would be
 // problematic!). In lieu of this, I'm going to not make RK_LIKELY_CASE for now. One day we could
 // switch to C++20 and be done with it.
+
+/**
+ * \def RK_DATA_BASE_DIR
+ * \brief Base path to the data directory.
+ */
+#ifndef RK_DATA_BASE_DIR
+#    define RK_DATA_BASE_DIR "data"
+#endif
+
+/**
+ * \def RK_SHADER_BASE_DIR
+ * \brief Base path to the shader directory.
+ */
+#ifndef RK_SHADER_BASE_DIR
+#    define RK_SHADER_BASE_DIR "data/shaders"
+#endif
 
 } // namespace rk

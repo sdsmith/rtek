@@ -253,6 +253,10 @@ if (NOT spdlog_FOUND)
     set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "spdlog build tests")
     set(SPDLOG_INSTALL ON CACHE BOOL "spdlog generate install target")
     set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
+    if (WIN32)
+        set(SPDLOG_WCHAR_SUPPORT ON CACHE BOOL "spdlog support wchar")
+        set(SPDLOG_WCHAR_FILENAMES ON CACHE BOOL "spdlog support wchar filenames")
+    endif()
     # TODO:
     #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
     #set(SPDLOG_NO_EXCEPTIONS ON CACHE BOOL "spdlog Compile with -fno-exceptions. Call abort() on any spdlog exceptions") # TODO: use at own peril!
@@ -338,6 +342,7 @@ set(header_files
     "src/core/hid/input.h"
     "src/core/logging/logging.h"
     "src/core/math/vector.h"
+    "src/core/platform/filesystem.h"
     "src/core/platform/glfw.h"
     "src/core/platform/input_manager.h"
     "src/core/platform/platform.h"
@@ -355,7 +360,6 @@ set(header_files
     "src/core/utility/time.h"
     "src/core/version.h"
 )
-source_group("Header Files" FILES ${header_files})
 
 set(source_files
     "src/core/assert.cpp"
@@ -363,6 +367,7 @@ set(source_files
     "src/core/ecs/entity_manager.cpp"
     "src/core/logging/logging.cpp"
     "src/core/math/vector.cpp"
+    "src/core/platform/filesystem.cpp"
     "src/core/platform/glfw.cpp"
     "src/core/platform/input_manager.cpp"
     "src/core/platform/platform.cpp"
@@ -374,6 +379,16 @@ set(source_files
     "src/core/utility/stb.cpp"
     "src/main.cpp"
 )
+
+set(source_files_win32
+    "src/core/platform/filesystem_win32.cpp"
+)
+
+if (WIN32)
+    list(APPEND source_files ${source_files_win32})
+endif()
+
+source_group("Header Files" FILES ${header_files})
 source_group("Source Files" FILES ${source_files})
 
 set(all_code_files
@@ -414,9 +429,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     sdslib
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    DEBUG_POSTFIX d
-)
+# Platform specific libraries
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "pathcch.lib")
+endif()
 
 # Build type configs
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -433,6 +449,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     ">"
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
+    DEBUG_POSTFIX d
     INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
     INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
     INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"

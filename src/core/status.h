@@ -21,6 +21,7 @@ public:
         window_error = 11,
         io_error = 12,
         invalid_value = 13,
+        unicode_error = 14,
     };
 
     constexpr Status(Type status) : m_status(status) {}

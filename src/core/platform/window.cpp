@@ -3,7 +3,7 @@
 #include "GLFW/glfw3.h"
 #include "core/logging/logging.h"
 #include "core/utility/fixme.h"
-#include <stb/stb_image.h>
+#include "core/utility/stb_image.h"
 #include <array>
 
 using namespace rk;

@@ -14,14 +14,6 @@
 // Ask for a high performance renderer
 #include "core/renderer/request_high_perf_renderer.h"
 
-/**
- * \def RK_SHADER_BASE_DIR
- * \brief Base path to the shader directory.
- */
-#ifndef RK_SHADER_BASE_DIR
-#    define RK_SHADER_BASE_DIR "data/shaders"
-#endif
-
 using namespace rk;
 
 Status Renderer::initialize() noexcept { return Status::ok; }

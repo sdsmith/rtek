@@ -13,22 +13,22 @@
 
 namespace rk::platform
 {
-void log_windows_error(const LPCTSTR function_name);
+// TODO(sdsmith): probs shouldn't be in platform
+s32 ustrlen(uchar const* s) noexcept;
 
-namespace fs // filesystem
+namespace windows
 {
-Status create_directory(char const* directory);
-bool directory_exists(char const* path);
-} // namespace fs
+void log_error(HRESULT hresult) noexcept;
+
+// TODO(sdsmith): uchar param or regular char param?
+void log_last_error(uchar const* function_name);
+} // namespace windows
+
 } // namespace rk::platform
 
 #elif defined(__CYGWIN__) && RK_OS != RK_OS_WINDOWS
 #    warning Cygwin is not officially supported
 #else
 #    error Unsupported platform
-#    define PATH_SEPARATOR '/'
+#    define RK_PATH_SEPARATOR '/'
 #endif
-
-#define RK_FILENAME                                                                            \
-    (std::strrchr(__FILE__, RK_PATH_SEPARATOR) ? std::strrchr(__FILE__, RK_PATH_SEPARATOR) + 1 \
-                                               : __FILE__)

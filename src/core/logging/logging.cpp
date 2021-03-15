@@ -1,6 +1,8 @@
 #include "core/logging/logging.h"
 
 #include "core/assert.h"
+#include "core/platform/filesystem.h"
+#include <fmt/core.h>
 #include <spdlog/spdlog.h>
 #include <string>
 
@@ -8,17 +10,15 @@ using namespace rk;
 
 bool Logger::s_initialized = false;
 std::mutex Logger::m_fallback_log_mutex;
-std::string Logger::s_log_dir = "log";
-std::string Logger::s_log_file = "rtek.log";
+uchar const* Logger::s_log_dir = L"log";
+uchar const* Logger::s_log_file = UC("rtek.log");
 
 Status Logger::initialize() noexcept
 {
     using namespace platform;
 
     // Create log directory
-    if (!fs::directory_exists(s_log_dir.c_str())) {
-        RK_CHECK(fs::create_directory(s_log_dir.c_str()));
-    }
+    if (!fs::directory_exists(s_log_dir)) { RK_CHECK(fs::create_directory(s_log_dir)); }
 
     Status status = Status::ok;
     spdlog_exception_boundary([&]() {
@@ -27,7 +27,7 @@ Status Logger::initialize() noexcept
             stderr_sink->set_level(spdlog::level::err);
 
             auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
-                s_log_dir + "/" + s_log_file, true);
+                fmt::format(UC("{}/{}"), s_log_dir, s_log_file), true);
             file_sink->set_level(spdlog::level::trace);
 
             std::array<spdlog::sink_ptr, 2> sinks = {stderr_sink, file_sink};

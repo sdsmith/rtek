@@ -64,3 +64,19 @@ Graphics:
 - `RK_OGL_DEBUG`: Display debug messages from OpenGL, including errors.
 - `RK_SHADER_BASE_DIR`: Directory containing all the shaders. Prepended to the path of the shader being opened.
 - `RK_REQUEST_HIGH_PERF_RENDERER`: Ask for a high performance renderer. For systems with an iGPU and dGPU, this typically means the dGPU.
+
+## Coding Conventions
+Engine macros are prefixed with `RK_`. Engine internal macros that should not be used are prefixed with `RK_I_`.
+
+## Unicode
+
+The engine is unicode only and does not support ANSI strings. It provides its own cross platform abstraction for unicode strings, `uchar` (read "unicode character") and the string litteral prefix `UC` (read "unicode"). The unicode chracter format use on each platform corresponds to:
+
+| Platform | Unicode Encoding |
+|-|-|
+| Windows | UTF-16 |
+| Linux | UTF-8 |
+
+This means that on Linux `uchar` is `char`. Be careful when developing Windows compatible unicode functions when working in Linux.
+
+Using UTF-16 on Windows means that the native Windows unicode functions can be used directly. For Windows, `uchar` is essentially `WCHAR`. And since this engine is always using UNICODE, it is also equivalent to `TCHAR`.
