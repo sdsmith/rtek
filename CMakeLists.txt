@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_LIST_DIR}/cmake/compiler_options.cmake")
 
 project(rtek CXX)
-set(PROJECT_NAME rtek)
 
 message(STATUS "Build RTEK")
 
@@ -54,6 +53,7 @@ endif()
 # ---------------------------------------------------------------------------------------
 # User options
 # ---------------------------------------------------------------------------------------
+option(RTEK_BUILD_TESTS "Build tests" OFF)
 set(RK_LOG_LEVEL RK_LOG_LEVEL_INFO CACHE STRING "Log level compiled into the application. One of \
 RK_LOG_LEVEL_{OFF, TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL}. Levels listed in order of least to \
 most precendence. Levels of equals or less precedence are removed.")
@@ -311,6 +311,36 @@ set_target_properties(sdslib PROPERTIES
 )
 message(STATUS "sdslib version: WIP")
 
+if (RTEK_BUILD_TESTS)
+    message(STATUS "googletest...")
+    # Download and unpack googletest at configure time
+    configure_file(cmake/googletest.cmake.in googletest-download/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+    if(result)
+        message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+    if(result)
+        message(FATAL_ERROR "Build step for googletest failed: ${result}")
+    endif()
+
+    # Prevent overriding the parent project's compiler/linker
+    # settings on Windows
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    # Add googletest directly to our build. This defines
+    # the gtest and gtest_main targets.
+    add_subdirectory(
+        ${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+        ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+        EXCLUDE_FROM_ALL
+    )
+endif()
+
 # ---------------------------------------------------------------------------------------
 # External Projects built with this project
 # ---------------------------------------------------------------------------------------
@@ -320,7 +350,7 @@ message(STATUS "sdslib version: WIP")
 add_subdirectory(external/glad)
 
 # ---------------------------------------------------------------------------------------
-# Project Files
+# rteklib Files
 # ---------------------------------------------------------------------------------------
 set(no_group_source_files
     ".clang-format"
@@ -328,7 +358,7 @@ set(no_group_source_files
 )
 source_group("" FILES ${no_group_source_files})
 
-set(header_files
+set(rteklib_header_files
     "external/stb/include/stb/stb_image.h"
     "src/core/assert.h"
     "src/core/core.h"
@@ -361,7 +391,7 @@ set(header_files
     "src/core/version.h"
 )
 
-set(source_files
+set(rteklib_source_files
     "src/core/assert.cpp"
     "src/core/core.cpp"
     "src/core/ecs/entity_manager.cpp"
@@ -377,27 +407,129 @@ set(source_files
     "src/core/renderer/renderer.cpp"
     "src/core/status.cpp"
     "src/core/utility/stb.cpp"
-    "src/main.cpp"
 )
 
-set(source_files_win32
+set(rteklib_source_files_win32
     "src/core/platform/filesystem_win32.cpp"
 )
 
+set(rteklib_test_files
+    "tests/test_filesystem.cpp"
+)
+
 if (WIN32)
-    list(APPEND source_files ${source_files_win32})
+    list(APPEND rteklib_source_files ${rteklib_source_files_win32})
 endif()
 
-source_group("Header Files" FILES ${header_files})
-source_group("Source Files" FILES ${source_files})
+source_group("Header Files" FILES ${rteklib_header_files})
+source_group("Source Files" FILES ${rteklib_source_files})
+source_group("Test Files" FILES ${rteklib_test_files})
 
-set(all_code_files
-    ${header_files}
-    ${source_files}
+set(rteklib_all_code_files
+    ${rteklib_header_files}
+    ${rteklib_source_files}
 )
 
 # ---------------------------------------------------------------------------------------
-# rtek target
+# rteklib Target
+# ---------------------------------------------------------------------------------------
+add_library(rteklib STATIC ${rteklib_all_code_files})
+
+target_include_directories(rteklib PUBLIC
+    "$<BUILD_INTERFACE:"
+        "${CMAKE_CURRENT_LIST_DIR}/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include"
+    ">"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+set_target_properties(rteklib PROPERTIES DEBUG_POSTFIX d)
+
+add_dependencies(rteklib
+    spdlog::spdlog
+    fmt::fmt
+    glfw
+    glad
+    sdslib
+)
+
+target_link_libraries(rteklib PUBLIC
+    spdlog::spdlog
+    fmt::fmt
+    glfw
+    glad
+    sdslib
+)
+
+# Platform specific libraries
+if (WIN32)
+    target_link_libraries(rteklib PRIVATE
+        "Pathcch.lib"
+        "Shlwapi.lib"
+    )
+endif()
+
+set_target_properties(rteklib PROPERTIES
+    DEBUG_POSTFIX d
+    INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
+    INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+)
+
+# Exposed cmake option feature toggles
+if (RK_LOG_LEVEL)
+    target_compile_definitions(rteklib PRIVATE RK_LOG_LEVEL=${RK_LOG_LEVEL})
+endif()
+if (RK_LOGGING_OFF)
+    target_compile_definitions(rteklib PRIVATE RK_LOGGING_OFF)
+endif()
+if (RK_LOGGING_PERF)
+    target_compile_definitions(rteklib PRIVATE RK_LOGGING_PERF)
+endif()
+if (RK_LOG_FIXME)
+    target_compile_definitions(rteklib PRIVATE RK_LOG_FIXME)
+endif()
+if (RK_OGL_DEBUG)
+    target_compile_definitions(rteklib PRIVATE RK_OGL_DEBUG)
+endif()
+if (RK_SHADER_BASE_DIR)
+    target_compile_definitions(rteklib PRIVATE RK_SHADER_BASE_DIR="${RK_SHADER_BASE_DIR}")
+endif()
+if (RK_REQUEST_HIGH_PERF_RENDERER)
+    target_compile_definitions(rteklib PRIVATE RK_REQUEST_HIGH_PERF_RENDERER)
+endif()
+if (RK_DATA_BASE_DIR)
+    target_compile_definitions(rteklib PRIVATE RK_DATA_BASE_DIR="${RK_DATA_BASE_DIR}")
+endif()
+
+# ---------------------------------------------------------------------------------------
+# rteklib_test Target
+# ---------------------------------------------------------------------------------------
+if (RTEK_BUILD_TESTS)
+    # NOTE(sdsmith): Can't use LINK_LIBRARIES property to determine what should
+    # be linked for the test executable. These values get processed later in the
+    # pipeline. Generator expansion will
+
+    enable_testing()
+
+    add_executable(rteklib_test ${rteklib_test_files})
+    add_dependencies(rteklib_test rteklib)
+    target_link_libraries(rteklib_test PRIVATE gtest_main rteklib)
+    add_test(NAME rteklib_test COMMAND rteklib_test)
+endif()
+
+# ---------------------------------------------------------------------------------------
+# rtek Files
+# ---------------------------------------------------------------------------------------
+set(rtek_source_files
+    "src/main.cpp"
+)
+
+set(rtek_all_code_files
+    ${rtek_source_files}
+)
+
+# ---------------------------------------------------------------------------------------
+# rtek Target
 # ---------------------------------------------------------------------------------------
 if (WIN32)
     # Create a GUI windows application
@@ -410,77 +542,12 @@ if (WIN32)
     # /subsystem:console gets appended to the linker flags, thereby overriding
     # the early /SUBSYSTEM:WINDOWS. Unfortunately, it looks like the only way to
     # get rid of this is to specify the 'WIN32' in add_executable.
-    add_executable(${PROJECT_NAME} WIN32 ${all_code_files})
+    add_executable(rtek WIN32 ${rtek_all_code_files})
 else()
-    add_executable(${PROJECT_NAME} ${all_code_files})
+    add_executable(rtek ${rtek_all_code_files})
 endif()
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include"
-)
-
-add_dependencies(${PROJECT_NAME} spdlog::spdlog fmt::fmt glfw glad sdslib)
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    spdlog::spdlog
-    fmt::fmt
-    glfw
-    glad
-    sdslib
-)
-
-# Platform specific libraries
-if (WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE "pathcch.lib")
-endif()
-
-# Build type configs
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    "$<$<CONFIG:Debug>:"
-    "RK_ASSERTIONS_ENABLED"
-    "RK_TARGET_ARCH_X86"
-    ">"
-    "$<$<CONFIG:Develop>:"
-    "RK_ASSERTIONS_ENABLED"
-    "RK_TARGET_ARCH_X86"
-    ">"
-    "$<$<CONFIG:Release>:"
-    "RK_TARGET_ARCH_X86"
-    ">"
-)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    DEBUG_POSTFIX d
-    INTERPROCEDURAL_OPTIMIZATION_DEBUG "FALSE"
-    INTERPROCEDURAL_OPTIMIZATION_DEVELOP "TRUE"
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-)
-
-# Exposed cmake option feature toggles
-if (RK_LOG_LEVEL)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOG_LEVEL=${RK_LOG_LEVEL})
-endif()
-if (RK_LOGGING_OFF)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOGGING_OFF)
-endif()
-if (RK_LOGGING_PERF)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOGGING_PERF)
-endif()
-if (RK_LOG_FIXME)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_LOG_FIXME)
-endif()
-if (RK_OGL_DEBUG)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_OGL_DEBUG)
-endif()
-if (RK_SHADER_BASE_DIR)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_SHADER_BASE_DIR="${RK_SHADER_BASE_DIR}")
-endif()
-if (RK_REQUEST_HIGH_PERF_RENDERER)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_REQUEST_HIGH_PERF_RENDERER)
-endif()
-if (RK_DATA_BASE_DIR)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE RK_DATA_BASE_DIR="${RK_DATA_BASE_DIR}")
-endif()
+add_dependencies(rtek rteklib)
+target_link_libraries(rtek PUBLIC rteklib)
 
 # ---------------------------------------------------------------------------------------
 # Visual Studio configuration
@@ -501,5 +568,5 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
     # Set rtek as the startup project in Visual Studio
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT rtek)
 endif()
