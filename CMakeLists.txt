@@ -351,6 +351,7 @@ set(header_files
     "src/core/types.h"
     "src/core/utility/fixme.h"
     "src/core/utility/no_exception.h"
+    "src/core/utility/stb_image.h"
     "src/core/utility/time.h"
     "src/core/version.h"
 )

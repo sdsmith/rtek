@@ -1,5 +1,10 @@
 #include "core/assert.h"
 
+/**
+ * \file stb.cpp
+ * \brief Implementation file for the stb library (think stb_image et al).
+ */
+
 #define STB_IMAGE_IMPLEMENTATION
 
 // Use RK_ASSERT
@@ -7,8 +12,9 @@
 
 // Supported image formats
 #define STBI_ONLY_PNG
+#define STBI_ONLY_JPEG
 
-// Better failure messages
-#define STBI_FAILURE_USERMSG
+// // User friendly failure messages
+// #define STBI_FAILURE_USERMSG
 
-#include <stb/stb_image.h>
+#include "core/utility/stb_image.h"
