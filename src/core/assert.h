@@ -54,8 +54,8 @@ void report_assertion_failure(char const* expr, char const* file, s32 line);
  * \param expr Expression.
  * \param msg Error message.
  */
-#define _ASSERT_GLUE(a, b) a##b
-#define ASSERT_GLUE(a, b) _ASSERT_GLUE(a, b)
+#define RK_I_ASSERT_GLUE(a, b) a##b
+#define RK_ASSERT_GLUE(a, b) RK_I_ASSERT_GLUE(a, b)
 
 #ifdef RK_CPLUSPLUS
 #    if RK_CPLUSPLUS >= RK_CPLUSPLUS_11
@@ -68,12 +68,12 @@ class Static_Assert;
 template <>
 class Static_Assert<true> {};
 #        define RK_STATIC_ASSERT(expr) \
-            enum { ASSERT_GLUE(g_assert_fail_, __LINE__) = sizeof(Static_Assert<!!(expr)>) }
+            enum { RK_ASSERT_GLUE(g_assert_fail_, __LINE__) = sizeof(Static_Assert<!!(expr)>) }
 #        define RK_STATIC_ASSERT_MSG(expr, msg) RK_STATIC_ASSERT(expr)
 #    endif
 #endif
 
-#undef ASSERT_GLUE
-#undef _ASSERT_GLUE
+#undef RK_ASSERT_GLUE
+#undef RK_I_ASSERT_GLUE
 
 } // namespace rk
