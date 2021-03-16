@@ -9,8 +9,6 @@
 #    include <Windows.h>
 #    include <strsafe.h>
 
-#    define RK_PATH_SEPARATOR "\\"
-
 namespace rk::platform
 {
 // TODO(sdsmith): probs shouldn't be in platform
@@ -30,5 +28,4 @@ void log_last_error(uchar const* function_name);
 #    warning Cygwin is not officially supported
 #else
 #    error Unsupported platform
-#    define RK_PATH_SEPARATOR "/"
 #endif

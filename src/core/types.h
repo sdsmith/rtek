@@ -27,6 +27,7 @@
 
 #if RK_OS == RK_OS_WINDOWS
 // Unicode support
+// TODO(sdsmith): define at compilation and check here
 #    ifndef _UNICODE
 #        define _UNICODE
 #    endif
@@ -162,6 +163,17 @@ using uchar = char;
 #    define RK_FUNCNAME __FUNCTION__
 #else
 #    define RK_FUNCNAME __FUNC__
+#endif
+
+/**
+ * \brief Platform specific path separator.
+ */
+#if RK_OS == RK_OS_WINDOW
+// NOTE(sdsmith): Latest Windows versions also support '/', although many older Windows API
+// functions do not.
+#    define RK_PATH_SEPARATOR "\\"
+#else
+#    define RK_PATH_SEPARATOR "/"
 #endif
 
 /**
