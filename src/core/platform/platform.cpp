@@ -56,7 +56,7 @@ void platform::windows::log_last_error(uchar const* function_name)
                     LocalSize(display_buf) / sizeof(TCHAR), TEXT("%s failed with error %d: %s"),
                     function_name, dw, msg_buf);
 
-    LOG_ERROR(display_buf);
+    LOG_ERROR(static_cast<LPTSTR>(display_buf));
 
     LocalFree(msg_buf);
     LocalFree(display_buf);
