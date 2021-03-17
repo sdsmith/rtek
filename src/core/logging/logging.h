@@ -10,6 +10,7 @@
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <sds/type_traits.h>
 #include <cassert>
 #include <exception>
 #include <iostream>
@@ -223,6 +224,9 @@ private:
                              spdlog::level::level_enum level, fmt_wstring_view fmt,
                              Args&&... args) noexcept
     {
+        static_assert(!sds::contains<char const*, std::decay_t<Args>...>::value,
+                      "Cannot mix unicode and non-unicode format and paramter strings");
+
         assert(file_name);
         assert(func_name);
 
@@ -258,6 +262,11 @@ private:
                              spdlog::level::level_enum level, fmt_string_view fmt,
                              Args&&... args) noexcept
     {
+        // TODO(sdsmith): imporve the error message when there is a narrow vs wide character
+        // encoding masmatch with format string and params.
+        static_assert(!sds::contains<uchar const*, std::decay_t<Args>...>::value,
+                      "Cannot mix unicode and non-unicode format and paramter strings");
+
         assert(file_name);
         assert(func_name);
 
