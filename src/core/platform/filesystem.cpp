@@ -1,5 +1,7 @@
 #include "core/platform/filesystem.h"
 
+#include "core/assert.h"
+#include "core/logging/logging.h"
 #include "core/platform/platform.h"
 #include "core/utility/stb_image.h"
 #include <fmt/core.h>
@@ -13,11 +15,16 @@ fs::Path::Path(uchar const* path) noexcept
     uchar const* p = path;
     s32 i = 0;
     while (*p != '\0') {
+        if (i >= (m_path.size() - 1)) {
+            LOG_ERROR(UC("Path greater than max path length ({}): \"{}\""), m_path.size(), path);
+            RK_ASSERT(0);
+        }
         m_path[i] = *p;
         ++i;
         ++p;
     }
 
+    m_path[i] = '\0';
     m_size = i;
 }
 
