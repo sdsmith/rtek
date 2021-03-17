@@ -5,10 +5,11 @@
  */
 
 #include "core/platform/platform.h"
+#include "core/platform/unicode.h"
 #include "core/status.h"
-
 #include <fmt/chrono.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <cassert>
 #include <exception>
 #include <iostream>
@@ -45,13 +46,13 @@
  * Takes precedence over \ref RK_LOG_LEVEL.
  */
 
-#define RK_LOG_LEVEL_OFF SPDLOG_LEVEL_OFF
-#define RK_LOG_LEVEL_TRACE SPDLOG_LEVEL_TRACE
-#define RK_LOG_LEVEL_DEBUG SPDLOG_LEVEL_DEBUG
-#define RK_LOG_LEVEL_INFO SPDLOG_LEVEL_INFO
-#define RK_LOG_LEVEL_WARN SPDLOG_LEVEL_WARN
-#define RK_LOG_LEVEL_ERROR SPDLOG_LEVEL_ERROR
-#define RK_LOG_LEVEL_CRITICAL SPDLOG_LEVEL_CRITICAL
+#define RK_LOG_LEVEL_TRACE 0
+#define RK_LOG_LEVEL_DEBUG 1
+#define RK_LOG_LEVEL_INFO 2
+#define RK_LOG_LEVEL_WARN 3
+#define RK_LOG_LEVEL_ERROR 4
+#define RK_LOG_LEVEL_CRITICAL 5
+#define RK_LOG_LEVEL_OFF 6
 
 #if defined(RK_LOGGING_OFF) && defined(RK_LOGGING_PERF)
 #    error Must defined either RK_LOGGING_OFF or RK_LOGGING_PERF. Not both.
@@ -73,6 +74,15 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+
+// Check the definitions are in sync
+static_assert(RK_LOG_LEVEL_TRACE == SPDLOG_LEVEL_TRACE);
+static_assert(RK_LOG_LEVEL_DEBUG == SPDLOG_LEVEL_DEBUG);
+static_assert(RK_LOG_LEVEL_INFO == SPDLOG_LEVEL_INFO);
+static_assert(RK_LOG_LEVEL_WARN == SPDLOG_LEVEL_WARN);
+static_assert(RK_LOG_LEVEL_ERROR == SPDLOG_LEVEL_ERROR);
+static_assert(RK_LOG_LEVEL_CRITICAL == SPDLOG_LEVEL_CRITICAL);
+static_assert(RK_LOG_LEVEL_OFF == SPDLOG_LEVEL_OFF);
 
 // Use the follow macros for logging
 //
@@ -148,10 +158,8 @@ public:
                 spdlog::default_logger_raw()->log(spdlog::source_loc{file_name, line_no, func_name},
                                                   level, args...);
             });
-        } else if (level < spdlog::level::warn) {
-            fallback_log_info(file_name, line_no, func_name, args...);
         } else {
-            fallback_log_error(file_name, line_no, func_name, args...);
+            fallback_log(file_name, line_no, func_name, level, args...);
         }
     }
 
@@ -203,45 +211,69 @@ private:
         std::terminate();
     }
 
+    using fmt_wstring_view = fmt::basic_string_view<wchar_t>;
+
+    /**
+     * \brief Fallback logging for when the primary logger is not initalized.
+     *
+     * NOTE(sdsmith): This overload handles wide encoded strings.
+     */
     template <typename... Args>
-    static void fallback_log(std::FILE* f, char const* file_name, long line_no,
-                             char const* func_name, Args const&... args) noexcept
+    static void fallback_log(char const* file_name, long line_no, char const* func_name,
+                             spdlog::level::level_enum level, fmt_wstring_view fmt,
+                             Args&&... args) noexcept
     {
         assert(file_name);
         assert(func_name);
 
-        // TODO(sdsmith): Can't get fmt::print to compile. Not sure why because
-        // the MSVC compilation messages are so poor...
-        assert(!"Doesn't work!");
+        std::FILE* f = (level < spdlog::level::warn ? stdout : stderr);
 
-        // spdlog_exception_boundary([&]() {
-        //     const std::time_t t = std::time(nullptr);
-        //     std::scoped_lock<std::mutex> lock(m_fallback_log_mutex);
-        //     fmt::print(f, "[{:%Y-%m-%d %H:%M:%S}] <fallback logger> {}:{}:{}: ",
-        //     fmt::localtime(t),
-        //                file_name, line_no, func_name);
+        spdlog_exception_boundary([&]() {
+            const std::time_t t = std::time(nullptr);
+            std::scoped_lock<std::mutex> lock(m_fallback_log_mutex);
 
-        //     if constexpr (sizeof...(Args) == 1) {
-        //         fmt::print(f, "{}", args...);
-        //     } else {
-        //         fmt::print(f, args...);
-        //     }
-        //     fmt::print(f, "\n");
-        // });
+            std::string const loc = fmt::format("{}:{}:{}", file_name, line_no, func_name);
+            std::wstring w_loc;
+            if (unicode::utf8_to_wide(loc, w_loc) != Status::ok) {
+                w_loc = UC("<loc_utf_conv_failed>");
+            }
+            fmt::print(f, UC("[{:%Y-%m-%d %H:%M:%S}] <fallback logger> {}: \n"), fmt::localtime(t),
+                       w_loc);
+
+            fmt::wmemory_buffer wbuf;
+            fmt::format_to(wbuf, fmt, std::forward<Args>(args)...);
+            fmt::print(UC("{}\n"), wbuf.data());
+        });
     }
 
-    template <typename... Args>
-    static void fallback_log_info(char const* file_name, long line_no, char const* func_name,
-                                  Args const&... args) noexcept
-    {
-        fallback_log(stdout, file_name, line_no, func_name, args...);
-    }
+    using fmt_string_view = fmt::basic_string_view<char>;
 
+    /**
+     * \brief Fallback logging for when the primary logger is not initalized.
+     *
+     * NOTE(sdsmith): This overload handles UTF8/ANSI encoded strings.
+     */
     template <typename... Args>
-    static void fallback_log_error(char const* file_name, long line_no, char const* func_name,
-                                   Args const&... args) noexcept
+    static void fallback_log(char const* file_name, long line_no, char const* func_name,
+                             spdlog::level::level_enum level, fmt_string_view fmt,
+                             Args&&... args) noexcept
     {
-        fallback_log(stderr, file_name, line_no, func_name, args...);
+        assert(file_name);
+        assert(func_name);
+
+        std::FILE* f = (level < spdlog::level::warn ? stdout : stderr);
+
+        spdlog_exception_boundary([&]() {
+            const std::time_t t = std::time(nullptr);
+            std::scoped_lock<std::mutex> lock(m_fallback_log_mutex);
+
+            fmt::print(f, "[{:%Y-%m-%d %H:%M:%S}] <fallback logger> {}:{}:{}: \n",
+                       fmt::localtime(t), file_name, line_no, func_name);
+
+            fmt::memory_buffer buf;
+            fmt::format_to(buf, fmt, std::forward<Args>(args)...);
+            fmt::print("{}\n", buf.data());
+        });
     }
 
     static void fallback_flush() noexcept;
