@@ -138,9 +138,6 @@ static_assert(RK_LOG_LEVEL_OFF == SPDLOG_LEVEL_OFF);
 
 //******************************************************************************
 
-// Define the log macros before platform.h so they can be used
-#include "core/platform/platform.h"
-
 namespace rk
 {
 class Logger {
