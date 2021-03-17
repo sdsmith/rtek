@@ -70,7 +70,7 @@ Status compile_shader(char const* name, s32 shader_id) noexcept
         LOG_DEBUG("Compiled shader id {} ('{}')", shader_id, shader_path);
         return Status::ok;
     });
-    auto p_status = std::get_if<0>(&ret);
+    auto p_status = std::get_if<Status>(&ret);
     RK_ASSERT(p_status); // must return a status
     return *p_status;
 }
