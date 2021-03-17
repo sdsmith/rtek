@@ -376,6 +376,7 @@ set(rteklib_header_files
     "src/core/platform/glfw.h"
     "src/core/platform/input_manager.h"
     "src/core/platform/platform.h"
+    "src/core/platform/unicode.h"
     "src/core/platform/window.h"
     "src/core/platform/window_manager.h"
     "src/core/renderer/opengl/shader_program.h"
@@ -411,6 +412,7 @@ set(rteklib_source_files
 
 set(rteklib_source_files_win32
     "src/core/platform/filesystem_win32.cpp"
+    "src/core/platform/unicode_win32.cpp"
 )
 
 set(rteklib_test_files
