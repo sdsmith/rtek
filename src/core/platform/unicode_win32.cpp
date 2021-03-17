@@ -5,8 +5,6 @@
 
 using namespace rk;
 
-// TODO(sdsmith): make them noexcept, check errors
-
 Status unicode::wide_to_ansi(std::wstring const& ws, std::string& s) noexcept
 {
     auto ret = exception_boundary([&]() {
