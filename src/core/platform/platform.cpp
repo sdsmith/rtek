@@ -14,7 +14,7 @@ using namespace rk;
 s32 platform::ustrlen(uchar const* s) noexcept
 {
     RK_ASSERT(s);
-    return fixme::scast<s32>(_tclen(s), "safe cast to narrow signed value");
+    return fixme::scast<s32>(_tcsclen(s), "safe cast to narrow signed value");
 }
 
 void platform::windows::log_error(HRESULT hresult) noexcept

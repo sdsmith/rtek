@@ -11,7 +11,13 @@
 
 namespace rk::platform
 {
-// TODO(sdsmith): probs shouldn't be in platform
+/**
+ * \brief Number of characters in the string.
+ *
+ * For wide encoded strings, this is the number of wide chracters.
+ * For multi-byte encoded strings this is the number of encoded characters, not the number of bytes.
+ */
+// TODO(sdsmith): move to rk::unicode
 s32 ustrlen(uchar const* s) noexcept;
 
 namespace windows
