@@ -461,11 +461,16 @@ target_link_libraries(rteklib PUBLIC
     sdslib
 )
 
-# Platform specific libraries
+# Platform specific
 if (WIN32)
     target_link_libraries(rteklib PRIVATE
         "Pathcch.lib"
         "Shlwapi.lib"
+    )
+    target_compile_definitions(rteklib PUBLIC
+        # Unicode windows application
+        "_UNICODE"
+        "UNICODE"
     )
 endif()
 

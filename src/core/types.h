@@ -29,10 +29,10 @@
 // Unicode support
 // TODO(sdsmith): define at compilation and check here
 #    ifndef _UNICODE
-#        define _UNICODE
+#        error Unicode only. Define _UNICODE.
 #    endif
 #    ifndef UNICODE
-#        define UNICODE
+#        error Unicode only. Define UNICODE
 #    endif
 #    include <Windows.h>
 #endif
