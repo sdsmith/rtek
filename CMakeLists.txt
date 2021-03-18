@@ -515,7 +515,7 @@ if (RTEK_BUILD_TESTS)
 
     add_executable(rteklib_test ${rteklib_test_files})
     add_dependencies(rteklib_test rteklib)
-    target_link_libraries(rteklib_test PRIVATE gtest_main rteklib)
+    target_link_libraries(rteklib_test PRIVATE rteklib gtest_main)
     add_test(NAME rteklib_test COMMAND rteklib_test)
 endif()
 
