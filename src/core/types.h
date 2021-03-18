@@ -168,7 +168,7 @@ using uchar = char;
 /**
  * \brief Platform specific path separator.
  */
-#if RK_OS == RK_OS_WINDOW
+#if RK_OS == RK_OS_WINDOWS
 // NOTE(sdsmith): Latest Windows versions also support '/', although many older Windows API
 // functions do not.
 #    define RK_PATH_SEPARATOR "\\"
