@@ -9,6 +9,7 @@
 using namespace rk;
 
 #if RK_OS == RK_OS_WINDOWS
+#    include <strsafe.h>
 #    include <tchar.h> // _tcslen
 
 void platform::windows::log_error(HRESULT hresult) noexcept

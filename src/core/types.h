@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vcruntime.h>
+//#include <vcruntime.h>
 #include <cstdint>
 
 /**
@@ -27,15 +27,7 @@
 #endif
 
 #if RK_OS == RK_OS_WINDOWS
-// Unicode support
-// TODO(sdsmith): define at compilation and check here
-#    ifndef _UNICODE
-#        error Unicode only. Define _UNICODE.
-#    endif
-#    ifndef UNICODE
-#        error Unicode only. Define UNICODE.
-#    endif
-#    include <Windows.h>
+#    include "core/platform/win32_include.h"
 #endif
 
 namespace rk

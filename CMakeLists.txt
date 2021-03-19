@@ -377,6 +377,7 @@ set(rteklib_header_files
     "src/core/platform/input_manager.h"
     "src/core/platform/platform.h"
     "src/core/platform/unicode.h"
+    "src/core/platform/win32_include.h"
     "src/core/platform/window.h"
     "src/core/platform/window_manager.h"
     "src/core/renderer/opengl/shader_program.h"

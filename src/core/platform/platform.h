@@ -5,9 +5,7 @@
 #include <cstring>
 
 #if RK_OS == RK_OS_WINDOWS
-#    define NOMINMAX // Stop definition of max and min from windows.h
-#    include <Windows.h>
-#    include <strsafe.h>
+#    include "core/platform/win32_include.h"
 
 namespace rk::platform::windows
 {

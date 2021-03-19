@@ -11,7 +11,7 @@
 // NOTE(sdsmith): windows.h must be included before GLAD. GLAD1 defines
 // APIENTRY, which is also defined by windows. GLAD2 solves this problem, but
 // there is no easy way around this in GLAD1.
-#   include <Windows.h>
+#   include "core/platform/win32_include.h"
 #endif
 
 // NOTE(sdsmith): GLAD must be included before any other OpenGL related header.

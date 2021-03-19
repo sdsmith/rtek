@@ -2,7 +2,7 @@
 
 #if RK_REQUEST_HIGH_PERF_RENDERER
 #    if RK_OS == RK_OS_WINDOWS
-#        include <Windows.h>
+#        include "core/platform/win32_include.h"
 
 /**
  * \file request_high_perf_renderer.h
@@ -24,7 +24,7 @@ extern "C" {
  * this request.
  *
  * NOTE(sdsmith): Cannot be set at runtime! It is read when the app is getting loaded. Modifications
-at runtime have no effect.
+ * at runtime have no effect.
  *
  * ref:
 https://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
