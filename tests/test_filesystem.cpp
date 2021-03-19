@@ -325,7 +325,6 @@ TEST_F(FilesystemTest, path_canonicalize)
 #endif
 }
 
-/* TODO(sdsmith):
 TEST_F(FilesystemTest, path_clean)
 {
     fs::Path path;
@@ -366,7 +365,6 @@ TEST_F(FilesystemTest, path_clean)
 
 #endif
 }
-*/
 
 TEST_F(FilesystemTest, path_combine)
 {
@@ -384,7 +382,7 @@ TEST_F(FilesystemTest, path_common_prefix)
     EXPECT_STREQ(path.data(), UC("\\a\\b\\c\\d"));
 
     RK_EXPECT_OK(fs::path_common_prefix(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\e\\f"), path));
-    EXPECT_STREQ(path.data(), UC("\\a\\b\\c\\d")); // TODO(sdsmith): odd result
+    EXPECT_STREQ(path.data(), UC("\\a\\b\\c\\d\\"));
     RK_EXPECT_OK(fs::path_common_prefix(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\"), path));
     EXPECT_STREQ(path.data(), UC("\\a\\b\\c\\d\\"));
 
@@ -421,7 +419,7 @@ TEST_F(FilesystemTest, path_common_prefix_length)
 
     RK_EXPECT_OK(
         fs::path_common_prefix_length(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\e\\f"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d"))); // TODO(sdsmith): odd result
+    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d\\")));
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\"), len));
     EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d\\")));
 
@@ -446,7 +444,6 @@ TEST_F(FilesystemTest, path_common_prefix_length)
 #endif
 }
 
-/* TODO(sdsmith):
 TEST_F(FilesystemTest, path_is_descendant)
 {
     bool is_descendant = false;
@@ -465,12 +462,12 @@ TEST_F(FilesystemTest, path_is_descendant)
     EXPECT_NOT_DESCENDANT(UC("\\a\\b\\c"), UC(""));
     EXPECT_NOT_DESCENDANT(UC(""), UC("\\a\\b\\c"));
     EXPECT_NOT_DESCENDANT(UC(""), UC(""));
+    EXPECT_NOT_DESCENDANT(UC("\\a\\b\\c"), UC("\\")); // slash as 'root' is only valid on linux
 
     EXPECT_IS_DESCENDANT(UC("\\a\\b\\c"), UC("\\a\\b\\"));
     EXPECT_IS_DESCENDANT(UC("\\a\\b\\c"), UC("\\a\\b"));
     EXPECT_IS_DESCENDANT(UC("\\a\\b\\c"), UC("\\a\\"));
     EXPECT_IS_DESCENDANT(UC("\\a\\b\\c"), UC("\\a"));
-    EXPECT_IS_DESCENDANT(UC("\\a\\b\\c"), UC("\\"));
 
     EXPECT_NOT_DESCENDANT(UC("\\a\\b\\"), UC("\\a\\b\\c"));
     EXPECT_NOT_DESCENDANT(UC("\\a\\b"), UC("\\a\\b\\c"));
@@ -497,4 +494,3 @@ TEST_F(FilesystemTest, path_is_descendant)
     EXPECT_NOT_DESCENDANT(UC("/"), UC("/a/b/c"));
 #endif
 }
-*/

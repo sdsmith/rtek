@@ -139,8 +139,6 @@ Status fs::path_canonicalize(uchar const* path_in, Path& path_out) noexcept
         case S_OK: break;
     }
     path_out.size_dirty();
-
-    RK_CHECK(fs::path_remove_dup_separators(path_out));
     return Status::ok;
 }
 
@@ -163,40 +161,24 @@ Status fs::path_common_prefix(uchar const* path1, uchar const* path2, Path& comm
     RK_ASSERT(path1);
     RK_ASSERT(path2);
 
-    s32 const len = PathCommonPrefix(path1, path2, common_prefix.data());
-    common_prefix.update_size(len + 1);
+    // s32 const len = PathCommonPrefix(path1, path2, common_prefix.data());
+    // common_prefix.update_size(len + 1);
 
-    //     uchar const* p1 = path1;
-    //     uchar const* p2 = path2;
-    //     s32 i = 0;
-    //     uchar const* last_sep = nullptr;
-    //     while (*p1 != UC('\0') && *p2 != UC('\0')) {
-    //         if (*p1 == *p2) {
-    //             common_prefix[i] = *p1;
-    //             if (is_path_separator(*p1)) { last_sep = p1; }
-    //         }
+    uchar const* p1 = path1;
+    uchar const* p2 = path2;
+    uchar* prefix = common_prefix.data();
+    RK_ASSERT(prefix);
 
-    //         ++i;
-    //         ++p1;
-    //         ++p2;
-    //     }
+    while (*p1 != UC('\0') && *p2 != UC('\0') && *p1 == *p2) {
+        *prefix = *p1;
+        ++prefix;
+        ++p1;
+        ++p2;
+    }
+    *prefix = UC('\0');
 
-    //     if (!last_sep) {
-    //         common_prefix[0] = UC('\0');
-    //     } else if (last_sep == path1) { // first character
-    // #if RK_OS == RK_OS_WINDOWS
-    //         common_prefix[0] = UC('\0');
-    // #else
-    //         // Keep root
-    //         *(last_sep + 1) = UC('\0');
-    // #endif
-    //     } else {
-
-    //     }
-
-    //     common_prefix[i] = UC('\0');
-    //     common_prefix.update_size(i);
-
+    // TODO(sdsmith): @optimize: calc size
+    common_prefix.size_dirty();
     return Status::ok;
 }
 
@@ -206,39 +188,58 @@ Status fs::path_common_prefix_length(uchar const* path1, uchar const* path2,
     RK_ASSERT(path1);
     RK_ASSERT(path2);
 
-    common_prefix_length = PathCommonPrefix(path1, path2, nullptr);
+    // NOTE(sdsmith): PathCommonPrefix returns len 3 when given "\\a\\b\\c" and "\\a". It should be
+    // 2!
+    // common_prefix_length = PathCommonPrefix(path1, path2, nullptr);
+    uchar const* p1 = path1;
+    uchar const* p2 = path2;
+    common_prefix_length = 0;
+    while (*p1 != UC('\0') && *p2 != UC('\0') && *p1 == *p2) {
+        ++common_prefix_length;
+        ++p1;
+        ++p2;
+    }
 
     return Status::ok;
 }
 
-// Status fs::path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant)
-// noexcept
-// {
-//     RK_ASSERT(child);
-//     RK_ASSERT(parent);
+Status fs::path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant) noexcept
+{
+    RK_ASSERT(child);
+    RK_ASSERT(parent);
 
-//     Path canonical_child;
-//     RK_CHECK(path_canonicalize(child, canonical_child));
-//     Path canonical_parent;
-//     RK_CHECK(path_canonicalize(parent, canonical_parent));
+    if (*child == UC('\0') || *parent == UC('\0')) {
+        is_descendant = false;
+        return Status::ok;
+    }
 
-//     s32 len = 0;
-//     RK_CHECK(path_common_prefix_length(canonical_parent.data(), canonical_child.data(), len));
-//     if (is_path_separator(canonical_parent.back()) && len > 1) {
-//         // path_common_prefix does not include trailing slashes in the common prefix
-//         len++;
-//     }
+    Path clean_child(child);
+    RK_CHECK(path_clean(clean_child));
+    Path clean_parent(parent);
+    RK_CHECK(path_clean(clean_parent));
 
-//     bool const parent_is_common_prefix = len == canonical_parent.size();
-//     bool const child_is_common_prefix = len == canonical_child.size();
+    if (clean_child.empty() || clean_parent.empty()) {
+        is_descendant = false;
+        return Status::ok;
+    }
 
-//     if (!parent_is_common_prefix ||                         // parent must be contained in child
-//         (parent_is_common_prefix && child_is_common_prefix) // path can't descend from itself
-//     ) {
-//         is_descendant = false;
-//         return Status::ok;
-//     }
+    s32 len = 0;
+    RK_CHECK(path_common_prefix_length(clean_parent.data(), clean_child.data(), len));
+    if (is_path_separator(clean_parent.back()) && len > 1) {
+        // path_common_prefix does not include trailing slashes in the common prefix
+        len++;
+    }
 
-//     is_descendant = true;
-//     return Status::ok;
-// }
+    bool const parent_is_common_prefix = len == clean_parent.size();
+    bool const child_is_common_prefix = len == clean_child.size();
+
+    if (!parent_is_common_prefix ||                         // parent must be contained in child
+        (parent_is_common_prefix && child_is_common_prefix) // path can't descend from itself
+    ) {
+        is_descendant = false;
+        return Status::ok;
+    }
+
+    is_descendant = true;
+    return Status::ok;
+}

@@ -182,18 +182,22 @@ Status path_remove_dup_separators(Path& path) noexcept;
  * path comparisons. Windows uses both '/' and '\' as path separators, but this function
  * only accepts '\'.
  *
+ * NOTE(sdsmith): Does not remove duplicate path separators.
+ *
  * \param path_in Path to canonicalize.
  * \param path_out Resulting path.
+ *
+ * \see path_normalize
+ * \see path_remove_dup_separators
  */
 Status path_canonicalize(uchar const* path_in, Path& path_out) noexcept;
 
-// TODO(sdsmith):
-// /**
-//  * \brief Transforms the path to its simplest form and normalizes the path separators.
-//  *
-//  * Trailing slashes are removed.
-//  */
-// Status path_clean(Path& path) noexcept;
+/**
+ * \brief Transforms the path to its simplest form and normalizes the path separators.
+ *
+ * Trailing slashes are removed.
+ */
+Status path_clean(Path& path) noexcept;
 
 /**
  * \brief Combines two path fragments into a single path. This function also canonicalizes any
@@ -222,20 +226,19 @@ Status path_common_prefix(uchar const* path1, uchar const* path2, Path& common_p
 Status path_common_prefix_length(uchar const* path1, uchar const* path2,
                                  s32& common_prefix_length) noexcept;
 
-// TODO(sdsmith):
-// /**
-//  * \brief Check if a path is a descendant of another path.
-//  *
-//  * Paths are simplified to their canonical path for comparison.
-//  *
-//  * NOTE(sdsmith):
-//  * - Does not check the existance of the paths in the file system!
-//  * - Assumes relative paths stem from the same working directory.
-//  * - Assumes that a path ending without a slash is a directory.
-//  *
-//  * \param child Check if this path decends from \a parent.
-//  * \param parent Parent path.
-//  */
-// Status path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant) noexcept;
+/**
+ * \brief Check if a path is a descendant of another path.
+ *
+ * Paths are simplified to their canonical path for comparison.
+ *
+ * NOTE(sdsmith):
+ * - Does not check the existance of the paths in the file system!
+ * - Assumes relative paths stem from the same working directory.
+ * - Assumes that a path ending without a slash is a directory.
+ *
+ * \param child Check if this path decends from \a parent.
+ * \param parent Parent path.
+ */
+Status path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant) noexcept;
 
 } // namespace rk::fs

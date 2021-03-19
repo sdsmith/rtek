@@ -84,17 +84,18 @@ Status fs::path_remove_trailing_slash(Path& path) noexcept
     return Status::ok;
 }
 
-// Status fs::path_clean(Path& path) noexcept
-// {
-//     RK_CHECK(path_normalize(path));
-//     RK_CHECK(path_remove_trailing_slash(path));
+Status fs::path_clean(Path& path) noexcept
+{
+    RK_CHECK(path_normalize(path));
+    RK_CHECK(path_remove_dup_separators(path));
+    RK_CHECK(path_remove_trailing_slash(path));
 
-//     fs::Path clean_path;
-//     RK_CHECK(path_canonicalize(path.data(), clean_path));
+    fs::Path clean_path;
+    RK_CHECK(path_canonicalize(path.data(), clean_path));
 
-//     path = clean_path;
-//     return Status::ok;
-// }
+    path = clean_path;
+    return Status::ok;
+}
 
 Status fs::path_remove_dup_separators(Path& path) noexcept
 {
