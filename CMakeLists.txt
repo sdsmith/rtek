@@ -421,15 +421,6 @@ set(rteklib_source_files_linux
     "src/core/platform/filesystem_linux.cpp"
 )
 
-set(rteklib_test_header_files
-    "tests/include/tests/common.h"
-)
-
-set(rteklib_test_source_files
-    "tests/test_filesystem.cpp"
-    "tests/test_unicode.cpp"
-)
-
 if (WIN32)
     list(APPEND rteklib_source_files ${rteklib_source_files_win32})
 elseif (UNIX AND NOT APPLE)
@@ -438,17 +429,10 @@ endif()
 
 source_group("Header Files" FILES ${rteklib_header_files})
 source_group("Source Files" FILES ${rteklib_source_files})
-source_group("Test Header Files" FILES ${rteklib_test_header_files})
-source_group("Test Source Files" FILES ${rteklib_test_source_files})
 
 set(rteklib_all_code_files
     ${rteklib_header_files}
     ${rteklib_source_files}
-)
-
-set(rteklib_all_test_files
-    ${rteklib_test_header_files}
-    ${rteklib_test_source_files}
 )
 
 # ---------------------------------------------------------------------------------------
@@ -531,9 +515,22 @@ endif()
 # rteklib_test Target
 # ---------------------------------------------------------------------------------------
 if (RTEK_BUILD_TESTS)
-    # NOTE(sdsmith): Can't use LINK_LIBRARIES property to determine what should
-    # be linked for the test executable. These values get processed later in the
-    # pipeline. Generator expansion will
+    set(rteklib_test_header_files
+        "tests/include/tests/common.h"
+    )
+
+    set(rteklib_test_source_files
+        "tests/test_filesystem.cpp"
+        "tests/test_unicode.cpp"
+    )
+
+    source_group("Test Header Files" FILES ${rteklib_test_header_files})
+    source_group("Test Source Files" FILES ${rteklib_test_source_files})
+
+    set(rteklib_all_test_files
+        ${rteklib_test_header_files}
+        ${rteklib_test_source_files}
+    )
 
     enable_testing()
 
