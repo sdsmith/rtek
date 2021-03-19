@@ -53,6 +53,14 @@ using ustring = std::string;
 namespace unicode
 {
 /**
+ * \brief Number of characters in a unicode string.
+ *
+ * For wide encoded strings, this is the number of wide chracters.
+ * For multi-byte encoded strings this is the number of encoded characters, not the number of bytes.
+ */
+s32 ustrlen(uchar const* s) noexcept;
+
+/**
  * \brief True if the given strings/substrings are equal.
  *
  * Given strings don't have to be the length of \a len. If either of the strings is shorter than \a

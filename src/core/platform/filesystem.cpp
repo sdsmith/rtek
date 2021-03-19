@@ -2,7 +2,6 @@
 
 #include "core/assert.h"
 #include "core/logging/logging.h"
-#include "core/platform/platform.h"
 #include "core/platform/unicode.h"
 #include "core/utility/fixme.h"
 #include "core/utility/stb_image.h"
@@ -34,7 +33,7 @@ Status fs::Path::normalize() noexcept { return fs::path_normalize(*this); }
 
 s32 fs::Path::size() noexcept
 {
-    if (is_size_dirty()) { m_size = platform::ustrlen(m_path.data()); }
+    if (is_size_dirty()) { m_size = unicode::ustrlen(m_path.data()); }
     return m_size;
 }
 

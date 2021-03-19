@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include "core/platform/platform.h"
+#include "core/platform/unicode.h"
 #include "tests/common.h"
 
 using namespace rk;
 
 TEST(Unicode, ustrlen)
 {
-    EXPECT_EQ(platform::ustrlen(UC("hello")), 5);
-    EXPECT_EQ(platform::ustrlen(UC("")), 0);
-    EXPECT_EQ(platform::ustrlen(UC("hello\n")), 6);
-    EXPECT_EQ(platform::ustrlen(UC("hello world\n")), 12);
+    EXPECT_EQ(unicode::ustrlen(UC("hello")), 5);
+    EXPECT_EQ(unicode::ustrlen(UC("")), 0);
+    EXPECT_EQ(unicode::ustrlen(UC("hello\n")), 6);
+    EXPECT_EQ(unicode::ustrlen(UC("hello world\n")), 12);
 }

@@ -3,8 +3,15 @@
 #include "core/utility/fixme.h"
 #include "core/utility/no_exception.h"
 #include <sds/string.h>
+#include <tchar.h> // _tcsclen
 
 using namespace rk;
+
+s32 unicode::ustrlen(uchar const* s) noexcept
+{
+    RK_ASSERT(s);
+    return fixme::scast<s32>(_tcsclen(s), "safe cast to narrow signed value");
+}
 
 Status unicode::wide_to_ansi(std::wstring const& ws, std::string& s) noexcept
 {
@@ -16,7 +23,7 @@ Status unicode::wide_to_ansi(std::wstring const& ws, std::string& s) noexcept
 Status unicode::wide_to_ansi(uchar const* ws, std::string& s) noexcept
 {
     RK_ASSERT(ws);
-    return wide_to_ansi(ws, platform::ustrlen(ws), s);
+    return wide_to_ansi(ws, ustrlen(ws), s);
 }
 
 Status unicode::wide_to_ansi(uchar const* ws, s32 ws_char_len, std::string& s) noexcept
@@ -89,7 +96,7 @@ Status unicode::wide_to_utf8(std::wstring const& ws, std::string& s) noexcept
 Status unicode::wide_to_utf8(uchar const* ws, std::string& s) noexcept
 {
     RK_ASSERT(ws);
-    return wide_to_utf8(ws, platform::ustrlen(ws), s);
+    return wide_to_utf8(ws, ustrlen(ws), s);
 }
 
 Status unicode::wide_to_utf8(uchar const* ws, s32 ws_char_len, std::string& s) noexcept

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "core/platform/filesystem.h"
-#include "core/platform/platform.h"
 #include "core/platform/unicode.h"
 #include "core/types.h"
 #include "tests/common.h"
@@ -266,7 +265,7 @@ TEST_F(FilesystemTest, path_remove_dup_separators)
     path = fs::Path(X);                                 \
     RK_EXPECT_OK(fs::path_remove_dup_separators(path)); \
     EXPECT_STREQ(path.data(), Y);                       \
-    EXPECT_EQ(path.size(), platform::ustrlen(Y));
+    EXPECT_EQ(path.size(), unicode::ustrlen(Y));
 
 #if RK_OS == RK_OS_WINDOWS
     EXPECT_RM_DUP_SEP(UC("a"), UC("a"));
@@ -413,34 +412,34 @@ TEST_F(FilesystemTest, path_common_prefix_length)
 
 #if RK_OS == RK_OS_WINDOWS
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("\\a\\b\\c\\d"), UC("\\a\\b\\c\\d"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("\\a\\b\\c\\d")));
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("\\a\\b\\c\\d"), UC("\\a\\b\\c\\d\\e\\f"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("\\a\\b\\c\\d")));
 
     RK_EXPECT_OK(
         fs::path_common_prefix_length(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\e\\f"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d\\")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("\\a\\b\\c\\d\\")));
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("\\a\\b\\c\\d\\"), UC("\\a\\b\\c\\d\\"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("\\a\\b\\c\\d\\")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("\\a\\b\\c\\d\\")));
 
     RK_EXPECT_OK(fs::path_common_prefix_length(
         UC("C:\\apple\\back\\cmd\\dock"), UC("C:\\apple\\back\\cmd\\dock\\epslon\\folder"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("C:\\apple\\back\\cmd\\dock")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("C:\\apple\\back\\cmd\\dock")));
 
 #elif RK_OS == RK_OS_LINUX
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("/a/b/c/d"), UC("/a/b/c/d"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("/a/b/c/d")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("/a/b/c/d")));
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("/a/b/c/d"), UC("/a/b/c/d/e/f"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("/a/b/c/d")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("/a/b/c/d")));
 
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("/a/b/c/d/"), UC("/a/b/c/d/e/f"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("/a/b/c/d")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("/a/b/c/d")));
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("/a/b/c/d/"), UC("/a/b/c/d/"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("/a/b/c/d/")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("/a/b/c/d/")));
 
     RK_EXPECT_OK(fs::path_common_prefix_length(UC("C:/apple/back/cmd/dock"),
                                                UC("C:/apple/back/cmd/dock/epslon/folder"), len));
-    EXPECT_EQ(len, platform::ustrlen(UC("C:/apple/back/cmd/dock")));
+    EXPECT_EQ(len, unicode::ustrlen(UC("C:/apple/back/cmd/dock")));
 #endif
 }
 

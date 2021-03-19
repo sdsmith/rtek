@@ -9,13 +9,7 @@
 using namespace rk;
 
 #if RK_OS == RK_OS_WINDOWS
-#    include <tchar.h>
-
-s32 platform::ustrlen(uchar const* s) noexcept
-{
-    RK_ASSERT(s);
-    return fixme::scast<s32>(_tcsclen(s), "safe cast to narrow signed value");
-}
+#    include <tchar.h> // _tcslen
 
 void platform::windows::log_error(HRESULT hresult) noexcept
 {
