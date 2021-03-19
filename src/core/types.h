@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vcruntime.h>
 #include <cstdint>
 
 /**
@@ -32,7 +33,7 @@
 #        error Unicode only. Define _UNICODE.
 #    endif
 #    ifndef UNICODE
-#        error Unicode only. Define UNICODE
+#        error Unicode only. Define UNICODE.
 #    endif
 #    include <Windows.h>
 #endif
@@ -166,14 +167,24 @@ using uchar = char;
 #endif
 
 /**
+ * \def RK_PATH_SEPARATOR
  * \brief Platform specific path separator.
+ */
+/**
+ * \def RK_PATH_SEPARATOR_STR
+ * \brief Platform specific path separator as a string.
+ *
+ * Allows for automatic string literal merging.
+ * Ex: `"hello" RK_PATH_SEPARATOR_STR "world"` => `"hello/world"`
  */
 #if RK_OS == RK_OS_WINDOWS
 // NOTE(sdsmith): Latest Windows versions also support '/', although many older Windows API
 // functions do not.
-#    define RK_PATH_SEPARATOR "\\"
+#    define RK_PATH_SEPARATOR '\\'
+#    define RK_PATH_SEPARATOR_STR "\\"
 #else
-#    define RK_PATH_SEPARATOR "/"
+#    define RK_PATH_SEPARATOR '/'
+#    define RK_PATH_SEPARATOR_STR "/"
 #endif
 
 /**

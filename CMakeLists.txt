@@ -402,6 +402,7 @@ set(rteklib_source_files
     "src/core/platform/glfw.cpp"
     "src/core/platform/input_manager.cpp"
     "src/core/platform/platform.cpp"
+    "src/core/platform/unicode.cpp"
     "src/core/platform/window.cpp"
     "src/core/platform/window_manager.cpp"
     "src/core/renderer/opengl/shader_program.cpp"
@@ -415,21 +416,38 @@ set(rteklib_source_files_win32
     "src/core/platform/unicode_win32.cpp"
 )
 
-set(rteklib_test_files
+set(rteklib_source_files_linux
+    "src/core/platform/filesystem_linux.cpp"
+)
+
+set(rteklib_test_header_files
+    "tests/include/tests/common.h"
+)
+
+set(rteklib_test_source_files
     "tests/test_filesystem.cpp"
+    "tests/test_unicode.cpp"
 )
 
 if (WIN32)
     list(APPEND rteklib_source_files ${rteklib_source_files_win32})
+elseif (UNIX AND NOT APPLE)
+    list(APPEND rteklib_source_files ${rteklib_source_files_linux})
 endif()
 
 source_group("Header Files" FILES ${rteklib_header_files})
 source_group("Source Files" FILES ${rteklib_source_files})
-source_group("Test Files" FILES ${rteklib_test_files})
+source_group("Test Header Files" FILES ${rteklib_test_header_files})
+source_group("Test Source Files" FILES ${rteklib_test_source_files})
 
 set(rteklib_all_code_files
     ${rteklib_header_files}
     ${rteklib_source_files}
+)
+
+set(rteklib_all_test_files
+    ${rteklib_test_header_files}
+    ${rteklib_test_source_files}
 )
 
 # ---------------------------------------------------------------------------------------
@@ -518,7 +536,8 @@ if (RTEK_BUILD_TESTS)
 
     enable_testing()
 
-    add_executable(rteklib_test ${rteklib_test_files})
+    add_executable(rteklib_test ${rteklib_all_test_files})
+    target_include_directories(rteklib_test PUBLIC "${CMAKE_CURRENT_LIST_DIR}/tests/include")
     add_dependencies(rteklib_test rteklib)
     target_link_libraries(rteklib_test PRIVATE rteklib gtest_main)
     add_test(NAME rteklib_test COMMAND rteklib_test)
