@@ -1,9 +1,11 @@
 #pragma once
 
 #include "core/assert.h"
+#include "core/platform/unicode.h"
 #include "core/status.h"
 #include "core/types.h"
 #include <array>
+#include <optional>
 
 // TODO(sdsmith): how can this be split nicely into the platform impls?
 #if RK_OS == RK_OS_WINDOWS
@@ -285,5 +287,36 @@ Status path_is_descendant(uchar const* child, uchar const* parent, bool& is_desc
  * \return True if the path was compacted in the given space.
  */
 bool path_compact(uchar const* path_in, Path& path_out, s32 max_len) noexcept;
+
+struct Path_Component {
+    /** Path component */
+    ustring_view name;
+    /** Points to start of component in path */
+    uchar const* path_loc = nullptr;
+
+    Path_Component(uchar const* start_of_component, s32 len) noexcept;
+    [[nodiscard]] std::optional<Path_Component> next() const noexcept;
+};
+
+/**
+ * \brief Return the next component in path.
+ *
+ * Ex:
+ *   Windows: `c:\path1\path2\file.txt` is 4 components `c:`, `path1`, `path2`, and `file.txt`.
+ *   Linux  : `/path1/path2/file.txt` is 3 components `path1`, `path2`, and `file.txt`.
+ *
+ * NOTE(sdsmith): Works with any path separator support on the platform.
+ *
+ * \return Pointer to the start of the next component. Component ends when either a path separator
+ * or null terminator is encountered. Return nullptr on error.
+ *
+ * \see is_path_separator
+ */
+uchar const* path_find_next_component(uchar const* path) noexcept;
+
+/**
+ * DOC(sdsmith):
+ */
+std::optional<Path_Component> path_get_component(uchar const* path) noexcept;
 
 } // namespace rk::fs

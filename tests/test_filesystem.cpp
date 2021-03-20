@@ -599,3 +599,34 @@ TEST_F(FilesystemTest, path_is_descendant)
 #undef EXPECT_NOT_DESCENDANT
 #undef EXPECT_IS_DESCENDANT
 }
+
+TEST_F(FilesystemTest, path_component)
+{
+    uchar const* p = nullptr;
+    std::optional<fs::Path_Component> component;
+
+#define CHECK_COMPONENT(X)                                                                      \
+    ASSERT_TRUE(component);                                                                     \
+    EXPECT_TRUE(                                                                                \
+        unicode::ustrcmp(component->name.data(), X, static_cast<s32>(component->name.size()))); \
+    component = component->next();
+
+    p = UC("c:\\path1\\path2\\file.txt");
+    component = fs::path_get_component(p);
+    CHECK_COMPONENT(UC("c:"));
+    CHECK_COMPONENT(UC("path1"));
+    CHECK_COMPONENT(UC("path2"));
+    CHECK_COMPONENT(UC("file.txt"));
+    EXPECT_FALSE(component);
+
+    p = UC("/path1/path2/file.txt");
+    component = fs::path_get_component(p);
+    CHECK_COMPONENT(UC("path1"));
+    CHECK_COMPONENT(UC("path2"));
+    CHECK_COMPONENT(UC("file.txt"));
+    EXPECT_FALSE(component);
+
+    // TODO(sdsmith):
+
+#undef CHECK_COMPONENT
+}

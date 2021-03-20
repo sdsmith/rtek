@@ -3,6 +3,7 @@
 #include "core/assert.h"
 #include "core/logging/logging.h"
 #include "core/platform/unicode.h"
+#include "core/types.h"
 #include "core/utility/fixme.h"
 #include "core/utility/stb_image.h"
 #include <fmt/core.h>
@@ -142,4 +143,49 @@ Status fs::path_remove_dup_separators(Path& path) noexcept
     // TODO(sdsmith): @optimize: update size properly
     path.size_dirty();
     return Status::ok;
+}
+
+fs::Path_Component::Path_Component(uchar const* start_of_component, s32 len) noexcept
+    : name{start_of_component, static_cast<size_t>(len)}, path_loc(start_of_component)
+{
+    RK_ASSERT(start_of_component);
+}
+
+std::optional<fs::Path_Component> fs::Path_Component::next() const noexcept
+{
+    return path_get_component(path_find_next_component(path_loc));
+}
+
+uchar const* fs::path_find_next_component(uchar const* path) noexcept
+{
+    RK_ASSERT(path);
+
+    if (*path == RK_NULL_TERM) { return nullptr; }
+
+    uchar const* p = path;
+
+    if (!is_path_separator(*p)) {
+        // Skip path segment to get to path separators
+        while (*p != RK_NULL_TERM && !is_path_separator(*p)) { ++p; }
+    }
+
+    // Skip path separators to get to the next path segment
+    while (*p != RK_NULL_TERM && is_path_separator(*p)) { ++p; }
+
+    return p;
+}
+
+std::optional<fs::Path_Component> fs::path_get_component(uchar const* path) noexcept
+{
+    if (path == nullptr || *path == RK_NULL_TERM) { return {}; }
+
+    uchar const* p = path;
+
+    s32 n = 0;
+    while (*p != RK_NULL_TERM && !is_path_separator(*p)) {
+        ++n;
+        ++p;
+    }
+
+    return fs::Path_Component(path, n);
 }

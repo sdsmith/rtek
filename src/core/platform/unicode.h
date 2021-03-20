@@ -3,6 +3,7 @@
 #include "core/assert.h"
 #include "core/status.h"
 #include <string>
+#include <string_view>
 
 // #define RK_CHAR_WIDE 0x1000
 // #define RK_CHAR_NARROW 0x1001
@@ -39,6 +40,7 @@ namespace rk
  * \see rk::uchar
  */
 using ustring = std::wstring;
+using ustring_view = std::wstring_view;
 #elif RK_OS == RK_OS_LINUX
 /**
  * \brief Unicode string.
@@ -46,6 +48,7 @@ using ustring = std::wstring;
  * \see rk::uchar
  */
 using ustring = std::string;
+using ustring = std::string_view;
 #else
 #    error Unsupported OS
 #endif
