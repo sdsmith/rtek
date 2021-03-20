@@ -225,6 +225,42 @@ TEST_F(FilesystemTest, path_add_extension)
     EXPECT_STREQ(path.data(), UC("test/path/zxcf.exe"));
 }
 
+TEST_F(FilesystemTest, path_find_extension)
+{
+    uchar const* path;
+
+    path = UC("");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC(RK_PATH_SEPARATOR_STR);
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC("hello" RK_PATH_SEPARATOR_STR);
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC("hello" RK_PATH_SEPARATOR_STR "world");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+
+    // File ending in period
+    path = UC("hello.");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC("hello.world.");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+
+    // Hidden files
+    path = UC(".hello.");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC(".hello");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC(".hello.et");
+    EXPECT_EQ(fs::path_find_extension(path), path + 6);
+
+    path = UC("hello.world");
+    EXPECT_EQ(fs::path_find_extension(path), path + 5);
+    path = UC("hello.world.me");
+    EXPECT_EQ(fs::path_find_extension(path), path + 11);
+    path = UC("abc" RK_PATH_SEPARATOR_STR "hello.world.me");
+    EXPECT_EQ(fs::path_find_extension(path), path + 15);
+}
+TEST_F(FilesystemTest, path_find_file_name) {}
+
 TEST_F(FilesystemTest, path_append)
 {
     fs::Path path;

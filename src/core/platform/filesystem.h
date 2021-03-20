@@ -111,6 +111,11 @@ Status create_directory(uchar const* directory) noexcept;
 bool directory_exists(uchar const* path) noexcept;
 
 /**
+ * \brief Check if the given path is a file.
+ */
+bool file_exists(uchar const* path) noexcept;
+
+/**
  * \brief True if the given chracter is a path separator.
  */
 constexpr bool is_path_separator(uchar c) noexcept
@@ -153,6 +158,24 @@ Status path_remove_trailing_slash(Path& path) noexcept;
  * \return Ok on success, invalid value if the path already has an extension, error otherwise.
  */
 Status path_add_extension(Path& path, uchar const* extension) noexcept;
+
+/**
+ * \brief Get the period corresponding to the file extension in the given path.
+ *
+ * Hidden files - files prefixed with a single period - are considered to not have an extension
+ * if they only start with a period and have no other extension tacked on. This deviates from
+ * Windows platform behaviour where they would be considered extensions.
+ *
+ * \return Nullptr if not found.
+ */
+uchar const* path_find_extension(uchar const* path) noexcept;
+
+/**
+ * \brief Get the first character corresponding to the filename in the given path.
+ *
+ * \return Nullptr if not found.
+ */
+uchar const* path_find_file_name(uchar const* path) noexcept;
 
 /**
  * \brief Appends one path to the end of another.
@@ -240,5 +263,16 @@ Status path_common_prefix_length(uchar const* path1, uchar const* path2,
  * \param parent Parent path.
  */
 Status path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant) noexcept;
+
+/**
+ * \brief Compacts the given path into the given maximum length.
+ *
+ * The path is not guaranteed to be a usable filesystem path.
+ *
+ * \param max_len Maximum number of characters the path can be, including the null-terminator. May
+ * take less than this.
+ * \return True if the path was compacted in the given space.
+ */
+bool path_compact(uchar const* path_in, Path& path_out, s32 max_len) noexcept;
 
 } // namespace rk::fs

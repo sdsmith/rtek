@@ -48,8 +48,15 @@ Status fs::create_directory(uchar const* directory) noexcept
 
 bool fs::directory_exists(uchar const* path) noexcept
 {
+    RK_ASSERT(path);
     DWORD attribs = GetFileAttributes(static_cast<LPCTSTR>(path));
     return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));
+}
+
+bool fs::file_exists(uchar const* path) noexcept
+{
+    RK_ASSERT(path);
+    return PathFileExists(path);
 }
 
 Status fs::path_normalize(Path& path) noexcept
@@ -97,6 +104,44 @@ Status fs::path_add_extension(Path& path, uchar const* extension) noexcept
 
     path.size_dirty();
     return Status::ok;
+}
+
+uchar const* fs::path_find_extension(uchar const* path) noexcept
+{
+    RK_ASSERT(path)
+    uchar const* p = PathFindExtension(path);
+
+    if (p) {
+        // Adjust return from PathFindExtension
+        if (*p == UC('\0')) { return nullptr; }
+
+        // NOTE(sdsmith): Windows considers hidden file names on Linux (filename prefixed with a
+        // '.') as extensions when there is no extension additional extension. For instance,
+        // ".emacs" on Windows has extension "emacs" and ".emacs.d" has extension "d". To keep
+        // behaviour between Windows and Linux consistent, consider hidden files with no extension
+        // as having no extension on all platforms.
+        if (p == path                      // start of the path
+            || is_path_separator(*(p - 1)) // start of the file name
+        ) {
+            // Is hidden file with no path extension
+            return nullptr;
+        }
+
+        // Treat files that end in a period as not having an extension
+        if (*(p + 1) == UC('\0')) { return nullptr; }
+    }
+    return p;
+}
+
+uchar const* fs::path_find_file_name(uchar const* path) noexcept
+{
+    RK_ASSERT(path)
+    uchar const* p = PathFindFileName(path);
+
+    // Adjust return from PathFindFileName
+    if (p && p == path) { return nullptr; }
+
+    return p;
 }
 
 Status fs::path_append(Path& path, uchar const* more) noexcept
@@ -188,9 +233,8 @@ Status fs::path_common_prefix_length(uchar const* path1, uchar const* path2,
     RK_ASSERT(path1);
     RK_ASSERT(path2);
 
-    // NOTE(sdsmith): PathCommonPrefix returns len 3 when given "\\a\\b\\c" and "\\a". It should be
-    // 2!
-    // common_prefix_length = PathCommonPrefix(path1, path2, nullptr);
+    // NOTE(sdsmith): PathCommonPrefix returns len 3 when given "\\a\\b\\c" and "\\a". It should
+    // be 2! common_prefix_length = PathCommonPrefix(path1, path2, nullptr);
     uchar const* p1 = path1;
     uchar const* p2 = path2;
     common_prefix_length = 0;
@@ -242,4 +286,12 @@ Status fs::path_is_descendant(uchar const* child, uchar const* parent, bool& is_
 
     is_descendant = true;
     return Status::ok;
+}
+
+bool fs::path_compact(uchar const* path_in, Path& path_out, s32 max_len) noexcept
+{
+    RK_ASSERT(path_in);
+    RK_ASSERT(max_len > 0);
+
+    return PathCompactPathEx(path_out.data(), path_in, max_len, 0);
 }
