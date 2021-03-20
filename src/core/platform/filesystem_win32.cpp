@@ -91,6 +91,17 @@ Status fs::path_add_trailing_slash(Path& path) noexcept
     return Status::ok;
 }
 
+bool fs::path_has_trailing_slash(uchar const* path) noexcept
+{
+    RK_ASSERT(path);
+    if (*path == RK_NULL_TERM) { return false; }
+
+    uchar const* p = path;
+    while (*p != RK_NULL_TERM) { ++p; }
+    --p;
+    return is_path_separator(*p);
+}
+
 Status fs::path_add_extension(Path& path, uchar const* extension) noexcept
 {
     RK_ASSERT(extension);
@@ -112,7 +123,7 @@ uchar const* fs::path_find_extension(uchar const* path) noexcept
     uchar const* p = PathFindExtension(path);
 
     if (p) {
-        // Adjust return from PathFindExtension
+        // Adjust "unfound" return from PathFindExtension
         if (*p == UC('\0')) { return nullptr; }
 
         // NOTE(sdsmith): Windows considers hidden file names on Linux (filename prefixed with a
@@ -129,17 +140,48 @@ uchar const* fs::path_find_extension(uchar const* path) noexcept
 
         // Treat files that end in a period as not having an extension
         if (*(p + 1) == UC('\0')) { return nullptr; }
+
+        return p;
+    } else {
+        return nullptr;
     }
-    return p;
 }
 
 uchar const* fs::path_find_file_name(uchar const* path) noexcept
 {
-    RK_ASSERT(path)
+    RK_ASSERT(path);
+
+    if (*path == RK_NULL_TERM ||
+        // If last character is a path separator, there's no filename
+        path_has_trailing_slash(path)) {
+        return nullptr;
+    }
+
     uchar const* p = PathFindFileName(path);
 
-    // Adjust return from PathFindFileName
-    if (p && p == path) { return nullptr; }
+    if (p) {
+        // Path separators aren't a file name
+        while (*p != RK_NULL_TERM && is_path_separator(*p)) { ++p; }
+
+        // If there is only path separators, there is no file name in the path
+        if (*p == RK_NULL_TERM) { return nullptr; }
+    }
+
+    return p;
+}
+
+uchar const* fs::path_find_file_name(Path& path) noexcept
+{
+    if (path.empty() || path.has_trailing_separator()) { return nullptr; }
+
+    uchar const* p = PathFindFileName(path.data());
+    if (p) {
+        // Path separators aren't a file name
+        while (*p != RK_NULL_TERM && is_path_separator(*p)) { ++p; }
+
+        // If there is only path separators, there is no file name in the path
+        if (*p == RK_NULL_TERM) { return nullptr; }
+    }
 
     return p;
 }

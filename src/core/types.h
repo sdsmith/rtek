@@ -95,6 +95,12 @@ using uchar = char;
  */
 #define UC(x) RK_I_UC(x)
 
+/**
+ * \def RK_NULL_TERM
+ * \brief Unicode string null terminator.
+ */
+#define RK_NULL_TERM UC('\0')
+
 // ---------------------------------------------------------------------------------------
 
 /**

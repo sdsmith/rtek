@@ -45,6 +45,8 @@ uchar& fs::Path::back()
     return m_path[size() - 1];
 }
 
+bool fs::Path::has_trailing_separator() noexcept { return !empty() && is_path_separator(back()); }
+
 bool fs::Path::is_windows_extended_path() const noexcept
 {
     // NOTE(sdsmith): Windows extended paths are prefixed with "\\?\".

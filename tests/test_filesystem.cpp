@@ -195,6 +195,25 @@ TEST_F(FilesystemTest, path_remove_tailing_slash)
     EXPECT_STREQ(path.data(), UC(""));
 }
 
+TEST_F(FilesystemTest, path_has_tailing_slash)
+{
+    EXPECT_FALSE(fs::path_has_trailing_slash(UC("")));
+    EXPECT_TRUE(fs::path_has_trailing_slash(UC(RK_PATH_SEPARATOR_STR)));
+    EXPECT_TRUE(fs::path_has_trailing_slash(UC("hello" RK_PATH_SEPARATOR_STR)));
+    EXPECT_FALSE(fs::path_has_trailing_slash(UC("hello")));
+    EXPECT_FALSE(fs::path_has_trailing_slash(UC("hello" RK_PATH_SEPARATOR_STR "world")));
+    EXPECT_TRUE(fs::path_has_trailing_slash(
+        UC("hello" RK_PATH_SEPARATOR_STR "world" RK_PATH_SEPARATOR_STR)));
+
+    EXPECT_FALSE(fs::Path(UC("")).has_trailing_separator());
+    EXPECT_TRUE(fs::Path(UC(RK_PATH_SEPARATOR_STR)).has_trailing_separator());
+    EXPECT_TRUE(fs::Path(UC("hello" RK_PATH_SEPARATOR_STR)).has_trailing_separator());
+    EXPECT_FALSE(fs::Path(UC("hello")).has_trailing_separator());
+    EXPECT_FALSE(fs::Path(UC("hello" RK_PATH_SEPARATOR_STR "world")).has_trailing_separator());
+    EXPECT_TRUE(fs::Path(UC("hello" RK_PATH_SEPARATOR_STR "world" RK_PATH_SEPARATOR_STR))
+                    .has_trailing_separator());
+}
+
 TEST_F(FilesystemTest, path_add_extension)
 {
     uchar const* exe0 = UC("exe");
@@ -251,6 +270,12 @@ TEST_F(FilesystemTest, path_find_extension)
     EXPECT_EQ(fs::path_find_extension(path), nullptr);
     path = UC(".hello.et");
     EXPECT_EQ(fs::path_find_extension(path), path + 6);
+    path = UC("abc" RK_PATH_SEPARATOR_STR ".hello.");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC("abc" RK_PATH_SEPARATOR_STR ".hello");
+    EXPECT_EQ(fs::path_find_extension(path), nullptr);
+    path = UC("abc" RK_PATH_SEPARATOR_STR ".hello.et");
+    EXPECT_EQ(fs::path_find_extension(path), path + 10);
 
     path = UC("hello.world");
     EXPECT_EQ(fs::path_find_extension(path), path + 5);
@@ -259,7 +284,47 @@ TEST_F(FilesystemTest, path_find_extension)
     path = UC("abc" RK_PATH_SEPARATOR_STR "hello.world.me");
     EXPECT_EQ(fs::path_find_extension(path), path + 15);
 }
-TEST_F(FilesystemTest, path_find_file_name) {}
+TEST_F(FilesystemTest, path_find_file_name)
+{
+    uchar const* path;
+    fs::Path fs_path;
+
+#define EXPECT_FIND_FILE_NAME(X, Ptr_Offset)                     \
+    path = X;                                                    \
+    EXPECT_EQ(fs::path_find_file_name(path), path + Ptr_Offset); \
+    fs_path = fs::Path(path);                                    \
+    EXPECT_EQ(fs::path_find_file_name(fs_path), fs_path.data() + Ptr_Offset)
+
+#define EXPECT_FIND_FILE_NAME_NULL(X)                  \
+    path = X;                                          \
+    EXPECT_EQ(fs::path_find_file_name(path), nullptr); \
+    fs_path = fs::Path(path);                          \
+    EXPECT_EQ(fs::path_find_file_name(fs_path), nullptr)
+
+    EXPECT_FIND_FILE_NAME_NULL(UC(""));
+    EXPECT_FIND_FILE_NAME_NULL(UC(RK_PATH_SEPARATOR_STR));
+    EXPECT_FIND_FILE_NAME_NULL(UC("hello" RK_PATH_SEPARATOR_STR));
+    EXPECT_FIND_FILE_NAME(UC("hello" RK_PATH_SEPARATOR_STR "world"), 6);
+
+    // File ending in period
+    EXPECT_FIND_FILE_NAME(UC("hello."), 0);
+    EXPECT_FIND_FILE_NAME(UC("hello.world."), 0);
+
+    // Hidden files
+    EXPECT_FIND_FILE_NAME(UC(".hello."), 0);
+    EXPECT_FIND_FILE_NAME(UC(".hello"), 0);
+    EXPECT_FIND_FILE_NAME(UC(".hello.et"), 0);
+    EXPECT_FIND_FILE_NAME(UC("abc" RK_PATH_SEPARATOR_STR ".hello."), 4);
+    EXPECT_FIND_FILE_NAME(UC("abc" RK_PATH_SEPARATOR_STR ".hello"), 4);
+    EXPECT_FIND_FILE_NAME(UC("abc" RK_PATH_SEPARATOR_STR ".hello.et"), 4);
+
+    EXPECT_FIND_FILE_NAME(UC("hello.world"), 0);
+    EXPECT_FIND_FILE_NAME(UC("hello.world.me"), 0);
+    EXPECT_FIND_FILE_NAME(UC("abc" RK_PATH_SEPARATOR_STR "hello.world.me"), 4);
+
+#undef EXPECT_FIND_FILE_NAME_NULL
+#undef EXPECT_FIND_FILE_NAME
+}
 
 TEST_F(FilesystemTest, path_append)
 {
@@ -324,6 +389,8 @@ TEST_F(FilesystemTest, path_remove_dup_separators)
     EXPECT_RM_DUP_SEP(UC("///"), UC("//"));
     EXPECT_RM_DUP_SEP(UC("//a///b"), UC("//a/b"));
 #endif
+
+#undef EXPECT_RM_DUP_SEP
 }
 
 TEST_F(FilesystemTest, path_canonicalize)
@@ -528,4 +595,7 @@ TEST_F(FilesystemTest, path_is_descendant)
     EXPECT_NOT_DESCENDANT(UC("/a"), UC("/a/b/c"));
     EXPECT_NOT_DESCENDANT(UC("/"), UC("/a/b/c"));
 #endif
+
+#undef EXPECT_NOT_DESCENDANT
+#undef EXPECT_IS_DESCENDANT
 }

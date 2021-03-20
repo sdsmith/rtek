@@ -58,6 +58,11 @@ public:
     [[nodiscard]] uchar& back();
 
     /**
+     * \brief Check if path has a trailing path separator.
+     */
+    [[nodiscard]] bool has_trailing_separator() noexcept;
+
+    /**
      * \brief Check if path is a windows extended path.
      *
      * ref: https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
@@ -152,6 +157,11 @@ Status path_add_trailing_slash(Path& path) noexcept;
 Status path_remove_trailing_slash(Path& path) noexcept;
 
 /**
+ * \brief True if path ends in a path separator.
+ */
+bool path_has_trailing_slash(uchar const* path) noexcept;
+
+/**
  * \brief Adds a file name extension to a path string.
  *
  * \param extension Extension to append, with or without the period.
@@ -176,6 +186,7 @@ uchar const* path_find_extension(uchar const* path) noexcept;
  * \return Nullptr if not found.
  */
 uchar const* path_find_file_name(uchar const* path) noexcept;
+uchar const* path_find_file_name(Path& path) noexcept;
 
 /**
  * \brief Appends one path to the end of another.
