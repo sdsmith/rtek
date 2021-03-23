@@ -23,7 +23,7 @@ using ifstream = nowide::ifstream;
  *
  * \see std::ofstream
  */
-using ostream = nowide::ofstream;
+using ofstream = nowide::ofstream;
 
 /**
  * \brief Same as std::fstream but accepts UTF-8 strings.

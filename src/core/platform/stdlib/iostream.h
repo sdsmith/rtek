@@ -12,7 +12,7 @@ namespace rk
  *
  * \see std::cin
  */
-using cin = nowide::cin;
+using nowide::cin;
 
 /**
  * \brief Same as std::cout but uses UTF-8.
@@ -22,7 +22,7 @@ using cin = nowide::cin;
  *
  * \see std::cout
  */
-using cout = nowide::cout;
+using nowide::cout;
 
 /**
  * \brief Same as std::cerr but uses UTF-8.
@@ -33,7 +33,7 @@ using cout = nowide::cout;
  * \see std::cerr
  */
 
-using cerr = nowide::cerr;
+using nowide::cerr;
 
 /**
  * \brief Same as std::clog but uses UTF-8.
@@ -43,6 +43,6 @@ using cerr = nowide::cerr;
  *
  * \see std::clog
  */
-using clog = nowide::clog;
+using nowide::clog;
 
 } // namespace rk
