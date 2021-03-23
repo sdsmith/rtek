@@ -5,6 +5,7 @@
  */
 
 #include "core/platform/platform.h"
+#include "core/platform/stdlib/iostream.h"
 #include "core/platform/unicode.h"
 #include "core/status.h"
 #include <fmt/chrono.h>
@@ -13,7 +14,6 @@
 #include <sds/type_traits.h>
 #include <cassert>
 #include <exception>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -198,11 +198,11 @@ private:
             f();
             return;
         } catch (const spdlog::spdlog_ex& e) {
-            std::cerr << e.what() << '\n';
+            rk::cerr << e.what() << '\n';
         } catch (const std::exception& e) {
-            std::cerr << "Unhandled exception: " << e.what() << '\n';
+            rk::cerr << "Unhandled exception: " << e.what() << '\n';
         } catch (...) {
-            std::cerr << "Unknown exception occured\n";
+            rk::cerr << "Unknown exception occured\n";
         }
 
         // TODO(sdsmith): There isn't really much that can be done here since it's the logger...

@@ -2,9 +2,9 @@
 
 #include "core/assert.h"
 #include "core/logging/logging.h"
+#include "core/platform/stdlib/fstream.h"
 #include "core/utility/no_exception.h"
 #include <glad/glad.h>
-#include <fstream>
 #include <string>
 
 using namespace rk;
@@ -28,7 +28,7 @@ Status compile_shader(char const* name, s32 shader_id) noexcept
     // the func name?
     auto ret = exception_boundary([&]() {
         std::string shader_path = fmt::format("{}/{}", RK_SHADER_BASE_DIR, name);
-        std::ifstream f(shader_path, std::ios::binary);
+        rk::ifstream f(shader_path, std::ios::binary);
         if (f.fail()) {
             LOG_ERROR("Failed to open shader file '{}'", shader_path);
             return Status::io_error;

@@ -41,7 +41,7 @@ Status Logger::initialize() noexcept
             s_initialized = true;
 
         } catch (const spdlog::spdlog_ex& e) {
-            std::cerr << "Unable to initialize logger: " << e.what() << '\n';
+            rk::cerr << "Unable to initialize logger: " << e.what() << '\n';
             throw;
         }
     });
@@ -68,6 +68,6 @@ spdlog::logger* Logger::get_default_logger() noexcept { return spdlog::default_l
 
 void Logger::fallback_flush() noexcept
 {
-    std::cout << std::flush;
-    std::cerr << std::flush;
+    rk::cout << std::flush;
+    rk::cerr << std::flush;
 }
