@@ -2,34 +2,9 @@
 
 #include "core/assert.h"
 #include "core/status.h"
+#include <nowide/args.hpp>
 #include <string>
 #include <string_view>
-
-// #define RK_CHAR_WIDE 0x1000
-// #define RK_CHAR_NARROW 0x1001
-
-// /**
-//  * \def RK_UNICODE
-//  * \brief Unicode encoding being used for unicode characters and strings.
-//  *
-//  * Has a value from one of \a RK_UNICODE_*.
-//  * Usage: `#if RK_UNICODE == RK_UNICODE_UTF16`
-//  */
-
-// #ifndef RK_UNICODE
-// #    define RK_UNICODE_UTF8 1
-// #    define RK_UNICODE_UTF16 2
-
-// #    if RK_OS == RK_OS_WINDOWS
-// #        define RK_UNICODE RK_UNICODE_UTF16
-// #        define RK_UNICODE_CHAR RK_CHAR_WIDE
-// #    elif RK_OS == RK_OS_LINUX
-// #        define RK_UNICODE RK_UNICODE_UTF8
-// #        define RK_UNICODE_CHAR RK_CHAR_NARROW
-// #    endif
-// #endif
-// RK_STATIC_ASSERT(RK_OS == RK_OS_WINDOWS && RK_UNICODE == RK_UNICODE_UTF16 &&
-//                  RK_UNICODE_CHAR == RK_CHAR_WIDE);
 
 namespace rk
 {
@@ -53,8 +28,119 @@ using ustring = std::string_view;
 #    error Unsupported OS
 #endif
 
+// TODO(sdsmith): rename utf?
 namespace unicode
 {
+// TODO(sdsmith): chracters get replaced with NOWIDE_REPLACEMENT_CHARACTER. Should this be exposed?
+
+/**
+ * \brief Replaces standard `main()`'s function args with UTF-8 encoded chracters on Windows for the
+ * lifetime of the instance.
+ *
+ * \see nowide::args
+ */
+using Args = nowide::args;
+
+/**
+ * \brief Convert wide string (UTF-16/32) in range [begin,end) to NULL terminated narrow string
+ * (UTF-8) stored in \a output of size \a output_size (including NULL)
+ *
+ * If there is not enough room NULL is returned, else output is returned.
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline char* narrow(char* output, s32 output_size, wchar_t const* begin,
+                    wchar_t const* end) noexcept;
+
+/**
+ * \brief Convert NULL terminated wide string (UTF-16/32) to NULL terminated narrow string (UTF-8)
+ * stored in \a output of size \a output_size (including NULL)
+ *
+ * If there is not enough room NULL is returned, else output is returned.
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline char* narrow(char* output, s32 output_size, wchar_t const* source) noexcept;
+
+/**
+ * \brief Convert narrow string (UTF-8) in range [begin,end) to NULL terminated wide string
+ * (UTF-16/32) stored in \a output of size \a output_size (including NULL)
+ *
+ * If there is not enough room NULL is returned, else output is returned.
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline wchar_t* widen(wchar_t* output, s32 output_size, char const* begin,
+                      char const* end) noexcept;
+
+/**
+ * \brief Convert NULL terminated narrow string (UTF-8) to NULL terminated wide string (UTF-16/32)
+ * most output_size (including NULL)
+ *
+ * If there is not enough room NULL is returned, else output is returned.
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline wchar_t* widen(wchar_t* output, s32 output_size, char const* source) noexcept;
+
+/**
+ * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
+ *
+ * \param s Input string
+ * \param count Number of characters to convert
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::string narrow(wchar_t const* s, s32 count);
+
+/**
+ * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
+ *
+ * \param s NULL terminated input string
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::string narrow(wchar_t const* s);
+
+/**
+ * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
+ *
+ * \param s Input string
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::string narrow(std::wstring const& s);
+
+/**
+ * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
+ *
+ * \param s Input string
+ * \param count Number of characters to convert
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::wstring widen(char const* s, s32 count);
+
+/**
+ * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
+ *
+ * \param s NULL terminated input string
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::wstring widen(char const* s);
+
+/**
+ * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
+ *
+ * \param s Input string
+ * Any illegal sequences are replaced with the replacement character, see
+ * #NOWIDE_REPLACEMENT_CHARACTER
+ */
+inline std::wstring widen(std::string const& s);
+
+// TODO(sdsmith): --------------------------------------------------------------------------------
+
 /**
  * \brief Number of characters in a unicode string.
  *

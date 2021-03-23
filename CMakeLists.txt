@@ -341,6 +341,26 @@ if (RTEK_BUILD_TESTS)
     )
 endif()
 
+# Cross platform unicode handling. UTF-8 everywhere.
+message(STATUS "Dependency: nowide...")
+set(nowide_version "11.0.0")
+find_package(nowide ${nowide_version} QUIET)
+if (NOT nowide_FOUND)
+    message(STATUS "nowide package not found, creating install target")
+    FetchContent_Declare(
+        nowide
+        URL "https://github.com/boostorg/nowide/releases/download/v${nowide_version}/nowide_standalone_v${nowide_version}.tar.gz"
+    )
+    set(NOWIDE_INSTALL ON CACHE BOOL "nowide generate install target")
+    set(NOWIDE_WERROR ON CACHE BOOL "nowide treat warnings as errors")
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "don't build shared libraries. Used by nowide")
+    FetchContent_MakeAvailable(nowide)
+    set_target_properties(nowide PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+    )
+    message(STATUS "nowide version: " ${nowide_version})
+endif()
+
 # ---------------------------------------------------------------------------------------
 # External Projects built with this project
 # ---------------------------------------------------------------------------------------
@@ -376,6 +396,10 @@ set(rteklib_header_files
     "src/core/platform/glfw.h"
     "src/core/platform/input_manager.h"
     "src/core/platform/platform.h"
+    "src/core/platform/stdlib/cstdio.h"
+    "src/core/platform/stdlib/cstdlib.h"
+    "src/core/platform/stdlib/fstream.h"
+    "src/core/platform/stdlib/iostream.h"
     "src/core/platform/unicode.h"
     "src/core/platform/win32_include.h"
     "src/core/platform/window.h"
@@ -403,6 +427,8 @@ set(rteklib_source_files
     "src/core/platform/glfw.cpp"
     "src/core/platform/input_manager.cpp"
     "src/core/platform/platform.cpp"
+    "src/core/platform/stdlib/cstdio.cpp"
+    "src/core/platform/stdlib/cstdlib.cpp"
     "src/core/platform/unicode.cpp"
     "src/core/platform/window.cpp"
     "src/core/platform/window_manager.cpp"
@@ -454,6 +480,7 @@ add_dependencies(rteklib
     glfw
     glad
     sdslib
+    nowide
 )
 
 target_link_libraries(rteklib PUBLIC
@@ -462,6 +489,7 @@ target_link_libraries(rteklib PUBLIC
     glfw
     glad
     sdslib
+    nowide
 )
 
 # Platform specific
@@ -471,7 +499,7 @@ if (WIN32)
         "Shlwapi.lib"
     )
     target_compile_definitions(rteklib PUBLIC
-        # Unicode windows application
+        # Unicode windows application. Stop ANSI functions from being available.
         "_UNICODE"
         "UNICODE"
     )
