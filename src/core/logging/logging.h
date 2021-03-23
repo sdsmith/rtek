@@ -176,8 +176,8 @@ public:
 private:
     static bool s_initialized;
     static std::mutex m_fallback_log_mutex;
-    static uchar const* s_log_dir;
-    static uchar const* s_log_file;
+    static char const* s_log_dir;
+    static char const* s_log_file;
 
     static std::string sconcat(char const* a, char const* b) noexcept(false);
 
@@ -221,29 +221,31 @@ private:
                              spdlog::level::level_enum level, fmt_wstring_view fmt,
                              Args&&... args) noexcept
     {
+        // fmtlib has a horrible error message for encoding mismatches. Use this to improve the
+        // error message.
         static_assert(!sds::contains<char const*, std::decay_t<Args>...>::value,
-                      "Cannot mix unicode and non-unicode format and paramter strings");
+                      "Cannot mix narrow and wide encodings for format and parameter strings");
+        static_assert(!sds::contains<char*, std::decay_t<Args>...>::value,
+                      "Cannot mix narrow and wide encodings for format and parameter strings");
 
         assert(file_name);
         assert(func_name);
 
         std::FILE* f = (level < spdlog::level::warn ? stdout : stderr);
 
+        // TODO(sdsmith): convert stuff to utf-8 before it goes out
         spdlog_exception_boundary([&]() {
             const std::time_t t = std::time(nullptr);
             std::scoped_lock<std::mutex> lock(m_fallback_log_mutex);
 
             std::string const loc = fmt::format("{}:{}:{}", file_name, line_no, func_name);
-            std::wstring w_loc;
-            if (unicode::utf8_to_wide(loc, w_loc) != Status::ok) {
-                w_loc = UC("<loc_utf_conv_failed>");
-            }
-            fmt::print(f, UC("[{:%Y-%m-%d %H:%M:%S}] <fallback logger> {}: \n"), fmt::localtime(t),
+            std::wstring w_loc = unicode::widen(loc);
+            fmt::print(f, L"[{:%Y-%m-%d %H:%M:%S}] <fallback logger> {}: \n", fmt::localtime(t),
                        w_loc);
 
             fmt::wmemory_buffer wbuf;
             fmt::format_to(wbuf, fmt, std::forward<Args>(args)...);
-            fmt::print(UC("{}\n"), wbuf.data());
+            fmt::print(L"{}\n", wbuf.data());
         });
     }
 
@@ -251,18 +253,18 @@ private:
 
     /**
      * \brief Fallback logging for when the primary logger is not initalized.
-     *
-     * NOTE(sdsmith): This overload handles UTF8/ANSI encoded strings.
      */
     template <typename... Args>
     static void fallback_log(char const* file_name, long line_no, char const* func_name,
                              spdlog::level::level_enum level, fmt_string_view fmt,
                              Args&&... args) noexcept
     {
-        // TODO(sdsmith): imporve the error message when there is a narrow vs wide character
-        // encoding masmatch with format string and params.
-        static_assert(!sds::contains<uchar const*, std::decay_t<Args>...>::value,
-                      "Cannot mix unicode and non-unicode format and paramter strings");
+        // fmtlib has a horrible error message for encoding mismatches. Use this to improve the
+        // error message.
+        static_assert(!sds::contains<wchar_t const*, std::decay_t<Args>...>::value,
+                      "Cannot mix narrow and wide encodings for format and parameter strings");
+        static_assert(!sds::contains<wchar_t*, std::decay_t<Args>...>::value,
+                      "Cannot mix narrow and wide encodings for format and parameter strings");
 
         assert(file_name);
         assert(func_name);

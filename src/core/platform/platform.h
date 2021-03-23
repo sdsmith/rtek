@@ -10,9 +10,7 @@
 namespace rk::platform::windows
 {
 void log_error(HRESULT hresult) noexcept;
-
-// TODO(sdsmith): uchar param or regular char param?
-void log_last_error(uchar const* function_name);
+void log_last_error(char const* function_name) noexcept;
 
 } // namespace rk::platform::windows
 

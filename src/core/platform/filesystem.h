@@ -6,6 +6,7 @@
 #include "core/types.h"
 #include <array>
 #include <optional>
+#include <string_view>
 
 // TODO(sdsmith): how can this be split nicely into the platform impls?
 #if RK_OS == RK_OS_WINDOWS
@@ -21,10 +22,10 @@ namespace rk::fs
 class Path {
 public:
     Path() noexcept = default;
-    explicit Path(uchar const* path) noexcept;
+    explicit Path(char const* path) noexcept;
 
-    [[nodiscard]] constexpr uchar* data() noexcept { return m_path.data(); }
-    [[nodiscard]] constexpr uchar const* data() const noexcept { return m_path.data(); }
+    [[nodiscard]] constexpr char* data() noexcept { return m_path.data(); }
+    [[nodiscard]] constexpr char const* data() const noexcept { return m_path.data(); }
 
     /**
      * \brief Noralize path separators.
@@ -44,20 +45,34 @@ public:
      * \brief Mark the size as needing to be updated.
      */
     constexpr void size_dirty() { m_size = dirty_flag; }
+
+    /**
+     * \brief Maximum possible size of the path including the null-terminator.
+     */
     [[nodiscard]] constexpr s32 capacity() const noexcept
     {
         return static_cast<s32>(m_path.size());
     }
+
+    /**
+     * \brief Current size of the path, not including the null-terminator.
+     */
     [[nodiscard]] s32 size() noexcept;
     [[nodiscard]] bool empty() noexcept;
+    [[nodiscard]] s32 available_capacity() noexcept;
 
-    constexpr uchar operator[](s32 pos) const noexcept { return m_path[pos]; }
-    constexpr uchar& operator[](s32 pos) noexcept { return m_path[pos]; }
+    constexpr char operator[](s32 pos) const noexcept { return m_path[pos]; }
+    constexpr char& operator[](s32 pos) noexcept { return m_path[pos]; }
 
     /**
      * \brief Return the last character in the path.
      */
-    [[nodiscard]] uchar& back();
+    [[nodiscard]] char& back() noexcept;
+
+    /**
+     * \brief Return pointer to the null-terminator of the path.
+     */
+    [[nodiscard]] char* end_ptr() noexcept;
 
     /**
      * \brief Check if path has a trailing path separator.
@@ -80,7 +95,7 @@ public:
     [[nodiscard]] bool is_windows_unc_path() const noexcept;
 
 private:
-    std::array<uchar, MAX_PATH> m_path;
+    std::array<char, MAX_PATH> m_path;
     s32 m_size = 0;
 
     static constexpr s32 dirty_flag = -1;
@@ -105,33 +120,42 @@ struct Image {
  *
  * \see Image::free_data
  */
-Status load_image(uchar const* path, Image& img) noexcept;
+Status load_image(char const* path, Image& img) noexcept;
+
+/**
+ * \brief Get current working directory.
+ */
+Status get_current_directory(Path& path) noexcept;
 
 /**
  * \brief Create directory.
  */
-Status create_directory(uchar const* directory) noexcept;
+Status create_directory(char const* directory) noexcept;
 
 /**
  * \brief Check if the given path is a directory.
+ *
+ * \param[out] exists True if directory exists.
  */
-bool directory_exists(uchar const* path) noexcept;
+Status directory_exists(char const* path, bool& exists) noexcept;
 
 /**
  * \brief Check if the given path is a file.
+ *
+ * \param[out] exists True if directory exists.
  */
-bool file_exists(uchar const* path) noexcept;
+Status file_exists(char const* path, bool& exists) noexcept;
 
 /**
  * \brief True if the given chracter is a path separator.
  */
-constexpr bool is_path_separator(uchar c) noexcept
+constexpr bool is_path_separator(char c) noexcept
 {
-    return c == UC('/')
+    return c == '/'
 #if RK_OS == RK_OS_WINDOWS
            // NOTE(sdsmith): Windows excepts either type of separator, although some Windows API
            // functions only accept the original Windows separator, '\'
-           || c == UC('\\');
+           || c == '\\';
 #endif
 }
 
@@ -147,21 +171,21 @@ constexpr bool is_path_separator(uchar c) noexcept
 Status path_normalize(Path& path) noexcept;
 
 /**
- * \brief Adds a backslash to the end of the given string. If the source path already has a
- * trailing backslash, no backslash will be added.
+ * \brief Adds a path separator to the end of the given string. If the source path already has a
+ * trailing separator, no separator will be added.
  */
-Status path_add_trailing_slash(Path& path) noexcept;
+Status path_add_trailing_separator(Path& path) noexcept;
 
 /**
  * \brief Adds a backslash to the end of the given string. If the source path already has a
  * trailing backslash, no backslash will be added.
  */
-Status path_remove_trailing_slash(Path& path) noexcept;
+Status path_remove_trailing_separator(Path& path) noexcept;
 
 /**
  * \brief True if path ends in a path separator.
  */
-bool path_has_trailing_slash(uchar const* path) noexcept;
+bool path_has_trailing_separator(char const* path) noexcept;
 
 /**
  * \brief Adds a file name extension to a path string.
@@ -169,7 +193,7 @@ bool path_has_trailing_slash(uchar const* path) noexcept;
  * \param extension Extension to append, with or without the period.
  * \return Ok on success, invalid value if the path already has an extension, error otherwise.
  */
-Status path_add_extension(Path& path, uchar const* extension) noexcept;
+Status path_add_extension(Path& path, char const* extension) noexcept;
 
 /**
  * \brief Get the period corresponding to the file extension in the given path.
@@ -180,15 +204,15 @@ Status path_add_extension(Path& path, uchar const* extension) noexcept;
  *
  * \return Nullptr if not found.
  */
-uchar const* path_find_extension(uchar const* path) noexcept;
+char const* path_find_extension(char const* path) noexcept;
 
 /**
  * \brief Get the first character corresponding to the filename in the given path.
  *
  * \return Nullptr if not found.
  */
-uchar const* path_find_file_name(uchar const* path) noexcept;
-uchar const* path_find_file_name(Path& path) noexcept;
+char const* path_find_file_name(char const* path) noexcept;
+char const* path_find_file_name(Path& path) noexcept;
 
 /**
  * \brief Appends one path to the end of another.
@@ -196,10 +220,10 @@ uchar const* path_find_file_name(Path& path) noexcept;
  * \param path Path to append to.
  * \param more Path to append.
  */
-Status path_append(Path& path, uchar const* more) noexcept;
+Status path_append(Path& path, char const* more) noexcept;
 
 /**
- * DOC(sdsmith):
+ * \brief Remove duplicate path separators.
  */
 Status path_remove_dup_separators(Path& path) noexcept;
 
@@ -226,7 +250,7 @@ Status path_remove_dup_separators(Path& path) noexcept;
  * \see path_normalize
  * \see path_remove_dup_separators
  */
-Status path_canonicalize(uchar const* path_in, Path& path_out) noexcept;
+Status path_canonicalize(char const* path_in, Path& path_out) noexcept;
 
 /**
  * \brief Transforms the path to its simplest form and normalizes the path separators.
@@ -245,21 +269,21 @@ Status path_clean(Path& path) noexcept;
  * combined. Can be nullptr. \param path_out Resulting path. Can be the same buffer as \a
  * path_in or \a more.
  */
-Status path_combine(uchar const* path_in, uchar const* more, Path& path_out) noexcept;
+Status path_combine(char const* path_in, char const* more, Path& path_out) noexcept;
 
 /**
  * \brief Get the common prefix of two paths.
  *
  * \param[out] common_prefix Common prefix shared between the paths.
  */
-Status path_common_prefix(uchar const* path1, uchar const* path2, Path& common_prefix) noexcept;
+Status path_common_prefix(char const* path1, char const* path2, Path& common_prefix) noexcept;
 
 /**
  * \brief Get the length common prefix of two paths.
  *
  * \param[out] common_prefix_length Length of the common prefix shared between the paths.
  */
-Status path_common_prefix_length(uchar const* path1, uchar const* path2,
+Status path_common_prefix_length(char const* path1, char const* path2,
                                  s32& common_prefix_length) noexcept;
 
 /**
@@ -272,31 +296,41 @@ Status path_common_prefix_length(uchar const* path1, uchar const* path2,
  * - Assumes relative paths stem from the same working directory.
  * - Assumes that a path ending without a slash is a directory.
  *
- * \param child Check if this path decends from \a parent.
+ * \param child Check if this path descends from \a parent.
  * \param parent Parent path.
  */
-Status path_is_descendant(uchar const* child, uchar const* parent, bool& is_descendant) noexcept;
+Status path_is_descendant(char const* child, char const* parent, bool& is_descendant) noexcept;
 
 /**
  * \brief Compacts the given path into the given maximum length.
  *
  * The path is not guaranteed to be a usable filesystem path.
  *
- * \param max_len Maximum number of characters the path can be, including the null-terminator. May
- * take less than this.
- * \return True if the path was compacted in the given space.
+ * \param max_len Maximum number of characters the path can be, including the null-terminator.
+ * May take less than this. \return True if the path was compacted in the given space.
  */
-bool path_compact(uchar const* path_in, Path& path_out, s32 max_len) noexcept;
+Status path_compact(char const* path_in, Path& path_out, s32 max_len) noexcept;
 
 struct Path_Component {
     /** Path component */
-    ustring_view name;
+    std::string_view name;
     /** Points to start of component in path */
-    uchar const* path_loc = nullptr;
+    char const* path_loc = nullptr;
 
-    Path_Component(uchar const* start_of_component, s32 len) noexcept;
+    Path_Component(char const* start_of_component, s32 len) noexcept;
+
+    /**
+     * \brief Return the next component in the path, if it exists.
+     */
     [[nodiscard]] std::optional<Path_Component> next() const noexcept;
 };
+
+/**
+ * \brief Get a path component from the given path.
+ *
+ * \see Path_Component
+ */
+std::optional<Path_Component> path_get_component(char const* path) noexcept;
 
 /**
  * \brief Return the next component in path.
@@ -305,18 +339,13 @@ struct Path_Component {
  *   Windows: `c:\path1\path2\file.txt` is 4 components `c:`, `path1`, `path2`, and `file.txt`.
  *   Linux  : `/path1/path2/file.txt` is 3 components `path1`, `path2`, and `file.txt`.
  *
- * NOTE(sdsmith): Works with any path separator support on the platform.
+ * NOTE(sdsmith): Works with any path separator supported on the platform.
  *
- * \return Pointer to the start of the next component. Component ends when either a path separator
- * or null terminator is encountered. Return nullptr on error.
+ * \return Pointer to the start of the next component. Component ends when either a path
+ * separator or null terminator is encountered. Return nullptr on error.
  *
  * \see is_path_separator
  */
-uchar const* path_find_next_component(uchar const* path) noexcept;
-
-/**
- * DOC(sdsmith):
- */
-std::optional<Path_Component> path_get_component(uchar const* path) noexcept;
+char const* path_find_next_component(char const* path) noexcept;
 
 } // namespace rk::fs

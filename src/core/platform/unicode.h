@@ -6,33 +6,8 @@
 #include <string>
 #include <string_view>
 
-namespace rk
+namespace rk::unicode
 {
-#if RK_OS == RK_OS_WINDOWS
-/**
- * \brief Unicode string.
- *
- * \see rk::uchar
- */
-using ustring = std::wstring;
-using ustring_view = std::wstring_view;
-#elif RK_OS == RK_OS_LINUX
-/**
- * \brief Unicode string.
- *
- * \see rk::uchar
- */
-using ustring = std::string;
-using ustring = std::string_view;
-#else
-#    error Unsupported OS
-#endif
-
-// TODO(sdsmith): rename utf?
-namespace unicode
-{
-// TODO(sdsmith): chracters get replaced with NOWIDE_REPLACEMENT_CHARACTER. Should this be exposed?
-
 /**
  * \brief Replaces standard `main()`'s function args with UTF-8 encoded chracters on Windows for the
  * lifetime of the instance.
@@ -49,8 +24,7 @@ using Args = nowide::args;
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline char* narrow(char* output, s32 output_size, wchar_t const* begin,
-                    wchar_t const* end) noexcept;
+char* narrow(char* output, s32 output_size, wchar_t const* begin, wchar_t const* end) noexcept;
 
 /**
  * \brief Convert NULL terminated wide string (UTF-16/32) to NULL terminated narrow string (UTF-8)
@@ -60,7 +34,8 @@ inline char* narrow(char* output, s32 output_size, wchar_t const* begin,
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline char* narrow(char* output, s32 output_size, wchar_t const* source) noexcept;
+char* narrow(char* output, s32 output_size, wchar_t const* source) noexcept;
+char* narrow(char* output, size_t output_size, wchar_t const* source) noexcept;
 
 /**
  * \brief Convert narrow string (UTF-8) in range [begin,end) to NULL terminated wide string
@@ -70,8 +45,7 @@ inline char* narrow(char* output, s32 output_size, wchar_t const* source) noexce
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline wchar_t* widen(wchar_t* output, s32 output_size, char const* begin,
-                      char const* end) noexcept;
+wchar_t* widen(wchar_t* output, s32 output_size, char const* begin, char const* end) noexcept;
 
 /**
  * \brief Convert NULL terminated narrow string (UTF-8) to NULL terminated wide string (UTF-16/32)
@@ -81,7 +55,8 @@ inline wchar_t* widen(wchar_t* output, s32 output_size, char const* begin,
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline wchar_t* widen(wchar_t* output, s32 output_size, char const* source) noexcept;
+wchar_t* widen(wchar_t* output, s32 output_size, char const* source) noexcept;
+wchar_t* widen(wchar_t* output, size_t output_size, char const* source) noexcept;
 
 /**
  * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
@@ -91,7 +66,7 @@ inline wchar_t* widen(wchar_t* output, s32 output_size, char const* source) noex
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::string narrow(wchar_t const* s, s32 count);
+std::string narrow(wchar_t const* s, s32 count);
 
 /**
  * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
@@ -100,7 +75,7 @@ inline std::string narrow(wchar_t const* s, s32 count);
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::string narrow(wchar_t const* s);
+std::string narrow(wchar_t const* s);
 
 /**
  * \brief Convert wide string (UTF-16/32) to narrow string (UTF-8).
@@ -109,7 +84,7 @@ inline std::string narrow(wchar_t const* s);
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::string narrow(std::wstring const& s);
+std::string narrow(std::wstring const& s);
 
 /**
  * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
@@ -119,7 +94,7 @@ inline std::string narrow(std::wstring const& s);
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::wstring widen(char const* s, s32 count);
+std::wstring widen(char const* s, s32 count);
 
 /**
  * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
@@ -128,7 +103,7 @@ inline std::wstring widen(char const* s, s32 count);
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::wstring widen(char const* s);
+std::wstring widen(char const* s);
 
 /**
  * \brief Convert narrow string (UTF-8) to wide string (UTF-16/32).
@@ -137,44 +112,44 @@ inline std::wstring widen(char const* s);
  * Any illegal sequences are replaced with the replacement character, see
  * #NOWIDE_REPLACEMENT_CHARACTER
  */
-inline std::wstring widen(std::string const& s);
-
-// TODO(sdsmith): --------------------------------------------------------------------------------
+std::wstring widen(std::string const& s);
 
 /**
- * \brief Number of characters in a unicode string.
+ * \brief True if the given chracter is an ASCII character.
  *
- * For wide encoded strings, this is the number of wide chracters.
- * For multi-byte encoded strings this is the number of encoded characters, not the number of bytes.
+ * NOTE(sdsmith): This does not include the extended ASCII characters.
  */
-s32 ustrlen(uchar const* s) noexcept;
+constexpr bool is_ascii(char c) noexcept { return c <= 0 && c <= 127; }
 
 /**
- * \brief True if the given strings/substrings are equal.
+ * \brief Checks if string is equal to the given ascii string up to the n-th character.
  *
- * Given strings don't have to be the length of \a len. If either of the strings is shorter than \a
+ * Given strings don't have to be the length of \a len. If either of the strings is shorter than
+ \a
  * len, this function returns false.
  *
- * \param s1 String.
- * \param s2 String.
- * \param len Number of characters to compare.
+ * NOTE(sdsmith): It's valid to compare an ascii string with a UTF-8 encoded string because UTF-8 is
+ * backwards compatible with ASCII.
+ *
+ * \param s String.
+ * \param ascii Ascii string.
+ * \param len Number of ascii code points to compare.
  */
-bool ustrcmp(uchar const* s1, uchar const* s2, s32 len) noexcept;
+bool ascii_cmp(char const* s, char const* ascii, s32 len) noexcept;
 
-Status wide_to_ansi(std::wstring const& ws, std::string& s) noexcept;
-Status wide_to_ansi(uchar const* ws, std::string& s) noexcept;
-Status wide_to_ansi(uchar const* ws, s32 ws_char_len, std::string& s) noexcept;
+/**
+ * \brief Checks if string is equal to the given ascii string up to the n-th character.
+ *
+ * Given strings don't have to be the length of \a len. If either of the strings is shorter than
+ \a
+ * len, this function returns false.
+ *
+ * NOTE(sdsmith): It's valid to compare an ascii string with a UTF-8 encoded string because UTF-8 is
+ * backwards compatible with ASCII.
+ *
+ * \param s String.
+ * \param ascii Ascii string.
+ */
+bool ascii_cmp(char const* s, char const* ascii) noexcept;
 
-Status ansi_to_wide(std::string const& s, std::wstring& ws) noexcept;
-Status ansi_to_wide(char const* s, std::wstring& ws) noexcept;
-Status ansi_to_wide(char const* s, s32 s_byte_size, std::wstring& ws) noexcept;
-
-Status wide_to_utf8(std::wstring const& ws, std::string& s) noexcept;
-Status wide_to_utf8(uchar const* ws, std::string& s) noexcept;
-Status wide_to_utf8(uchar const* ws, s32 ws_char_len, std::string& s) noexcept;
-
-Status utf8_to_wide(std::string const& s, std::wstring& ws) noexcept;
-Status utf8_to_wide(char const* s, std::wstring& ws) noexcept;
-Status utf8_to_wide(char const* s, s32 s_byte_size, std::wstring& ws) noexcept;
-} // namespace unicode
-} // namespace rk
+} // namespace rk::unicode

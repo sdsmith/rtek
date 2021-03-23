@@ -4,31 +4,39 @@
 
 #include "core/assert.h"
 #include "core/logging/logging.h"
+#include "core/platform/unicode.h"
 #include "core/utility/fixme.h"
+#include <sds/array/carray.h>
 
 using namespace rk;
 
 #if RK_OS == RK_OS_WINDOWS
 #    include <strsafe.h>
-#    include <tchar.h> // _tcslen
 
 void platform::windows::log_error(HRESULT hresult) noexcept
 {
     if (FACILITY_WINDOWS == HRESULT_FACILITY(hresult)) { hresult = HRESULT_CODE(hresult); }
-    TCHAR* msg = nullptr;
 
-    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hresult,
-                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPTSTR>(&msg), 0,
-                      nullptr) != 0) {
+    WCHAR* msg = nullptr;
+    DWORD size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                                nullptr, hresult, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                reinterpret_cast<LPWSTR>(&msg), 0, nullptr);
+    if (size == 0) {
+        LOG_ERROR("Unable to find description for HRESULT error {}", hresult);
+    } else {
         LOG_ERROR(msg);
         LocalFree(msg);
-    } else {
-        LOG_ERROR("Unable to find description for HRESULT error {}", hresult);
     }
 }
 
-void platform::windows::log_last_error(uchar const* function_name)
+void platform::windows::log_last_error(char const* function_name) noexcept
 {
+    wchar_t w_func_name[256];
+    if (!unicode::widen(w_func_name, 256, function_name)) {
+        static constexpr wchar_t const errstr[] = L"<widen:buf too small>";
+        memcpy(w_func_name, errstr, sds::byte_size(errstr));
+    }
+
     // Retrieve error message from system
     //
     LPVOID msg_buf;
@@ -37,21 +45,21 @@ void platform::windows::log_last_error(uchar const* function_name)
 
     FormatMessage(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPTSTR>(&msg_buf),
+        nullptr, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&msg_buf),
         0, nullptr);
 
     // Print error message
     //
-    display_buf = static_cast<LPVOID>(
-        LocalAlloc(LMEM_ZEROINIT, (_tcslen(static_cast<LPCTSTR>(msg_buf)) +
-                                   _tcslen(static_cast<LPCTSTR>(function_name)) + 40) *
-                                      sizeof(TCHAR)));
+    display_buf = static_cast<LPVOID>(LocalAlloc(
+        LMEM_ZEROINIT,
+        (wcslen(static_cast<LPCWSTR>(msg_buf)) + wcslen(static_cast<LPCWSTR>(w_func_name)) + 40) *
+            sizeof(WCHAR)));
 
-    StringCchPrintf(static_cast<LPTSTR>(display_buf), //-V111 -V576
-                    LocalSize(display_buf) / sizeof(TCHAR), TEXT("%s failed with error %d: %s"),
+    StringCchPrintf(static_cast<LPWSTR>(display_buf), //-V111 -V576
+                    LocalSize(display_buf) / sizeof(WCHAR), TEXT("%s failed with error %d: %s"),
                     function_name, dw, msg_buf);
 
-    LOG_ERROR(static_cast<LPTSTR>(display_buf));
+    LOG_ERROR(static_cast<LPWSTR>(display_buf));
 
     LocalFree(msg_buf);
     LocalFree(display_buf);

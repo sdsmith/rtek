@@ -10,15 +10,17 @@ using namespace rk;
 
 bool Logger::s_initialized = false;
 std::mutex Logger::m_fallback_log_mutex;
-uchar const* Logger::s_log_dir = L"log";
-uchar const* Logger::s_log_file = UC("rtek.log");
+char const* Logger::s_log_dir = "log";
+char const* Logger::s_log_file = "rtek.log";
 
 Status Logger::initialize() noexcept
 {
     using namespace platform;
 
     // Create log directory
-    if (!fs::directory_exists(s_log_dir)) { RK_CHECK(fs::create_directory(s_log_dir)); }
+    bool exists = false;
+    RK_CHECK(fs::directory_exists(s_log_dir, exists));
+    if (!exists) { RK_CHECK(fs::create_directory(s_log_dir)); }
 
     Status status = Status::ok;
     spdlog_exception_boundary([&]() {
@@ -27,7 +29,7 @@ Status Logger::initialize() noexcept
             stderr_sink->set_level(spdlog::level::err);
 
             auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
-                fmt::format(UC("{}/{}"), s_log_dir, s_log_file), true);
+                fmt::format("{}/{}", s_log_dir, s_log_file), true);
             file_sink->set_level(spdlog::level::trace);
 
             std::array<spdlog::sink_ptr, 2> sinks = {stderr_sink, file_sink};

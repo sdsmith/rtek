@@ -72,13 +72,32 @@ Engine macros are prefixed with `RK_`. Engine internal macros that should not be
 
 ## Unicode
 
-The engine is unicode only and does not support ANSI strings. It provides its own cross platform abstraction for unicode strings, `uchar` (read "unicode character") and the string litteral prefix `UC` (read "unicode"). The unicode chracter format use on each platform corresponds to:
+All internal representation of strings and text output are UTF-8. The engine is unicode only and does not support ANSI strings. It follows the principles of [UTF-8 everywhere](https://utf8everywhere.org).
 
-| Platform | Unicode Encoding |
-|-|-|
-| Windows | UTF-16 |
-| Linux | UTF-8 |
+> NOTE: UTF-8 is backwards compatible with ASCII[^not-extended-ascii]. Therefore searching for ASCII characters/strings in UTF-8 strings is a valid.
 
-This means that on Linux `uchar` is `char`. Be careful when developing Windows compatible unicode functions when working in Linux.
+[^not-extended-ascii]: ASCII is not Extended ASCII! ASCII encodes characters from 0-127.
 
-Using UTF-16 on Windows means that the native Windows unicode functions can be used directly. For Windows, `uchar` is essentially `WCHAR`. And since this engine is always using UNICODE, it is also equivalent to `TCHAR`.
+**Programming guidelines:**
+- `std::string` and `char*` variables are considered UTF-8, anywhere in the program.
+- Use what's available in `platform/stdlib/*` over those in the standard library. These functions take UTF-8 strings.[^winstdlib-utf8]
+- Do not use `wchar_t` or `std::wstring` in any place other than adjacent point to APIs accepting UTF-16.
+- Do not use `L""` literals in any place other than parameters to APIs accepting UTF-16.
+- Windows:
+  - Do not use types, functions, or their derivatives that are sensitive to the `UNICODE` constant, such as `LPTSTR`, `CreateWindow()` or the `_T()` macro. Instead, use `LPWSTR`, `CreateWindowW()`, and explicit `L""` literals.
+  - `UNICODE` and `_UNICODE` are always defined to avoid passing narrow UTF-8 strings to ANSI WinAPI getting silently compiled.
+  - Only use Win32 functions that accept widechars (`LPWSTR`), never those which accept `LPTSTR` or `LPSTR`. Pass parameters this way:
+     ```cpp
+     std::array<wchar_t, MAX_PATH> wpath;
+     if (!unicode::widen(wpath.data(), wpath.size(), some_string)) {
+         return Status::unicode_error;
+     }
+     SetWindowTestW(wpath.data());
+     ```
+     - Output from windows API functions require `unicode::narrow` to re-encode to UTF-8 for use internally.
+
+**Working with files, filenames, and fstreams:**
+- Always produce text output files in UTF-8.
+- Use what's available in `platform/stdlib/*` over those in the standard library. These functions take UTF-8 strings.[^winstdlib-utf8]
+
+[^winstdlib-utf8]: Windows does not make their standard library implementation UTF-8 aware (`iostream`, `fstream`, ...). Using the ones provided allows for proper UTF-8 handling across platforms.

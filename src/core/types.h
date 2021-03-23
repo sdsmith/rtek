@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <vcruntime.h>
 #include <cstdint>
 
 /**
@@ -52,56 +51,6 @@ constexpr auto operator""_KB(u64 s) { return s * 1024; }
 constexpr auto operator""_MB(u64 s) { return s * 1024_KB; }
 
 constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
-
-// ---------------------------------------------------------------------------------------
-// Unicode support
-// ---------------------------------------------------------------------------------------
-
-#if RK_OS == RK_OS_WINDOWS
-/**
- * \brief Unicode character.
- *
- * On Windows, wchar_t is two bytes for UTF-16. Other platforms use wchar_t as 4 bytes to support
- * UTF-32. Use Window's \a WCHAR to support their 'unique' unicode scheme and support their unicode
- * functions.
- *
- * \see _u
- */
-using uchar = WCHAR;
-#    define RK_I_UC(x) L##x // UTF-16 encoding
-#elif RK_OS == RK_OS_LINUX
-/**
- * \brief Unicode character.
- *
- * On linux, just use UTF-8 since it's so much easier and better supported.
- *
- * \see _u
- */
-using uchar = char;
-#    define RK_I_UC(x) = u8##x // UTF-8 encoding
-#else
-#    error Unsupported OS
-#endif
-
-/**
- * \def UC
- * \brief String litteral prefix for unicode strings.
- *
- * Will define the appropriate encoding based on the unicode settings.
- *
- * Usage: `UC("hello world")`
- *
- * \see uchar
- */
-#define UC(x) RK_I_UC(x)
-
-/**
- * \def RK_NULL_TERM
- * \brief Unicode string null terminator.
- */
-#define RK_NULL_TERM UC('\0')
-
-// ---------------------------------------------------------------------------------------
 
 /**
  * \def RK_COMPILER

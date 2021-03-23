@@ -255,7 +255,7 @@ if (NOT spdlog_FOUND)
     set(SPDLOG_FMT_EXTERNAL ON CACHE BOOL "spdlog Use external fmt library instead of bundled")
     if (WIN32)
         set(SPDLOG_WCHAR_SUPPORT ON CACHE BOOL "spdlog support wchar")
-        set(SPDLOG_WCHAR_FILENAMES ON CACHE BOOL "spdlog support wchar filenames")
+        # set(SPDLOG_WCHAR_FILENAMES ON CACHE BOOL "spdlog support wchar filenames")
     endif()
     # TODO:
     #set(SPDLOG_BUILD_WARNINGS ON CACHE BOOL "Enable spdlog compiler warnings")
@@ -352,7 +352,7 @@ if (NOT nowide_FOUND)
         URL "https://github.com/boostorg/nowide/releases/download/v${nowide_version}/nowide_standalone_v${nowide_version}.tar.gz"
     )
     set(NOWIDE_INSTALL ON CACHE BOOL "nowide generate install target")
-    set(NOWIDE_WERROR ON CACHE BOOL "nowide treat warnings as errors")
+    # set(NOWIDE_WERROR ON CACHE BOOL "nowide treat warnings as errors")
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "don't build shared libraries. Used by nowide")
     FetchContent_MakeAvailable(nowide)
     set_target_properties(nowide PROPERTIES
@@ -440,7 +440,6 @@ set(rteklib_source_files
 
 set(rteklib_source_files_win32
     "src/core/platform/filesystem_win32.cpp"
-    "src/core/platform/unicode_win32.cpp"
 )
 
 set(rteklib_source_files_linux
@@ -480,7 +479,7 @@ add_dependencies(rteklib
     glfw
     glad
     sdslib
-    nowide
+    nowide::nowide
 )
 
 target_link_libraries(rteklib PUBLIC
@@ -489,7 +488,7 @@ target_link_libraries(rteklib PUBLIC
     glfw
     glad
     sdslib
-    nowide
+    nowide::nowide
 )
 
 # Platform specific
@@ -549,7 +548,6 @@ if (RTEK_BUILD_TESTS)
 
     set(rteklib_test_source_files
         "tests/test_filesystem.cpp"
-        "tests/test_unicode.cpp"
     )
 
     source_group("Test Header Files" FILES ${rteklib_test_header_files})

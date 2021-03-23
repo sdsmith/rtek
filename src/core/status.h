@@ -22,6 +22,7 @@ public:
         io_error = 12,
         invalid_value = 13,
         unicode_error = 14,
+        buffer_length_error = 15,
     };
 
     constexpr Status(Type status) : m_status(status) {}
