@@ -6,12 +6,12 @@
  * consistently across the codebase.
  */
 
-// Unicode support
-#ifndef _UNICODE
-#    error Unicode only. Define _UNICODE.
-#endif
+// Unicode only. No ANSI allowed.
 #ifndef UNICODE
-#    error Unicode only. Define UNICODE.
+#    define UNICODE
+#endif
+#ifndef _UNICODE
+#    define _UNICODE
 #endif
 
 // Stop definition of max and min from windows.h

@@ -10,6 +10,7 @@
 
 // TODO(sdsmith): how can this be split nicely into the platform impls?
 #if RK_OS == RK_OS_WINDOWS
+#    include "core/platform/win32_include.h"
 #    include <windef.h> // MAX_PATH
 #else
 #    error Unsupported OS
@@ -138,6 +139,34 @@ Status create_directory(char const* directory) noexcept;
  * \param[out] exists True if directory exists.
  */
 Status directory_exists(char const* path, bool& exists) noexcept;
+
+/*
+TODO(sdsmith):
+Status write_sync(); // WriteFile
+Status write_async();     // WriteFileEx
+Status file_delete();     // DeleteFileW
+Status file_flush();      // FlushFileBuffers
+Status disk_free_space(); // GetDiskFreeSpaceExW
+Status file_size();       // GetFileSizeEx
+Status file_time();       // GetFileTime
+Status file_time_cmp();   // CompareFileTime
+Status file_type();       // GetFileType
+
+GetLongPathNameW
+GetShortPathNameW
+GetTempFileNameW
+GetTempPathW
+GetFullPathNameW
+LocalFileTimeToFileTime
+LockFileEx
+ReadFileEx
+RemoveDirectoryW
+SetEndOfFile
+SetFilePointerEx
+SetFileAttributesW
+SetFileIoOverlappedRange
+UnlockFileEx
+ */
 
 /**
  * \brief Check if the given path is a file.

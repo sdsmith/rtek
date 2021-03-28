@@ -25,10 +25,6 @@
 #    endif
 #endif
 
-#if RK_OS == RK_OS_WINDOWS
-#    include "core/platform/win32_include.h"
-#endif
-
 namespace rk
 {
 using s8 = int8_t;
