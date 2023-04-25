@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
 project(glad CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -28,7 +25,7 @@ set(all_code_files
     ${source_files}
 )
 
-set_source_files_properties(${source_files} PROPERTIES LANGUAGE CXX)
+set_source_files_properties(${all_code_files} PROPERTIES LANGUAGE CXX)
 add_library(glad STATIC ${all_code_files})
 target_include_directories(glad SYSTEM PUBLIC
     "$<BUILD_INTERFACE:${glad_SOURCE_DIR}/include>"
