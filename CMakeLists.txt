@@ -166,7 +166,7 @@ if (RTEK_MASTER_PROJECT)
             )
     else()
         # TODO: non-msvc builds
-        message(FATAL_ERROR "Compiler not supported")
+        #message(FATAL_ERROR "Compiler not supported: ${CMAKE_CXX_COMPILER_ID}")
     endif()
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
@@ -269,7 +269,7 @@ if (NOT spdlog_FOUND)
 endif()
 
 message(STATUS "Dependency: glfw...")
-set(glfw_version "3.3.3")
+set(glfw_version "3.3.8")
 find_package(glfw3 ${glfw_version} QUIET)
 if (NOT glfw3_FOUND)
     message(STATUS "glfw package not found, creating install target")
