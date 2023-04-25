@@ -15,8 +15,10 @@
 #endif
 
 // Stop definition of max and min from windows.h
-#define NOMINMAX
-
-#include <Windows.h>
-
-#undef NOMINMAX
+#ifndef NOMINMAX
+#   define NOMINMAX
+#       include <Windows.h>
+#   undef NOMINMAX
+#else
+#   include <Windows.h>
+#endif

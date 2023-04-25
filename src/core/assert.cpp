@@ -11,7 +11,13 @@ using namespace rk;
     // Break into the debugger
 #if RK_COMPILER == RK_COMPILER_MSC
     __debugbreak();
-#elif RK_OS != RK_OS_WINDOWS
+#elif RK_OS == RK_OS_WINDOWS
+#   if RK_COMPILER == RK_COMPILER_CLANG && __has_builtin(__builtin_debugtrap)
+        __builtin_debugtrap();
+#   else
+#       error Unsupported compiler
+#   endif
+#else
 #    if (RK_COMPILER == RK_COMPILER_GCC) || (RK_COMPILER == RK_COMPILER_CLANG)
 #        if RK_TARGET_ARCH_X86
     asm("int 3");
@@ -21,8 +27,6 @@ using namespace rk;
 #    else
 #        error Unsupported compiler
 #    endif
-#else
-#    error Unsupported compiler
 #endif
 }
 
