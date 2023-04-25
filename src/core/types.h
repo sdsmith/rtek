@@ -2,6 +2,19 @@
 
 #include <cstdint>
 
+
+/**
+ * \def RK_STR
+ * \brief Convert macro value to a string.
+ *
+ * Ex usage:
+ *  #define FOO somevalue
+ *  #pragma message "Value: " RK_STR(FOO)
+ *      => "Value: somevalue"
+ */
+#define RK_I_STR(X) #X
+#define RK_STR(X) RK_I_STR(X)
+
 /**
  * \def RK_OS
  * \brief Operating system being compiled on.
@@ -54,22 +67,65 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
  *
  * Has a value from one of \a RK_COMPILER_*
  * Usage: `#if RK_COMPILER == RK_COMPILER_MSC`
+ *
+ * ref: https://sourceforge.net/p/predef/wiki/Compilers/
  */
 #ifndef RK_COMPILER
 /** Microsoft C/C++ compiler */
 #    define RK_COMPILER_MSC 1
 #    define RK_COMPILER_GCC 2
 #    define RK_COMPILER_CLANG 3
+#    define RK_COMPILER_MINGW32 4
+#    define RK_COMPILER_MINGW64 5
 
 #    if defined(_MSC_VER)
 #        define RK_COMPILER RK_COMPILER_MSC
+#    elif defined(__clang__)
+        // IMPORTANT: Always check clang before gcc.
+        // There's a weird case with MingW's clang compliation, where it
+        // defines both __clang__ and __GNUC__.
+#       define RK_COMPILER RK_COMPILER_CLANG
 #    elif defined(__GNUC__)
 #        define RK_COMPILER RK_COMPILER_GCC
-#    elif defined(__clang__)
-#        define RK_COMPILER RK_COMPILER_CLANG
+#    elif defined(__MINGW32__)
+#        define RK_COMPILER RK_COMPILER_MINGW32
+#    elif defined(__MINGW64__)
+#        define RK_COMPILER RK_COMPILER_MINGW64
 #    else
 #        error Unknown compiler
 #    endif
+#endif
+
+//
+// CPU Architecture
+//
+// ref: https://sourceforge.net/p/predef/wiki/Architectures/
+//
+#if defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)
+// Intel x86
+#   define RK_ARCH_IX86 1
+#elif defined(__x86_64__) || defined(__x86_64__) || defined(_M_X64) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64)
+#   define RK_ARCH_AMD64 1
+#else
+#   error Unknown CPU architecture
+#endif
+
+/**
+ * \def RK_32_BIT
+ * \brief True if compiling in 32-bit.
+ */
+/**
+ * \def RK_64_BIT
+ * \brief True if compiling in 64-bit.
+ */
+#if RK_OS == RK_OS_WINDOWS
+#   if _WIN64
+#       define RK_64_BIT
+#   else
+#       define RK_32_BIT
+    #endif
+#else
+#   error Unsupported OS
 #endif
 
 /**
@@ -104,9 +160,11 @@ constexpr auto operator""_GB(u64 s) { return s * 1024_MB; }
  * \brief Portable function name.
  */
 #if RK_COMPILER == RK_COMPILER_MSC
-#    define RK_FUNCNAME __FUNCTION__
+#   define RK_FUNCNAME __FUNCTION__
+#elif RK_COMPILER == RK_COMPILER_CLANG
+#   define RK_FUNCNAME __func__
 #else
-#    define RK_FUNCNAME __FUNC__
+#   define RK_FUNCNAME __FUNC__
 #endif
 
 /**
