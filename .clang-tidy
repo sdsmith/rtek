@@ -1,4 +1,4 @@
-Checks: '-*,readability-identifier-naming,clang-analyzer-*,clang-analyzer-cplusplus*,modernize-*,-modernize-use-auto,-modernize-use-trailing-return-type,performance-*,bugprone-*'
+Checks: '-*,readability-identifier-naming,clang-analyzer-*,clang-analyzer-cplusplus*,modernize-*,-modernize-use-auto,-modernize-use-trailing-return-type,performance-*,bugprone-*,concurrency-*'
 CheckOptions:
   - { key: readability-identifier-naming.AbstractClassCase, value: Camel_Snake_Case }
   - { key: readability-identifier-naming.ClassCase,     value: Camel_Snake_Case }
@@ -14,3 +14,4 @@ CheckOptions:
   - { key: readability-identifier-naming.EnumConstantCase, value: lower_case    }
   - { key: readability-identifier-naming.ParameterCase, value: lower_case       }
   - { key: readability-identifier-naming.MacroDefinitionCase, value: UPPER_CASE }
+HeaderFilterRegex: 'C:\Users\stewa\source\repos\rtek\src/.*'
