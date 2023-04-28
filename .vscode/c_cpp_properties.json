@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "cmake",
+            "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "includePath": [
+                "${workspaceRoot}/src"
+            ]
+        }
+    ],
+    "version": 4
+}
