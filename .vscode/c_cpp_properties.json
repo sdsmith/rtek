@@ -3,7 +3,11 @@
         {
             "name": "cmake",
             "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/src"
+            ]
         }
     ],
     "version": 4
