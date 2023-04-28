@@ -1,6 +1,5 @@
 {
     "cmake.configureOnOpen": true,
-    "cmake.generator": "MinGW Makefiles",
     "cmake.configureArgs": [
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
         "-DFETCHCONTENT_SOURCE_DIR_SDSLIB='C:/Users/stewa/source/repos/sdslib-cpp'",
