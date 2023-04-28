@@ -4,6 +4,7 @@
 #include "core/types.h"
 
 using namespace rk;
+using namespace sds;
 
 Game_Input Input_Manager::input_buffer = Input_Manager::zeroed_input;
 

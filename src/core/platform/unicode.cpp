@@ -6,6 +6,7 @@
 #include <nowide/convert.hpp>
 
 using namespace rk;
+using namespace sds;
 
 // TODO(sdsmith): chracters get replaced with NOWIDE_REPLACEMENT_CHARACTER. Should this be exposed?
 

@@ -10,6 +10,7 @@
 #include <array>
 
 using namespace rk;
+using namespace sds;
 
 using wpath_buf = std::array<wchar_t, MAX_PATH>;
 

@@ -8,6 +8,7 @@
 #include <string>
 
 using namespace rk;
+using namespace sds;
 
 RK_INTERNAL
 std::string get_program_info_log(u32 id) noexcept

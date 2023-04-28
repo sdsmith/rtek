@@ -15,6 +15,7 @@
 #include "core/renderer/request_high_perf_renderer.h"
 
 using namespace rk;
+using namespace sds;
 
 Status Renderer::initialize() noexcept { return Status::ok; }
 

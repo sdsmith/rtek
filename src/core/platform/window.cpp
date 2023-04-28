@@ -7,6 +7,7 @@
 #include <array>
 
 using namespace rk;
+using namespace sds;
 
 /**
  * \brief Load image at the given path intended as a window icon into the given GLFW image

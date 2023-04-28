@@ -3,6 +3,7 @@
 #include "core/logging/logging.h"
 
 using namespace rk;
+using namespace sds;
 
 /**
  * \brief Called on every glfw error when hooked up with \a glfwSetErrorCallback.

@@ -10,6 +10,7 @@
 #include <sds/string.h>
 
 using namespace rk;
+using namespace sds;
 
 fs::Path::Path(char const* path) noexcept
 {
@@ -122,7 +123,7 @@ Status fs::path_add_trailing_separator(Path& path) noexcept
 Status fs::path_remove_trailing_separator(Path& path) noexcept
 {
     if (!path.empty() &&
-#if RK_OS == RK_OS_LINUX
+#if SDS_OS_LINUX
         // Don't remove root
         path.size() > 1 &&
 #endif
@@ -230,13 +231,13 @@ Status fs::path_remove_dup_separators(Path& path) noexcept
     if (path.empty()) { return Status::ok; }
 
     char* w = path.data(); // write pointer
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     // In windows it is valid to have two starting path separators (extended paths, UNC, ...)
     if (unicode::ascii_cmp(w, "\\\\", 2)) {
         // Only advance one since the first separator always gets copied. 1 skipped + 1 copied = 2.
         w += 1;
     }
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     /* NOTE(sdsmith): POSIX standard:
      * > A pathname consisting of a single slash shall resolve to the root
      *   directory of the process. A null pathname shall not be successfully

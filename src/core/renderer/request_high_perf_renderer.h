@@ -1,7 +1,7 @@
 #pragma once
 
 #if RK_REQUEST_HIGH_PERF_RENDERER
-#    if RK_OS == RK_OS_WINDOWS
+#    if SDS_OS_WINDOWS
 #        include "core/platform/win32_include.h"
 
 /**

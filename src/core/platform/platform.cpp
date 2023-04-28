@@ -9,8 +9,9 @@
 #include <sds/array/carray.h>
 
 using namespace rk;
+using namespace sds;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
 #    include <strsafe.h>
 
 void platform::windows::log_error(HRESULT hresult) noexcept
@@ -65,4 +66,4 @@ void platform::windows::log_last_error(char const* function_name) noexcept
     LocalFree(display_buf);
 }
 
-#endif // RK_OS_WINDOWS
+#endif // SDS_OS_WINDOWS

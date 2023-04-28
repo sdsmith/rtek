@@ -7,7 +7,7 @@
 // clang-format off
 //
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
 // NOTE(sdsmith): windows.h must be included before GLAD. GLAD1 defines
 // APIENTRY, which is also defined by windows. GLAD2 solves this problem, but
 // there is no easy way around this in GLAD1.

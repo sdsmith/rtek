@@ -4,6 +4,7 @@
 #include <nowide/cstdio.hpp>
 
 using namespace rk;
+using namespace sds;
 
 FILE* rk::freopen(char const* file_name, char const* mode, FILE* stream) noexcept
 {

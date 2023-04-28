@@ -5,20 +5,22 @@
 #include <cassert>
 
 using namespace rk;
+using namespace sds;
+
 
 [[noreturn]] void rk::debug_break()
 {
     // Break into the debugger
-#if RK_COMPILER == RK_COMPILER_MSC
+#if SDS_COMPILER_MSC
     __debugbreak();
-#elif RK_OS == RK_OS_WINDOWS
-#   if RK_COMPILER == RK_COMPILER_CLANG && __has_builtin(__builtin_debugtrap)
+#elif SDS_OS_WINDOWS
+#   if SDS_COMPILER_CLANG && __has_builtin(__builtin_debugtrap)
         __builtin_debugtrap();
 #   else
 #       error Unsupported compiler
 #   endif
 #else
-#    if (RK_COMPILER == RK_COMPILER_GCC) || (RK_COMPILER == RK_COMPILER_CLANG)
+#    if SDS_COMPILER_GCC || SDS_COMPILER_CLANG
 #        if RK_TARGET_ARCH_X86
     asm("int 3");
 #        else

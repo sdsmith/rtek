@@ -5,6 +5,7 @@
 #include "core/platform/glfw.h"
 
 using namespace rk;
+using namespace sds;
 
 Status Window_Manager::initialize() noexcept { return Status::ok; }
 

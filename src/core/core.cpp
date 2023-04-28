@@ -11,6 +11,8 @@
 #include <sds/array/make_array.h>
 
 using namespace rk;
+using namespace sds;
+
 
 Status Rtek_Engine::initialize() noexcept
 {

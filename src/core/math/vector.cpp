@@ -6,6 +6,7 @@
 #include <sstream>
 
 using namespace rk;
+using namespace sds;
 
 f32 Vector3::x() const { return vec[0]; }
 f32 Vector3::y() const { return vec[1]; }

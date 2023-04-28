@@ -7,7 +7,7 @@
  * NOTE(sdsmith): Include this file instead of the actual stb_image.h directly!
  */
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
 // Use unicode filenames
 //
 // NOTE(sdsmith): Call stbi_convert_wchar_to_utf8 to convert Windows wchar_t to utf8.

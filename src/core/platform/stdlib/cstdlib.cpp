@@ -4,6 +4,7 @@
 #include <nowide/cstdlib.hpp>
 
 using namespace rk;
+using namespace sds;
 
 char* rk::getenv(const char* key) noexcept
 {

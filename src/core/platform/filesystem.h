@@ -9,7 +9,7 @@
 #include <string_view>
 
 // TODO(sdsmith): how can this be split nicely into the platform impls?
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
 #    include "core/platform/win32_include.h"
 #    include <windef.h> // MAX_PATH
 #else
@@ -181,7 +181,7 @@ Status file_exists(char const* path, bool& exists) noexcept;
 constexpr bool is_path_separator(char c) noexcept
 {
     return c == '/'
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
            // NOTE(sdsmith): Windows excepts either type of separator, although some Windows API
            // functions only accept the original Windows separator, '\'
            || c == '\\';

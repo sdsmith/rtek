@@ -10,6 +10,7 @@
 #include <string>
 
 using namespace rk;
+using namespace sds;
 namespace stdfs = std::filesystem;
 
 // TODO(sdsmith): Check path sizes after each function is called. make sure it's being update
@@ -114,7 +115,7 @@ TEST_F(FilesystemTest, path_normalize)
 {
     fs::Path path;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     path = fs::Path("C:\\hello\\world");
     RK_EXPECT_OK(fs::path_normalize(path));
     EXPECT_STREQ(path.data(), "C:\\hello\\world");
@@ -127,7 +128,7 @@ TEST_F(FilesystemTest, path_normalize)
     RK_EXPECT_OK(fs::path_normalize(path));
     EXPECT_STREQ(path.data(), "C:\\hello\\world");
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     path = fs::Path("/hello/world");
     RK_EXPECT_OK(fs::path_normalize(path));
     EXPECT_STREQ(path.data(), "/hello/world");
@@ -185,7 +186,7 @@ TEST_F(FilesystemTest, path_remove_tailing_separator)
     RK_EXPECT_OK(fs::path_remove_trailing_separator(path));
     EXPECT_STREQ(path.data(), "/example/windows/slash");
 
-#if RK_OS == RK_OS_LINUX
+#if SDS_OS_LINUX
     // Root
     path = fs::Path("/");
     RK_EXPECT_OK(fs::path_remove_trailing_separator(path));
@@ -340,7 +341,7 @@ TEST_F(FilesystemTest, path_append)
     RK_EXPECT_OK(fs::path_append(path, "world"));
     EXPECT_STREQ(path.data(), "hello" RK_PATH_SEPARATOR_STR "world");
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     path = fs::Path("hello\\");
     RK_EXPECT_OK(fs::path_append(path, "world"));
     EXPECT_STREQ(path.data(), "hello\\world");
@@ -370,7 +371,7 @@ TEST_F(FilesystemTest, path_remove_dup_separators)
     EXPECT_STREQ(path.data(), Y);                       \
     EXPECT_EQ(path.size(), sds::str_size(Y));
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     EXPECT_RM_DUP_SEP("a", "a");
     EXPECT_RM_DUP_SEP("a\\", "a\\");
     EXPECT_RM_DUP_SEP("a\\\\", "a\\");
@@ -383,7 +384,7 @@ TEST_F(FilesystemTest, path_remove_dup_separators)
     EXPECT_RM_DUP_SEP("\\\\\\", "\\\\");
     EXPECT_RM_DUP_SEP("\\\\a\\\\\\b", "\\\\a\\b");
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     // TODO(sdsmith): other test cases
 
     // Linux allows two path separators as a path prefix
@@ -399,7 +400,7 @@ TEST_F(FilesystemTest, path_canonicalize)
 {
     fs::Path path;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     RK_EXPECT_OK(fs::path_canonicalize("C:\\name_1\\.\\name_2\\..\\name_3", path));
     EXPECT_STREQ(path.data(), "C:\\name_1\\name_3");
     RK_EXPECT_OK(fs::path_canonicalize("C:\\name_1\\..\\name_2\\.\\name_3", path));
@@ -436,7 +437,7 @@ TEST_F(FilesystemTest, path_clean)
     RK_EXPECT_OK(fs::path_clean(path));
     EXPECT_STREQ(path.data(), "");
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     path = fs::Path("/abc/.\\..\\hello/");
     RK_EXPECT_OK(fs::path_clean(path));
     EXPECT_STREQ(path.data(), "\\hello");
@@ -453,7 +454,7 @@ TEST_F(FilesystemTest, path_clean)
     RK_EXPECT_OK(fs::path_clean(path));
     EXPECT_STREQ(path.data(), "deep\\ocean");
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     path = fs::Path("");
     RK_EXPECT_OK(fs::path_clean(path));
     EXPECT_STREQ(path.data(), "");
@@ -478,7 +479,7 @@ TEST_F(FilesystemTest, path_common_prefix)
 {
     fs::Path path;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     RK_EXPECT_OK(fs::path_common_prefix("\\a\\b\\c\\d", "\\a\\b\\c\\d", path));
     EXPECT_STREQ(path.data(), "\\a\\b\\c\\d");
     RK_EXPECT_OK(fs::path_common_prefix("\\a\\b\\c\\d", "\\a\\b\\c\\d\\e\\f", path));
@@ -493,7 +494,7 @@ TEST_F(FilesystemTest, path_common_prefix)
                                         "C:\\apple\\back\\cmd\\dock\\epslon\\folder", path));
     EXPECT_STREQ(path.data(), "C:\\apple\\back\\cmd\\dock");
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     RK_EXPECT_OK(fs::path_common_prefix("/a/b/c/d", "/a/b/c/d", path));
     EXPECT_STREQ(path.data(), "/a/b/c/d");
     RK_EXPECT_OK(fs::path_common_prefix("/a/b/c/d", "/a/b/c/d/e/f", path));
@@ -514,7 +515,7 @@ TEST_F(FilesystemTest, path_common_prefix_length)
 {
     s32 len = 0;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     RK_EXPECT_OK(fs::path_common_prefix_length("\\a\\b\\c\\d", "\\a\\b\\c\\d", len));
     EXPECT_EQ(len, sds::str_size("\\a\\b\\c\\d"));
     RK_EXPECT_OK(fs::path_common_prefix_length("\\a\\b\\c\\d", "\\a\\b\\c\\d\\e\\f", len));
@@ -529,7 +530,7 @@ TEST_F(FilesystemTest, path_common_prefix_length)
                                                "C:\\apple\\back\\cmd\\dock\\epslon\\folder", len));
     EXPECT_EQ(len, sds::str_size("C:\\apple\\back\\cmd\\dock"));
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     RK_EXPECT_OK(fs::path_common_prefix_length("/a/b/c/d", "/a/b/c/d", len));
     EXPECT_EQ(len, sds::str_size("/a/b/c/d"));
     RK_EXPECT_OK(fs::path_common_prefix_length("/a/b/c/d", "/a/b/c/d/e/f", len));
@@ -559,7 +560,7 @@ TEST_F(FilesystemTest, path_is_descendant)
     RK_EXPECT_OK(fs::path_is_descendant(A, B, is_descendant)); \
     EXPECT_FALSE(is_descendant) << "Expect: " << A << " not descendant of " << B;
 
-#if RK_OS == RK_OS_WINDOWS
+#if SDS_OS_WINDOWS
     EXPECT_NOT_DESCENDANT("\\a\\b\\c", "\\a\\b\\c");
     EXPECT_NOT_DESCENDANT("\\a\\b\\c", "");
     EXPECT_NOT_DESCENDANT("", "\\a\\b\\c");
@@ -577,7 +578,7 @@ TEST_F(FilesystemTest, path_is_descendant)
     EXPECT_NOT_DESCENDANT("\\a", "\\a\\b\\c");
     EXPECT_NOT_DESCENDANT("\\", "\\a\\b\\c");
 
-#elif RK_OS == RK_OS_LINUX
+#elif SDS_OS_LINUX
     EXPECT_NOT_DESCENDANT("/a/b/c", "/a/b/c");
     EXPECT_NOT_DESCENDANT("/a/b/c", "");
     EXPECT_NOT_DESCENDANT("", "/a/b/c");

@@ -7,6 +7,7 @@
 #include <string>
 
 using namespace rk;
+using namespace sds;
 
 bool Logger::s_initialized = false;
 std::mutex Logger::m_fallback_log_mutex;
