@@ -1,5 +1,6 @@
 #pragma once
 
+#define SDS_ASSERT RK_ASSERT
 #define SDS_FORWARD_TYPES_TO_NAMESPACE rk
 #include "sds/types.h"
 #define RK_INTERNAL SDS_INTERNAL
