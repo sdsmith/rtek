@@ -6,7 +6,8 @@
 #include "core/logging/logging.h"
 #include "core/platform/unicode.h"
 #include "core/utility/fixme.h"
-#include <sds/array/carray.h>
+#include <sds/array.h>
+#include <sds/array/make_array.h>
 
 using namespace rk;
 using namespace sds;
@@ -32,10 +33,10 @@ void platform::windows::log_error(HRESULT hresult) noexcept
 
 void platform::windows::log_last_error(char const* function_name) noexcept
 {
-    wchar_t w_func_name[256];
-    if (!unicode::widen(w_func_name, 256, function_name)) {
-        static constexpr wchar_t const errstr[] = L"<widen:buf too small>";
-        memcpy(w_func_name, errstr, sds::byte_size(errstr));
+    std::array<wchar_t, 256> w_func_name;
+    if (!unicode::widen(w_func_name.data(), w_func_name.size(), function_name)) {
+        static constexpr auto const errstr = sds::make_array(L"<widen:buf too small>");
+        memcpy(w_func_name.data(), errstr.data(), sds::byte_size(errstr));
     }
 
     // Retrieve error message from system
@@ -53,7 +54,7 @@ void platform::windows::log_last_error(char const* function_name) noexcept
     //
     display_buf = static_cast<LPVOID>(LocalAlloc(
         LMEM_ZEROINIT,
-        (wcslen(static_cast<LPCWSTR>(msg_buf)) + wcslen(static_cast<LPCWSTR>(w_func_name)) + 40) *
+        (wcslen(static_cast<LPCWSTR>(msg_buf)) + wcslen(static_cast<LPCWSTR>(w_func_name.data())) + 40) *
             sizeof(WCHAR)));
 
     StringCchPrintf(static_cast<LPWSTR>(display_buf), //-V111 -V576

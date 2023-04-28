@@ -13,7 +13,7 @@ f32 Vector3::y() const { return vec[1]; }
 f32 Vector3::z() const { return vec[2]; }
 
 Vector3 const& Vector3::operator+() const { return *this; }
-Vector3 Vector3::operator-() const { return Vector3(-vec[0], -vec[1], -vec[2]); }
+Vector3 Vector3::operator-() const { return {-vec[0], -vec[1], -vec[2]}; }
 f32 Vector3::operator[](size_t i) const { return vec[i]; }
 f32& Vector3::operator[](size_t i) { return vec[i]; }
 
@@ -152,8 +152,8 @@ f32 rk::dot(Vector3 const& v1, Vector3 const& v2)
 }
 Vector3 rk::cross(Vector3 const& v1, Vector3 const& v2)
 {
-    return Vector3((v1[1] * v2[2] - v1[2] * v2[1]), (-(v1[0] * v2[2] - v1[2] * v2[0])),
-                   (v1[0] * v2[1] - v1[1] * v2[0]));
+    return {(v1[1] * v2[2] - v1[2] * v2[1]), (-(v1[0] * v2[2] - v1[2] * v2[0])),
+            (v1[0] * v2[1] - v1[1] * v2[0])};
 }
 
 Vector3 rk::unit_vector(Vector3 const& v)

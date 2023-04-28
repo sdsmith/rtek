@@ -57,14 +57,14 @@ bool fs::Path::has_trailing_separator() noexcept { return !empty() && is_path_se
 bool fs::Path::is_windows_extended_path() const noexcept
 {
     // NOTE(sdsmith): Windows extended paths are prefixed with "\\?\".
-    char const* prefix = "\\\\?\\";
+    char const* prefix = R"(\\?\)";
     return unicode::ascii_cmp(m_path.data(), prefix, 4);
 }
 
 bool fs::Path::is_windows_unc_path() const noexcept
 {
     // NOTE(sdsmith): Windows UNC paths are prefixed with "\\?\UNC\".
-    char const* prefix = "\\\\?\\UNC\\";
+    char const* prefix = R"(\\?\UNC\)";
     return unicode::ascii_cmp(m_path.data(), prefix, 8);
 }
 

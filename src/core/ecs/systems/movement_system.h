@@ -5,9 +5,7 @@
 #include "core/ecs/components/transform_component.h"
 #include <vector>
 
-namespace rk
-{
-namespace Ecs
+namespace rk::ecs
 {
 struct Movement_Component_Tuple : public Component_Tuple {
     const Movement_Component* movement;
@@ -15,7 +13,7 @@ struct Movement_Component_Tuple : public Component_Tuple {
 };
 
 class Movement_System : public System {
-    using Time_Step = Time::Time_Step;
+    using Time_Step = time::Time_Step;
 
 public:
     std::vector<Movement_Component_Tuple> get_component_tuples() noexcept
@@ -31,5 +29,4 @@ public:
         }
     }
 };
-} // namespace Ecs
-} // namespace rk
+} // namespace rk::ecs
