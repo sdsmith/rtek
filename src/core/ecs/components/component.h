@@ -1,3 +1,5 @@
+#pragma once
+
 namespace rk::ecs
 {
 class Component {};
