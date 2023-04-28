@@ -6,7 +6,7 @@
 #include "core/logging/logging.h"
 #include "core/platform/unicode.h"
 #include "core/utility/fixme.h"
-#include <sds/array.h>
+#include <sds/array/array.h>
 #include <sds/array/make_array.h>
 
 using namespace rk;
