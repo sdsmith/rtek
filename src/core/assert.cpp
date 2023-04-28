@@ -7,8 +7,7 @@
 using namespace rk;
 using namespace sds;
 
-
-[[noreturn]] void rk::debug_break()
+void rk::debug_break()
 {
     // Break into the debugger
 #if SDS_COMPILER_MSC

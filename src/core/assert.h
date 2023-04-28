@@ -10,7 +10,7 @@ namespace rk
  *
  * Architecture specific. Controlled by the \a TARGET_ARCH_* macros.
  */
-[[noreturn]] void debug_break();
+void debug_break();
 
 void report_assertion_failure(char const* expr, char const* file, s32 line);
 

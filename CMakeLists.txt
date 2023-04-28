@@ -97,6 +97,8 @@ message(STATUS "  RK_LOG_FIXME    : " ${RK_LOG_FIXME})
 # ---------------------------------------------------------------------------------------
 # Compile and link options
 # ---------------------------------------------------------------------------------------
+#
+# For help identifying clang-cl: https://stackoverflow.com/questions/10046114/in-cmake-how-can-i-test-if-the-compiler-is-clang
 
 if (RTEK_MASTER_PROJECT)
     set(cxx_flags "")
@@ -107,7 +109,8 @@ if (RTEK_MASTER_PROJECT)
     set(exe_linker_flags_debug "")
     set(exe_linker_flags_develop "")
     set(exe_linker_flags_release "")
-    if(MSVC)
+
+    if (MSVC)
         # TODO: potentially set:
         # - CMAKE_MODULE_LINKER_FLAGS
         # - CMAKE_SHARED_LINKER_FLAGS
@@ -169,6 +172,14 @@ if (RTEK_MASTER_PROJECT)
         #message(FATAL_ERROR "Compiler not supported: ${CMAKE_CXX_COMPILER_ID}")
     endif()
 
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # Note: clang args will trigger for clang-cl as well
+        string(APPEND cxx_flags
+            "-Wno-unused-variable "
+            "-Wno-unused-function "
+            )
+    endif()
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${cxx_flags}")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${cxx_flags_debug}")
     set(CMAKE_CXX_FLAGS_DEVELOP "${CMAKE_CXX_FLAGS_DEVELOP} ${cxx_flags_develop}")
@@ -179,6 +190,9 @@ if (RTEK_MASTER_PROJECT)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${exe_linker_flags_release}")
 endif()
 
+message(STATUS "CMAKE_CXX_COMPILER_ID         : " ${CMAKE_CXX_COMPILER_ID})
+message(STATUS "CMAKE_CXX_COMPILER_FRONTEND_VARIANT: " ${CMAKE_CXX_COMPILER_FRONTEND_VARIANT})
+message(STATUS "CMAKE_CXX_COMPILER_VERSION    : " ${CMAKE_CXX_COMPILER_VERSION})
 message(STATUS "CMAKE_CXX_FLAGS               : " ${CMAKE_CXX_FLAGS})
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG         : " ${CMAKE_CXX_FLAGS_DEBUG})
 message(STATUS "CMAKE_CXX_FLAGS_DEVELOP       : " ${CMAKE_CXX_FLAGS_DEVELOP})
@@ -343,7 +357,7 @@ endif()
 
 # Cross platform unicode handling. UTF-8 everywhere.
 message(STATUS "Dependency: nowide...")
-set(nowide_version "11.0.0")
+set(nowide_version "11.2.0")
 find_package(nowide ${nowide_version} QUIET)
 if (NOT nowide_FOUND)
     message(STATUS "nowide package not found, creating install target")
