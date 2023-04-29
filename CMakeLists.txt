@@ -376,6 +376,36 @@ if (NOT nowide_FOUND)
     message(STATUS "nowide version: " ${nowide_version})
 endif()
 
+# FreeType font rendering library
+# TODO: use https://cmake.org/cmake/help/latest/module/FindFreetype.html
+message(STATUS "Dependency: freetype...")
+set(freetype_version "2.13.0")
+find_package(freetype ${freetype_version} QUIET)
+if (NOT freetype_FOUND)
+    message(STATUS "freetype package not found, creating install target")
+    FetchContent_Declare(
+        freetype
+        GIT_REPOSITORY "https://gitlab.freedesktop.org/freetype/freetype.git"
+        GIT_TAG "VER-2-13-0"
+        GIT_SHALLOW 1
+        GIT_PROGRESS 1
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ""
+        TEST_COMMAND ""
+        )
+    set(FT_DISABLE_ZLIB ON CACHE BOOL "freetype disable system zlib and use internal one")
+    set(FT_DISABLE_BZIP2 ON CACHE BOOL "feetype disable bzip2 compressed fonts")
+    set(FT_DISABLE_PNG ON CACHE BOOL "freetype disable support of PNG compressed OpenType embedded bitmaps")
+    set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "freetype disable HarfBuzz")
+    set(FT_DISABLE_BROTLI ON CACHE BOOL "freetype disable compressed WOFF2 fonts")
+    set(FT_ENABLE_ERROR_STRINGS ON CACHE BOOL "freetype enable meaningful error descriptions")
+    FetchContent_MakeAvailable(freetype)
+    set_target_properties(freetype PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+        )
+    message(STATUS "freetype version: " ${freetype_version})
+endif()
+
 # ---------------------------------------------------------------------------------------
 # External Projects built with this project
 # ---------------------------------------------------------------------------------------
@@ -495,6 +525,7 @@ add_dependencies(rteklib
     glad
     sdslib
     nowide::nowide
+    freetype
 )
 
 target_link_libraries(rteklib PUBLIC
@@ -504,6 +535,7 @@ target_link_libraries(rteklib PUBLIC
     glad
     sdslib
     nowide::nowide
+    freetype
 )
 
 # Platform specific
