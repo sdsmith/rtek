@@ -406,6 +406,23 @@ if (NOT freetype_FOUND)
     message(STATUS "freetype version: " ${freetype_version})
 endif()
 
+#
+message(STATUS "Dependency: glm...")
+set(glm_version "0.9.9.8")
+find_package(glm ${glm_version} QUIET)
+if (NOT glm_FOUND)
+    message(STATUS "glm package not found, creating install target")
+    FetchContent_Declare(
+        glm
+        URL "https://github.com/g-truc/glm/releases/download/${glm_version}/glm-${glm_version}.zip"
+    )
+    FetchContent_MakeAvailable(glm)
+    set_target_properties(glm PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+    )
+    message(STATUS "glm version: " ${glm_version})
+endif()
+
 # ---------------------------------------------------------------------------------------
 # External Projects built with this project
 # ---------------------------------------------------------------------------------------
@@ -526,6 +543,7 @@ add_dependencies(rteklib
     sdslib
     nowide::nowide
     freetype
+    glm
 )
 
 target_link_libraries(rteklib PUBLIC
@@ -536,6 +554,7 @@ target_link_libraries(rteklib PUBLIC
     sdslib
     nowide::nowide
     freetype
+    glm
 )
 
 # Platform specific
