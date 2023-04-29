@@ -10,9 +10,6 @@
 #include <sds/array/array.h>
 #include <sds/array/make_array.h>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 using namespace rk;
 using namespace sds;
 
@@ -52,79 +49,7 @@ Status Rtek_Engine::initialize() noexcept
     constexpr s32 window_h = 600;
     RK_CHECK(m_window_mgr->create_window("RTek", window_w, window_h, *m_renderer, *m_input_mgr));
     RK_CHECK(m_renderer->setup_gl_api());
-
-    {
-#define RK_FT_SAME_AS_OTHER_DIM 0
-        FT_Library ft_lib;
-        FT_Error err = FT_Init_FreeType(&ft_lib);
-        if (err) {
-            // TODO:
-        }
-
-        FT_Face font_face;
-        err = FT_New_Face(ft_lib, fmt::format("{}/{}", RK_DATA_BASE_DIR, "fonts/calibri/calibri-regular.ttf").c_str(), 0, &font_face);
-        if (err == FT_Err_Unknown_File_Format) {
-            // TODO: file opened and read, but has unsupporte format
-        } else if (err) {
-            // TODO: file could not be open or read
-        }
-
-        // Set charmap encoding
-        const FT_Encoding encoding = FT_ENCODING_UNICODE;
-        err = FT_Select_Charmap(font_face, encoding);
-
-        // NOTE: char heights and widths are specified in 1/64 of a point. A point is a physical distance equal to 1/72 of an inch.
-
-#if 0
-        err = FT_Set_Char_Size(
-            font_face,
-            RK_FT_SAME_AS_OTHER_DIM, // char_width in 1/64 of points
-            16*64, // char_height in 1/64 of points
-            window_w, // horizontal device resolution
-            window_h // vertical device resolution
-        );
-        if (err) {
-            // TODO:
-        }
-#else
-        err = FT_Set_Pixel_Sizes(
-            font_face,
-            RK_FT_SAME_AS_OTHER_DIM, // pixel width
-            16 // pixel height
-        );
-        if (err) {
-            // TODO:
-        }
-#endif
-
-        FT_GlyphSlot slot = font_face->glyph;
-        std::string s = "hello world";
-        s32 pen_x = window_w;
-        s32 pen_y = window_h;
-        for (char c : s) {
-            // Load glyph into slot
-            // @perf may be faster to FT_Get_Char_Index, FT_Load_Glyph, then cache the result of FT_Render_Glyph
-            err = FT_Load_Glyph(font_face, c, FT_LOAD_RENDER);
-            if (err) {
-                // TODO:
-            }
-
-            // draw to target surface
-            // NOTE: For ideal rendering on a screen this function should perform linear blending with gamma correction, using the bitmap as an alpha channel.
-            // NOTE: Note that bitmap_left is the horizontal distance from the current pen position to the leftmost border of the glyph bitmap, while bitmap_top is the vertical distance from the pen position (on the baseline) to the topmost border of the glyph bitmap. It is positive to indicate an upwards distance.
-/*             draw_bitmap(&slot->bitmap,
-                        pen_x + slot->bitmap_left,
-                        pen_y - slot->bitmap_top // assumes increasing Y corresponds to downward scanlines (hence the subtraction)
-                        ); */
-
-            // increment pen
-            pen_x += slot->advance.x >> 6;
-        }
-
-        // TODO: "More Advanced Rendering" https://freetype.org/freetype2/docs/tutorial/step1.html
-
-#undef SAME_AS_OTHER_DIM
-    }
+    RK_CHECK(m_renderer->load_font_glyphs());
 
     LOG_INFO("Engine initialized");
     m_initialized = true;
@@ -153,6 +78,8 @@ Status Rtek_Engine::run() noexcept
 {
     Shader_Program simple_shader("identity.vert", "identity.frag");
     RK_CHECK(simple_shader.compile());
+    Shader_Program text_shader("font_glyph.vert", "font_glyph.frag");
+    RK_CHECK(text_shader.compile());
 
     constexpr auto vertices =
         sds::make_array<f32>(-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f);
@@ -248,6 +175,10 @@ Status Rtek_Engine::run() noexcept
                 GL_UNSIGNED_INT, nullptr);
 
             glBindVertexArray(0);
+        }
+
+        { // Overlay
+            RK_CHECK(m_renderer->render_text(text_shader, "Hello world!", 25.0f, 25.0f, 1.0f, glm::vec3(.5f, .8f, .2f)));
         }
 
         RK_CHECK(m_renderer->swap_buffers());

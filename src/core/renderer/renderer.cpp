@@ -11,13 +11,23 @@
 #include <cstring>
 #include <iterator>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 // Ask for a high performance renderer
 #include "core/renderer/request_high_perf_renderer.h"
 
 using namespace rk;
 using namespace sds;
 
-Status Renderer::initialize() noexcept { return Status::ok; }
+Status Renderer::initialize() noexcept {
+
+
+    return Status::ok;
+}
 
 Status Renderer::destroy() noexcept { return Status::ok; }
 
@@ -258,4 +268,182 @@ void framebuffer_size_callback(GLFWwindow* window, s32 width, s32 height) noexce
 GLFWframebuffersizefun Renderer::get_framebuffer_size_callback() const noexcept
 {
     return framebuffer_size_callback;
+}
+
+Status Renderer::load_font_glyphs() noexcept {
+    // TODO: update to take font param. Will need a charcode map per active font
+#define RK_FT_SAME_AS_OTHER_DIM 0
+    FT_Library ft;
+    FT_Error err = FT_Init_FreeType(&ft);
+    if (err) {
+        // TODO:
+        return Status::generic_error;
+    }
+
+    FT_Face face;
+    err = FT_New_Face(ft, fmt::format("{}/{}", RK_DATA_BASE_DIR, "fonts/calibri/calibri-regular.ttf").c_str(), 0, &face);
+    if (err) {
+        LOG_ERROR("Failed to load font face: {}", FT_Error_String(err));
+/*         if (err == FT_Err_Unknown_File_Format) {
+            // TODO: file opened and read, but has unsupported format
+        } else {
+            // TODO: file could not be open or read
+        } */
+        return Status::io_error;
+    }
+
+    // Set charmap encoding
+    const FT_Encoding encoding = FT_ENCODING_UNICODE;
+    err = FT_Select_Charmap(face, encoding);
+    if (err) {
+        // TODO:
+    }
+
+    // NOTE: char heights and widths are specified in 1/64 of a point. A point is a physical distance equal to 1/72 of an inch.
+
+#if 0
+    err = FT_Set_Char_Size(
+        face,
+        RK_FT_SAME_AS_OTHER_DIM, // char_width in 1/64 of points
+        16*64, // char_height in 1/64 of points
+        window_w, // horizontal device resolution
+        window_h // vertical device resolution
+    );
+    if (err) {
+        // TODO:
+    }
+#else
+    err = FT_Set_Pixel_Sizes(
+        face,
+        RK_FT_SAME_AS_OTHER_DIM, // pixel width
+        16 // pixel height
+    );
+    if (err) {
+        // TODO:
+    }
+#endif
+#undef RK_FT_SAME_AS_OTHER_DIM
+
+    // Cache the 128 ASCII characters
+    //
+    // NOTE: The glyph is a grayscale 8-bit image with a single byte per color. Disable OGL 32-bit alignment requirement so we can maintain one byte per color.
+
+    // disable byte-alignment restriction
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    for (u32 charcode = 0; charcode < 128; ++charcode) {
+        err = FT_Load_Glyph(face, charcode, FT_LOAD_RENDER);
+        if (err) {
+            LOG_ERROR("Failed to load glyph for character code '{}'", charcode);
+            continue;
+        }
+
+        u32 texture = 0;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RED,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer
+        );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        Character c{
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x
+        };
+        m_characters[charcode] = c;
+    }
+
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
+
+    // TODO: should this be done only when rendering text??
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // ortho projection (text always renders in screen space... for now)
+    // Setup matrix so that vertex coodinates are 1:1 with screen space
+    s32 win_w = 0;
+    s32 win_h = 0;
+    RK_CHECK(m_window->get_window_size(win_w, win_h));
+    m_screen_ortho_projection = glm::ortho(0.0f, static_cast<f32>(win_w), 0.0f, static_cast<f32>(win_h));
+
+    glGenVertexArrays(1, &m_text_vao);
+    glGenBuffers(1, &m_text_vbo);
+    glBindVertexArray(m_text_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
+    // 6 verts in quad, 4 floats each
+    // dynamic draw - will be changing buffer content often
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return Status::ok;
+}
+
+Status Renderer::render_text(Shader_Program& shader, std::string_view text, f32 screen_pos_x, f32 screen_pos_y, f32 scale, glm::vec3 color) const noexcept {
+    shader.use();
+    glUniformMatrix4fv(glGetUniformLocation(shader.handle(), "projection"), 1, GL_FALSE, glm::value_ptr(m_screen_ortho_projection));
+    glUniform3f(glGetUniformLocation(shader.handle(), "text_color"), color.x, color.y, color.z);
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(m_text_vao);
+
+    for (char c : text) {
+        auto ch_iter = m_characters.find(c);
+        if (ch_iter == m_characters.end()) {
+            // TODO: error - unable to find glyph for character
+            continue;
+        }
+        Character ch = ch_iter->second;
+
+        f32 pos_x = screen_pos_x + ch.bearing.x * scale;
+        f32 pos_y = screen_pos_y - (ch.size.y - ch.bearing.y) * scale;
+
+        f32 w = ch.size.x * scale;
+        f32 h = ch.size.y * scale;
+
+        // update vbo per character
+        f32 vertices[6][4] = {
+            { pos_x,     pos_y + h, 0.0f, 0.0f },
+            { pos_x,     pos_y,     0.0f, 1.0f },
+            { pos_x + w, pos_y,     1.0f, 1.0f },
+
+            { pos_x,     pos_y + h, 0.0f, 0.0f },
+            { pos_x + w, pos_y,     1.0f, 1.0f },
+            { pos_x + w, pos_y + h, 1.0f, 0.0f },
+        };
+
+        // render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.texture_id);
+        // update vbo
+        glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // render quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // advance cursor for next glyph
+        // NOTE: advance is number of 1/64 points
+        //  bitshift >> 6 => 2^6 = 64
+        screen_pos_x += (ch.advance >> 6) * scale;
+    }
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return Status::ok;
 }

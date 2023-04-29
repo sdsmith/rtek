@@ -41,6 +41,8 @@ public:
      */
     void use() const noexcept;
 
+    u32 handle() const noexcept { return m_id; }
+
     /**
      * \brief Compile the shader program.
      */
