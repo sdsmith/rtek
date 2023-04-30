@@ -9,6 +9,7 @@
 #include "core/utility/stb_image.h"
 #include <sds/array/array.h>
 #include <sds/array/make_array.h>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/mat4x4.hpp>
 
 using namespace rk;
