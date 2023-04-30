@@ -260,8 +260,6 @@ void Renderer::draw_wireframe(bool enable) const noexcept
 
 Status Renderer::swap_buffers() const noexcept { return m_window->swap_buffers(); }
 
-#include <glm/gtx/string_cast.hpp>
-
 /**
  * \brief Window resize callback function.
  */
