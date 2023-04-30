@@ -9,7 +9,6 @@
 #include "core/utility/stb_image.h"
 #include <sds/array/array.h>
 #include <sds/array/make_array.h>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/mat4x4.hpp>
 
 using namespace rk;
@@ -98,7 +97,7 @@ Status Rtek_Engine::run() noexcept
         RK_CHECK(m_window_mgr->get_window().get_window_size(win_w, win_h));
         g_renderer_state.screen_ortho_projection = glm::ortho(0.0f, static_cast<f32>(win_w), 0.0f, static_cast<f32>(win_h));
         text_shader.use();
-        glUniformMatrix4fv(glGetUniformLocation(text_shader.handle(), "projection"), 1, GL_FALSE, glm::value_ptr(g_renderer_state.screen_ortho_projection));
+        text_shader.set_mat4("projection", g_renderer_state.screen_ortho_projection);
     }
 
     constexpr auto vertices =

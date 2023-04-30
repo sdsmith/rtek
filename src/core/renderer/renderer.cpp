@@ -401,7 +401,7 @@ Status Renderer::render_text(Shader_Program& shader, std::string_view text, f32 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     shader.use();
-    glUniform3f(glGetUniformLocation(shader.handle(), "text_color"), color.x, color.y, color.z);
+    shader.set_vec3("text_color", color);
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_text_vao);

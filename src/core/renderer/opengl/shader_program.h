@@ -2,6 +2,13 @@
 
 #include "core/status.h"
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat2x2.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+
 namespace rk
 {
 class Shader_Program {
@@ -24,6 +31,8 @@ private:
     const char* m_frag_shader_path = nullptr;
 
 public:
+    static constexpr const u32 invalid_handle = 0;
+
     /**
      * \brief Set the shaders to be used with the shader prorgam.
      */
@@ -41,11 +50,40 @@ public:
      */
     void use() const noexcept;
 
+    /**
+     * \brief True if the active program (ie. in use).
+     *
+     * \see use
+     */
+    [[nodiscard]] bool is_active() const noexcept;
+
+    /**
+     * \brief Handle/ID of shader program.
+     *
+     * Program is not compiled if value is invalid.
+     *
+     * \see invalid_handle Value of invalid handle.
+     * \see compile
+     */
     [[nodiscard]] u32 handle() const noexcept { return m_id; }
 
     /**
      * \brief Compile the shader program.
      */
     [[nodiscard]] Status compile() noexcept;
+
+    void set_bool(char const* name, bool v) const noexcept;
+    void set_s32(char const* name, s32 v) const noexcept;
+    void set_u32(char const* name, u32 v) const noexcept;
+    void set_f32(char const* name, f32 v) const noexcept;
+    void set_vec2(char const* name, f32 x, f32 y) const noexcept;
+    void set_vec2(char const* name, glm::vec2 const& v) const noexcept;
+    void set_vec3(char const* name, f32 x, f32 y, f32 z) const noexcept;
+    void set_vec3(char const* name, glm::vec3 const& v) const noexcept;
+    void set_vec4(char const* name, f32 x, f32 y, f32 z, f32 w) const noexcept;
+    void set_vec4(char const* name, glm::vec4 const& v) const noexcept;
+    void set_mat2(char const* name, glm::mat2 const& v) const noexcept;
+    void set_mat3(char const* name, glm::mat3 const& v) const noexcept;
+    void set_mat4(char const* name, glm::mat4 const& v) const noexcept;
 };
 } // namespace rk
