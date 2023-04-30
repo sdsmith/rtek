@@ -2,7 +2,9 @@
     "cmake.configureOnOpen": true,
     "cmake.configureArgs": [
         "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-        "-DFETCHCONTENT_SOURCE_DIR_SDSLIB='C:/Users/stewa/source/repos/sdslib-cpp'"
+        "-DFETCHCONTENT_SOURCE_DIR_SDSLIB='C:/Users/stewa/source/repos/sdslib-cpp'",
+        "-DRK_ASSERTIONS_ENABLED=ON",
+        "-DRK_OGL_DEBUG=ON"
     ],
     "C_Cpp.codeAnalysis.exclude": {
         "${workspaceFolder}/build/**": true,

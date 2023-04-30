@@ -72,6 +72,7 @@ option(RK_LOGGING_OFF "Remove all logging. Takes precedence over `RK_LOG_LEVEL`.
 option(RK_LOGGING_PERF "Compile in minimal logging (for performance). Takes precedence over `RK_LOG_LEVEL`." OFF)
 option(RK_LOG_FIXME "Print out fix me and the reason they should be fixed as they are encountered." OFF)
 
+option(RK_ASSERTIONS_ENABLED "Enable assertions." OFF)
 option(RK_OGL_DEBUG "Display debug messages from OpenGL, including errors." OFF)
 set(RK_SHADER_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/shaders" CACHE STRING
     "Directory containing all the shaders. Prepended to the path of the shader being opened.")
@@ -590,6 +591,9 @@ if (RK_LOGGING_PERF)
 endif()
 if (RK_LOG_FIXME)
     target_compile_definitions(rteklib PRIVATE RK_LOG_FIXME)
+endif()
+if (RK_ASSERTIONS_ENABLED)
+    target_compile_definitions(rteklib PRIVATE RK_ASSERTIONS_ENABLED)
 endif()
 if (RK_OGL_DEBUG)
     target_compile_definitions(rteklib PRIVATE RK_OGL_DEBUG)
