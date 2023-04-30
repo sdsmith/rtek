@@ -12,11 +12,19 @@
 
 namespace rk
 {
+struct Global_Renderer_State {
+    glm::mat4 screen_ortho_projection;
+};
+extern Global_Renderer_State g_renderer_state;
+
 class Renderer {
 public:
     Renderer() = default;
 
-    [[nodiscard]] Status initialize() noexcept;
+    struct Config {
+        bool enable_debug = false;
+    };
+    [[nodiscard]] Status initialize(Config config) noexcept;
     Status destroy() noexcept;
 
     /**
@@ -62,6 +70,8 @@ public:
     [[nodiscard]] Status render_text(Shader_Program& shader, std::string_view text, f32 screen_pos_x, f32 screen_pos_y, f32 scale, glm::vec3 color) const noexcept;
 
 private:
+    Config m_config = {};
+
     Window* m_window = nullptr;
     static constexpr s32 m_ogl_ctx_version_major = 4;
     static constexpr s32 m_ogl_ctx_version_minor = 6;
@@ -76,6 +86,5 @@ private:
 
     u32 m_text_vao = 0;
     u32 m_text_vbo = 0;
-    glm::mat4 m_screen_ortho_projection;
 };
 } // namespace rk

@@ -15,7 +15,6 @@
 #include FT_FREETYPE_H
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 // Ask for a high performance renderer
 #include "core/renderer/request_high_perf_renderer.h"
@@ -23,24 +22,29 @@
 using namespace rk;
 using namespace sds;
 
-Status Renderer::initialize() noexcept {
+Global_Renderer_State rk::g_renderer_state = {};
 
-
+Status Renderer::initialize(Config config) noexcept {
+    m_config = config;
     return Status::ok;
 }
 
-Status Renderer::destroy() noexcept { return Status::ok; }
+Status Renderer::destroy() noexcept {
+    glDeleteVertexArrays(1, &m_text_vao);
+    glDeleteBuffers(1, &m_text_vbo);
+
+    // TODO: cleanup glyphs?
+
+    return Status::ok;
+}
 
 Status Renderer::prepare_window() noexcept
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_ogl_ctx_version_major);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_ogl_ctx_version_minor);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef RK_OGL_DEBUG
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#else
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
-#endif
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT,
+        (m_config.enable_debug ? GLFW_TRUE : GLFW_FALSE));
 
     return platform::glfw::handle_error();
 }
@@ -164,6 +168,8 @@ void GLAPIENTRY ogl_debug_callback(GLenum source, GLenum type, u32 id, GLenum se
                   to_string_ogl_debug_type(type), to_string_ogl_debug_source(source), id,
                   to_string_ogl_debug_severity(severity), message);
 
+
+
         // TODO(sdsmith): Fail?
         RK_ASSERT(!"OGL error");
 
@@ -201,26 +207,26 @@ Status Renderer::setup_gl_api() noexcept
     glGetIntegerv(GL_CONTEXT_FLAGS, &ctx_flags);
     bool const is_ogl_debug_ctx = (ctx_flags & GL_CONTEXT_FLAG_DEBUG_BIT);
 
-#ifdef RK_OGL_DEBUG
-    RK_ASSERT(is_ogl_debug_ctx);
+    if (m_config.enable_debug) {
+        RK_ASSERT(is_ogl_debug_ctx);
 
-    // NOTE(sdsmith): @perf: Enabling synchronous debug callbacks is slow, but provides
-    // better debugging. By default is is async, which has no guarantees that it
-    // is called on the same thread or at the same time that the message was
-    // created. Async is faster.
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(ogl_debug_callback, nullptr /*user_param*/);
+        // NOTE(sdsmith): @perf: Enabling synchronous debug callbacks is slow, but provides
+        // better debugging. By default is is async, which has no guarantees that it
+        // is called on the same thread or at the same time that the message was
+        // created. Async is faster.
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(ogl_debug_callback, nullptr /*user_param*/);
 
-    // Enable all messages
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        // Enable all messages
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
-    char const* khr_debug_msg = "Setup KHR_debug message callback";
-    glDebugMessageInsert(
-        GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, -1, GL_DEBUG_SEVERITY_NOTIFICATION,
-        fixme::scast<s32>(std::strlen(khr_debug_msg), "replace strlen"), khr_debug_msg);
-    RK_CHECK(handle_ogl_error());
-#endif
+        char const* khr_debug_msg = "Setup KHR_debug message callback";
+        glDebugMessageInsert(
+            GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, -1, GL_DEBUG_SEVERITY_NOTIFICATION,
+            fixme::scast<s32>(std::strlen(khr_debug_msg), "replace strlen"), khr_debug_msg);
+        RK_CHECK(handle_ogl_error());
+    }
 
     // Explicitly set counter-clockwise winding order
     glFrontFace(GL_CCW);
@@ -254,6 +260,8 @@ void Renderer::draw_wireframe(bool enable) const noexcept
 
 Status Renderer::swap_buffers() const noexcept { return m_window->swap_buffers(); }
 
+#include <glm/gtx/string_cast.hpp>
+
 /**
  * \brief Window resize callback function.
  */
@@ -263,6 +271,9 @@ void framebuffer_size_callback(GLFWwindow* window, s32 width, s32 height) noexce
     RK_ASSERT(window);
     LOG_INFO("Window resized to width: {}, height: {} - adjusting viewport", width, height);
     glViewport(0, 0, width, height);
+
+    // Update the ortho_projection
+    g_renderer_state.screen_ortho_projection = glm::ortho(0.0f, static_cast<f32>(width), 0.0f, static_cast<f32>(height));
 }
 
 GLFWframebuffersizefun Renderer::get_framebuffer_size_callback() const noexcept
@@ -276,19 +287,16 @@ Status Renderer::load_font_glyphs() noexcept {
     FT_Library ft;
     FT_Error err = FT_Init_FreeType(&ft);
     if (err) {
-        // TODO:
-        return Status::generic_error;
+        LOG_ERROR("Failed to initialize FreeType: {}", FT_Error_String(err));
+        return Status::api_error;
     }
 
     FT_Face face;
-    err = FT_New_Face(ft, fmt::format("{}/{}", RK_DATA_BASE_DIR, "fonts/calibri/calibri-regular.ttf").c_str(), 0, &face);
+    // TODO: update to rk::filesystem path API
+    std::string font_path = fmt::format("{}/{}", RK_DATA_BASE_DIR, "assets/fonts/calibri/calibri-regular.ttf");
+    err = FT_New_Face(ft, font_path.c_str(), 0, &face);
     if (err) {
-        LOG_ERROR("Failed to load font face: {}", FT_Error_String(err));
-/*         if (err == FT_Err_Unknown_File_Format) {
-            // TODO: file opened and read, but has unsupported format
-        } else {
-            // TODO: file could not be open or read
-        } */
+        LOG_ERROR("Failed to load font face ({}): {}", font_path.c_str(), FT_Error_String(err));
         return Status::io_error;
     }
 
@@ -296,7 +304,8 @@ Status Renderer::load_font_glyphs() noexcept {
     const FT_Encoding encoding = FT_ENCODING_UNICODE;
     err = FT_Select_Charmap(face, encoding);
     if (err) {
-        // TODO:
+        LOG_ERROR("Failed to select encoding for '{}': {}", font_path, FT_Error_String(err));
+        return Status::api_error;
     }
 
     // NOTE: char heights and widths are specified in 1/64 of a point. A point is a physical distance equal to 1/72 of an inch.
@@ -310,16 +319,18 @@ Status Renderer::load_font_glyphs() noexcept {
         window_h // vertical device resolution
     );
     if (err) {
-        // TODO:
+        LOG_ERROR("Failed to set font glyph character size for '{}': {}", font_path, FT_Error_String(err));
+        return Status::api_error;
     }
 #else
     err = FT_Set_Pixel_Sizes(
         face,
         RK_FT_SAME_AS_OTHER_DIM, // pixel width
-        16 // pixel height
+        64 // pixel height
     );
     if (err) {
-        // TODO:
+        LOG_ERROR("Failed to set font glyph pixel size for '{}': {}", font_path, FT_Error_String(err));
+        return Status::api_error;
     }
 #endif
 #undef RK_FT_SAME_AS_OTHER_DIM
@@ -327,12 +338,10 @@ Status Renderer::load_font_glyphs() noexcept {
     // Cache the 128 ASCII characters
     //
     // NOTE: The glyph is a grayscale 8-bit image with a single byte per color. Disable OGL 32-bit alignment requirement so we can maintain one byte per color.
-
-    // disable byte-alignment restriction
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     for (u32 charcode = 0; charcode < 128; ++charcode) {
-        err = FT_Load_Glyph(face, charcode, FT_LOAD_RENDER);
+        err = FT_Load_Char(face, charcode, FT_LOAD_RENDER);
         if (err) {
             LOG_ERROR("Failed to load glyph for character code '{}'", charcode);
             continue;
@@ -365,21 +374,12 @@ Status Renderer::load_font_glyphs() noexcept {
         };
         m_characters[charcode] = c;
     }
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
 
-    // TODO: should this be done only when rendering text??
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // ortho projection (text always renders in screen space... for now)
-    // Setup matrix so that vertex coodinates are 1:1 with screen space
-    s32 win_w = 0;
-    s32 win_h = 0;
-    RK_CHECK(m_window->get_window_size(win_w, win_h));
-    m_screen_ortho_projection = glm::ortho(0.0f, static_cast<f32>(win_w), 0.0f, static_cast<f32>(win_h));
-
+    // Create text quad buffer
     glGenVertexArrays(1, &m_text_vao);
     glGenBuffers(1, &m_text_vbo);
     glBindVertexArray(m_text_vao);
@@ -388,7 +388,7 @@ Status Renderer::load_font_glyphs() noexcept {
     // dynamic draw - will be changing buffer content often
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -396,13 +396,18 @@ Status Renderer::load_font_glyphs() noexcept {
 }
 
 Status Renderer::render_text(Shader_Program& shader, std::string_view text, f32 screen_pos_x, f32 screen_pos_y, f32 scale, glm::vec3 color) const noexcept {
+    RK_ASSERT(!m_characters.empty());
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     shader.use();
-    glUniformMatrix4fv(glGetUniformLocation(shader.handle(), "projection"), 1, GL_FALSE, glm::value_ptr(m_screen_ortho_projection));
     glUniform3f(glGetUniformLocation(shader.handle(), "text_color"), color.x, color.y, color.z);
+
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_text_vao);
 
     for (char c : text) {
+        // TODO: can we access this by ref?
         auto ch_iter = m_characters.find(c);
         if (ch_iter == m_characters.end()) {
             // TODO: error - unable to find glyph for character
@@ -416,7 +421,8 @@ Status Renderer::render_text(Shader_Program& shader, std::string_view text, f32 
         f32 w = ch.size.x * scale;
         f32 h = ch.size.y * scale;
 
-        // update vbo per character
+        // update vbo per character to create the rect it will be rendered in
+        // @perf don't allocate this every time (will it get hoisted?)
         f32 vertices[6][4] = {
             { pos_x,     pos_y + h, 0.0f, 0.0f },
             { pos_x,     pos_y,     0.0f, 1.0f },
@@ -444,6 +450,7 @@ Status Renderer::render_text(Shader_Program& shader, std::string_view text, f32 
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_BLEND);
 
     return Status::ok;
 }

@@ -2,11 +2,11 @@
 in vec2 tex_coords;
 out vec4 color;
 
-uniform sample2D text;
+uniform sampler2D glyph_bitmap;
 uniform vec3 text_color;
 
 void main()
 {
-    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, tex_coords).r);
+    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(glyph_bitmap, tex_coords).r);
     color = vec4(text_color, 1.0) * sampled;
 }

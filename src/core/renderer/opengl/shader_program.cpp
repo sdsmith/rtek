@@ -64,8 +64,10 @@ Status compile_shader(char const* name, s32 shader_id) noexcept
         s32 compile_success = 0;
         glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_success);
         if (!compile_success) {
-            LOG_ERROR("Failed to compile shader {}: {}", shader_id,
-                      get_program_info_log(shader_id));
+            LOG_ERROR("Failed to compile shader {} ('{}'): {}",
+                shader_id,
+                shader_path,
+                get_program_info_log(shader_id));
         }
 
         LOG_DEBUG("Compiled shader id {} ('{}')", shader_id, shader_path);

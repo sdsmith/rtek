@@ -19,6 +19,7 @@
 #include <string>
 #include <variant>
 
+
 //******************************************************************************
 // Setup logging level. Unused logging levels are not compiled in.
 //

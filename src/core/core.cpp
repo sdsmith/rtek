@@ -9,6 +9,8 @@
 #include "core/utility/stb_image.h"
 #include <sds/array/array.h>
 #include <sds/array/make_array.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/mat4x4.hpp>
 
 using namespace rk;
 using namespace sds;
@@ -42,12 +44,18 @@ Status Rtek_Engine::initialize() noexcept
         m_renderer = std::make_unique<Renderer>();
         return Status::ok;
     }));
-    RK_CHECK(m_renderer->initialize());
+    Renderer::Config renderer_config = {};
+#ifdef RK_OGL_DEBUG
+    // TODO: set based on CLI args
+    renderer_config.enable_debug = true;
+#endif
+    RK_CHECK(m_renderer->initialize(renderer_config));
 
     LOG_INFO("Initializing rendering context...");
     constexpr s32 window_w = 800;
     constexpr s32 window_h = 600;
     RK_CHECK(m_window_mgr->create_window("RTek", window_w, window_h, *m_renderer, *m_input_mgr));
+
     RK_CHECK(m_renderer->setup_gl_api());
     RK_CHECK(m_renderer->load_font_glyphs());
 
@@ -78,32 +86,23 @@ Status Rtek_Engine::run() noexcept
 {
     Shader_Program simple_shader("identity.vert", "identity.frag");
     RK_CHECK(simple_shader.compile());
-    Shader_Program text_shader("font_glyph.vert", "font_glyph.frag");
-    RK_CHECK(text_shader.compile());
+
+    Shader_Program text_shader("font_glyphs.vert", "font_glyphs.frag");
+    {
+        RK_CHECK(text_shader.compile());
+
+        // ortho projection (text always renders in screen space... for now)
+        // Setup matrix so that vertex coodinates are 1:1 with screen space
+        s32 win_w = 0;
+        s32 win_h = 0;
+        RK_CHECK(m_window_mgr->get_window().get_window_size(win_w, win_h));
+        g_renderer_state.screen_ortho_projection = glm::ortho(0.0f, static_cast<f32>(win_w), 0.0f, static_cast<f32>(win_h));
+        text_shader.use();
+        glUniformMatrix4fv(glGetUniformLocation(text_shader.handle(), "projection"), 1, GL_FALSE, glm::value_ptr(g_renderer_state.screen_ortho_projection));
+    }
 
     constexpr auto vertices =
         sds::make_array<f32>(-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f);
-
-    u32 vao = 0;
-    glGenVertexArrays(1, &vao);
-    u32 vbo = 0;
-    glGenBuffers(1, &vbo);
-
-    { // Config vao
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sds::byte_size(vertices), vertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), nullptr);
-        glEnableVertexAttribArray(0);
-
-        // glVertexAttribPointer registered the vbo as the vertex attributes buffer. Can safely
-        // unbind.
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindVertexArray(0);
-    }
 
     constexpr auto rectangle_vertices = sds::make_array<f32>(0.5f, 0.5f, 0.0f,   // top right
                                                              0.5f, -0.5f, 0.0f,  // bottom right
@@ -136,7 +135,6 @@ Status Rtek_Engine::run() noexcept
         // glVertexAttribPointer registered the vbo as the vertex attributes buffer. Can safely
         // unbind.
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
         glBindVertexArray(0);
     }
 
@@ -165,9 +163,6 @@ Status Rtek_Engine::run() noexcept
 
             simple_shader.use();
 
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-
             glBindVertexArray(rectangle_vao);
             glDrawElements(
                 GL_TRIANGLES,
@@ -179,17 +174,18 @@ Status Rtek_Engine::run() noexcept
 
         { // Overlay
             RK_CHECK(m_renderer->render_text(text_shader, "Hello world!", 25.0f, 25.0f, 1.0f, glm::vec3(.5f, .8f, .2f)));
+            RK_CHECK(m_renderer->render_text(text_shader, "!@#$%^&*()_+", 575.0f, 560.0f, .5f, glm::vec3(.5f, .8f, .2f)));
         }
 
         RK_CHECK(m_renderer->swap_buffers());
         Logger::flush(); // @perf: do this on an async thread
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &rectangle_vao);
     glDeleteBuffers(1, &rectangle_vbo);
-    simple_shader.destroy(); // not explicitly necessary, but good practice
+    // not explicitly necessary to destory these shaders, but good practice
+    simple_shader.destroy();
+    text_shader.destroy();
 
     return Status::ok;
 }
