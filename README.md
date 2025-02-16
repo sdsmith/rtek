@@ -48,6 +48,15 @@ By default this installs them to a `_deps` in the root of the repository.
 
 Next time cmake configuration is done, the packages will be picked up from the `_deps` location. Very helpful if you need to blow away `build` or when a file is added/removed from the project.
 
+### Developing the dependencies in parallel
+
+To develop one or more of the dependencies while working on RTek, point FetchContent to the local repo by overriding the cmake cache value.
+
+For example, to develop sdslib:
+```sh
+cmake -S. -B./build -G"Visual Studio 16 2019" -DFETCHCONTENT_SOURCE_DIR_SDSLIB=<PATH_TO_REPO_ROOT>
+```
+
 ## Feature Toggles
 
 These are done through preprocessor defines and/or cmake options.
