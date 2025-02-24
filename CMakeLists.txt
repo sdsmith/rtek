@@ -424,6 +424,32 @@ if (NOT glm_FOUND)
     message(STATUS "glm version: " ${glm_version})
 endif()
 
+message(STATUS "Dependency: type_safe...")
+set(type_safe_version "0.2.4")
+find_package(type_safe ${type_safe_version} QUIET)
+if (NOT type_safe_FOUND)
+    message(STATUS "type_safe package not found, creating dependency install target")
+    FetchContent_Declare(
+        type_safe
+        GIT_REPOSITORY "https://github.com/foonathan/type_safe"
+        GIT_TAG "v0.2.4"
+        GIT_SHALLOW 1
+        GIT_PROGRESS 1
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ""
+        TEST_COMMAND ""
+        )
+    set(TYPE_SAFE_ENABLE_ASSERTIONS ON CACHE BOOL "whether or not to enable internal assertions for the type_safe library")
+    set(TYPE_SAFE_ENABLE_PRECONDITION_CHECKS ON CACHE BOOL "whether or not to enable precondition checks")
+    set(TYPE_SAFE_ENABLE_WRAPPER ON CACHE BOOL "whether or not the wrappers in types.hpp are used")
+    FetchContent_MakeAvailable(type_safe)
+    set_target_properties(type_safe PROPERTIES
+        MAP_IMPORTED_CONFIG_DEVELOP RelWithDebInfo
+        )
+    get_target_property(type_safe_version type_safe VERSION)
+    message(STATUS "type_safe version: " ${type_safe_version})
+endif()
+
 # ---------------------------------------------------------------------------------------
 # External Projects built with this project
 # ---------------------------------------------------------------------------------------
@@ -545,6 +571,7 @@ add_dependencies(rteklib
     nowide::nowide
     freetype
     glm
+    type_safe
 )
 
 target_link_libraries(rteklib PUBLIC
@@ -556,6 +583,7 @@ target_link_libraries(rteklib PUBLIC
     nowide::nowide
     freetype
     glm
+    type_safe
 )
 
 # Platform specific
