@@ -31,8 +31,13 @@ void platform::windows::log_error(HRESULT hresult) noexcept
     }
 }
 
-void platform::windows::log_last_error(char const* function_name) noexcept
+void platform::windows::log_last_error(char const* file_name, int line_no,
+    char const* func_name, char const* platform_func_name) noexcept
 {
+    RK_ASSERT(file_name);
+    RK_ASSERT(func_name);
+    RK_ASSERT(platform_func_name);
+
     std::array<wchar_t, 256> w_func_name;
     if (!unicode::widen(w_func_name.data(), w_func_name.size(), function_name)) {
         static constexpr auto const errstr = sds::make_array(L"<widen:buf too small>");
@@ -58,13 +63,42 @@ void platform::windows::log_last_error(char const* function_name) noexcept
             sizeof(WCHAR)));
 
     StringCchPrintf(static_cast<LPWSTR>(display_buf), //-V111 -V576
-                    LocalSize(display_buf) / sizeof(WCHAR), TEXT("%s failed with error %d: %s"),
-                    function_name, dw, msg_buf);
+                    LocalSize(display_buf) / sizeof(WCHAR), TEXT("'%s' failed with error %d: %s"),
+                    platform_func_name, dw, msg_buf);
 
-    LOG_ERROR(static_cast<LPWSTR>(display_buf));
+    ::rk::Logger::log(spdlog::level::err, file_name, line_no, func_name, static_cast<LPWSTR>(display_buf);
 
     LocalFree(msg_buf);
     LocalFree(display_buf);
 }
 
-#endif // SDS_OS_WINDOWS
+#elif SDS_OS_LINUX
+
+#include "core/platform/linux_include.h"
+
+#include <cerrno>
+#    include <cstring>
+
+void platform::linux::log_last_error(char const* file_name, int line_no,
+    char const* func_name, char const* platform_func_name) noexcept
+{
+    RK_ASSERT(file_name);
+    RK_ASSERT(func_name);
+    RK_ASSERT(platform_func_name);
+
+    const int err = errno; // ensure we are referencing the same value in a multithreaded app
+    Linux_Error_Short_Strs short_strs = platform::linux::linux_errno_to_short_str(err);
+    std::string s;
+    for (size_t i = 0;
+        (i < short_strs.desc.max_size()) && (short_strs.desc[i] != nullptr);
+        i++)
+    {
+        if (!s.empty()) { s += ", "; }
+        s += short_strs.desc[i];
+    }
+
+    ::rk::Logger::log(spdlog::level::err, file_name, line_no, func_name,
+        "'{}' failed with error {} ({}): {}", platform_func_name, err, s, strerror(err));
+}
+
+#endif

@@ -12,6 +12,10 @@
 #if SDS_OS_WINDOWS
 #    include "core/platform/win32_include.h"
 #    include <windef.h> // MAX_PATH
+#    define RK_MAX_PATH MAX_PATH
+#elif SDS_OS_LINUX
+#    include <limits.h>
+#    define RK_MAX_PATH PATH_MAX
 #else
 #    error Unsupported OS
 #endif
@@ -96,7 +100,8 @@ public:
     [[nodiscard]] bool is_windows_unc_path() const noexcept;
 
 private:
-    std::array<char, MAX_PATH> m_path;
+    // TODO(sdsmith): MAX_PATH is a requirement for Windows (unless the path is prefixed by "\\?\" to tell windows API to ignore MAX_PATH. For Linux, there isn't really a max even though it's defined. You really need to check pathconf. In either case it can be considered the lower bound of supported path length for now.
+    std::array<char, RK_MAX_PATH> m_path;
     s32 m_size = 0;
 
     static constexpr s32 dirty_flag = -1;
@@ -186,6 +191,7 @@ constexpr bool is_path_separator(char c) noexcept
            // functions only accept the original Windows separator, '\'
            || c == '\\';
 #endif
+    ;
 }
 
 /**

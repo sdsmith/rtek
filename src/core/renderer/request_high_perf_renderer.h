@@ -46,6 +46,8 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
  */
 __declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
 }
+#    elif SDS_OS_LINUX
+#        // TODO(sdsmith): Can't figure out a quick way to control this from within the app. Live with it for now.
 #    else
 #        error Requesting high performance renderer not handled on this platform
 #    endif

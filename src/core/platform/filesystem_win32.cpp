@@ -2,6 +2,7 @@
 
 #include "core/platform/platform.h"
 #include "core/platform/unicode.h"
+#include "core/status.h"
 #include "core/types.h"
 #include "core/utility/fixme.h"
 #include "core/utility/stb_image.h"
@@ -19,7 +20,7 @@ Status fs::get_current_directory(Path& path) noexcept
     wpath_buf buf;
     DWORD ret = GetCurrentDirectoryW(fixme::scast<s32>(buf.size(), "safe cast"), buf.data());
     if (ret == 0) {
-        platform::windows::log_last_error("GetCurrentDirectory");
+        platform::windows::log_last_error("GetCurrentDirectoryW");
         return Status::platform_error;
     }
 
@@ -41,7 +42,7 @@ Status fs::create_directory(char const* directory) noexcept
     }
 
     if (!CreateDirectoryW(buf.data(), nullptr)) {
-        platform::windows::log_last_error("CreateDirectoryA");
+        platform::windows::log_last_error("CreateDirectoryW");
         return Status::generic_error;
     }
 

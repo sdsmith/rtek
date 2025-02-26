@@ -20,7 +20,7 @@ void rk::debug_break()
 #   endif
 #else
 #    if SDS_COMPILER_GCC || SDS_COMPILER_CLANG
-#        if RK_TARGET_ARCH_X86
+#        if SDS_ARCH_X86 || SDS_ARCH_AMD64
     asm("int 3");
 #        else
 #            error Unsupported architecture

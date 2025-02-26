@@ -146,7 +146,7 @@ public:
     static Status initialize() noexcept;
 
     template <typename... Args>
-    static void log(spdlog::level::level_enum level, char const* file_name, long line_no,
+    static void log(spdlog::level::level_enum level, char const* file_name, int line_no,
                     char const* func_name, Args const&... args) noexcept
     {
         assert(file_name);
